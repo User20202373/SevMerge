@@ -37,7 +37,7 @@
 | Backend | Spring Boot, Spring Security, JPA |
 | Frontend | Mustache |
 | Database | MySQL |
-| 인증 | JWT, OAuth2 (카카오 · 구글) |
+| 인증 | OAuth2 (카카오 · 구글) |
 | 결제 | 카카오페이 / 포트원(PortOne) |
 | 협업 | Git Flow, GitHub |
 
