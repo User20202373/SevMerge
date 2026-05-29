@@ -1,6 +1,7 @@
 package com.example.SevMerge.board;
 
 import com.example.SevMerge.member.Member;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,7 +47,10 @@ public class BoardController {
     }
 
     @GetMapping("/boards/save")
-    public String saveBoardPage(@RequestParam(defaultValue = "FREE") String boardType,Model model) {
+    public String saveBoardPage(@RequestParam(defaultValue = "FREE") String boardType,
+                                Model model) {
+
+
 
         model.addAttribute("boardType",boardType);
         model.addAttribute("isFree",boardType.equalsIgnoreCase("FREE"));
@@ -56,9 +60,10 @@ public class BoardController {
     }
 
     @PostMapping("boards/save")
-    public String saveBoard(BoardRequest.SaveBoardDTO saveBoardDTO) {
-        Member member = new Member();
-        boardService.saveBoard(member,saveBoardDTO);
+    public String saveBoard(BoardRequest.SaveBoardDTO saveBoardDTO,
+                            HttpSession session) {
+        Member sessionMember = (Member) session.getAttribute("sessionMember");
+        boardService.saveBoard(sessionMember,saveBoardDTO);
 
         return "redirect:/boards";
     }
