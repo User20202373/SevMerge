@@ -4,10 +4,12 @@ import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.expertprofile.ExpertProfile;
 import com.example.SevMerge.member.Member;
 import lombok.Builder;
+import lombok.Data;
 
 public class ReviewRequest {
 
 
+    @Data
     public static class SaveReviewDTO {
 
         private Member member;
@@ -25,7 +27,7 @@ public class ReviewRequest {
             this.expert = expert;
         }
 
-        public void validate(Review review) {
+        public void validate(ReviewRequest.SaveReviewDTO review) {
 
             if (review == null){
                 throw new BadRequestException("리뷰를 작성 하지 않았습니다");
