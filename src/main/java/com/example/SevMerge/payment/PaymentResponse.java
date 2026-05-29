@@ -28,9 +28,9 @@ public class PaymentResponse {
     public static PaymentResponse from(Payment payment) {
         return PaymentResponse.builder()
                 .id(payment.getId())
-//                .projectId(payment.getProject())
-//                .clientId(payment.getClientId())
-//                .expertId(payment.getExpertId())
+                .projectId(payment.getProjectId())
+                .clientId(payment.getClientId())
+                .expertId(payment.getExpertId())
                 .amount(payment.getAmount())
                 .platformFee(payment.getPlatformFee())
                 .netAmount(payment.getNetAmount())
