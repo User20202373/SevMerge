@@ -8,11 +8,11 @@
 //@RequiredArgsConstructor
 //public class CommentController {
 //
-//    //private final CommentService commentService;
+//    private final CommentService commentService;
 //
 //    // 댓글 등록 기능 요청
-////    @PostMapping("/comment/save")
-////    public String saveProc() {
-////
-////    }
-////}
+//    @PostMapping("/comment/save")
+//    public String saveProc() {
+//
+//    }
+//}
