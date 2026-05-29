@@ -1,5 +1,6 @@
 package com.example.SevMerge.review;
 
+import com.example.SevMerge.member.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    // 리뷰목록 화면
     @GetMapping("review/list")
     public String reviewPage() {
          return "review/review-list";
@@ -22,15 +24,22 @@ public class ReviewController {
         return  "review/review-save";
     }
 
-    // 리뷰 기능
+    // 리뷰 작성 기능
     @PostMapping("review/save")
-    public String reviewProc(Review review, Model model) {
+    public String reviewSaveProc(ReviewRequest.SaveReviewDTO reviewDTO, Model model, HttpSession session) {
 
-        reviewService.save(review);
+        Member member = (Member) session.getAttribute("member"); // 누가 쓸건지 특정
 
+        Review review = reviewService.save(reviewDTO);
+        // 작성한 리뷰 뿌리기
         model.addAttribute("review",review);
 
+        // 반환후 리뷰 리스트로 이동
+        // 리뷰 등록·삭제 시마다 avgRating
         return "redirect:/review/list";
     }
+
+    // 리뷰
+
 
 }
