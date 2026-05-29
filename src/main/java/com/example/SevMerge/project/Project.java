@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "project")
+@Table(name = "project_tb")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
