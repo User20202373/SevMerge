@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  * ERD 기준 결제 테이블
  *
  * [충돌 방지 전략]
- * - Project(팀장), Member(팀원B), Bid(팀장) 등 타 도메인 Entity를 직접 참조하지 않고
+ * - Project(팀장), Member(팀원B) 등 타 도메인 Entity를 직접 참조하지 않고
  *   FK를 Long 타입으로만 보관합니다. (@ManyToOne 미사용)
  * - 타 도메인 Entity가 수정되어도 이 파일에는 영향이 없습니다.
  */
