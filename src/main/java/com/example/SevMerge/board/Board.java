@@ -1,6 +1,7 @@
 package com.example.SevMerge.board;
 
 
+import com.example.SevMerge.comment.Comment;
 import com.example.SevMerge.member.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -39,19 +40,18 @@ public class Board {
     @JoinColumn(name = "member_id")
     private Member member;
 
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinColumn(name="comment_id")
-    // todo - 추후 Comment Class 추가
-    //private Comment comment;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name="comment_id")
+    private Comment comment;
 
     @Builder
-    public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member) {
+    public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member, Comment comment) {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
         this.createdAt = createdAt;
         this.member = member;
-        //this.comment = comment;
+        this.comment = comment;
     }
 }
