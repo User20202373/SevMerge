@@ -4,7 +4,6 @@ import com.example.SevMerge.member.Member;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,10 +23,10 @@ public class CommentController {
         // 유효성 검사
         saveDTO.validate();
 
-        // commentService.createComment(saveDTO, sessionMember.getId());
+        commentService.createComment(saveDTO, sessionMember.getId());
 
         // 해당 게시글에 댓글 작성 후 리다이렉션 처리 (해당 게시글로)
-        return "redirect:/board/" + saveDTO.getBoardId();
+        return "redirect:/boards/" + saveDTO.getBoardId();
     }
 
     // 댓글 삭제 기능 요청
@@ -39,6 +38,6 @@ public class CommentController {
         Member sessionMember = (Member) session.getAttribute("sessionMember");
         commentService.deleteComment(commentId,sessionMember.getId());
 
-        return "redirect:/board/" + boardId;
+        return "redirect:/boards/" + boardId;
     }
 }
