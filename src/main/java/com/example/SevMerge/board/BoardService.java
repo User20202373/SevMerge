@@ -21,7 +21,7 @@ public class BoardService {
 
     // 게시글 조회
     public List<Board> findAllByBoardType(BoardType BoardType) {
-        return  boardRepository.findAllByBoardType(BoardType);
+        return  boardRepository.findAllByBoardTypeWithMember(BoardType);
     }
 
     // 게시글 저장
@@ -52,7 +52,7 @@ public class BoardService {
         boardRepository.save(newBoard);
     }
 
-    public void updateBoard(Integer boardId, BoardRequest.updateBoardDTO updateBoardDTO) {
+    public void updateBoard(Long boardId, BoardRequest.updateBoardDTO updateBoardDTO) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new NotFoundException("게시글을 찾을 수 없습니다.")
         );
@@ -63,5 +63,13 @@ public class BoardService {
                 board.getTitle(),board.getContent());
 
         boardRepository.save(board);
+    }
+
+    public Board detailBoard(Long boardId) {
+        Board board = boardRepository.findByIdWithMember(boardId).orElseThrow(
+                () -> new NotFoundException("게시글을 찾을 수 없습니다.")
+        );
+
+        return board;
     }
 }
