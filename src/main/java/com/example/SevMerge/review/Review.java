@@ -37,7 +37,7 @@ public class Review {
 
 
     @CreationTimestamp
-    private Timestamp createdAt;
+    private Timestamp createdAt; // 작성일
 
     private Integer countStar; // 별점
 
