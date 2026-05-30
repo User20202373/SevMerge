@@ -47,17 +47,6 @@ public class BoardController {
         return "board/board-list";
     }
 
-    @GetMapping("/boards/save")
-    public String saveBoardPage(@RequestParam(defaultValue = "FREE") String boardType,
-                                Model model) {
-
-        model.addAttribute("boardType",boardType);
-        model.addAttribute("isFree",boardType.equalsIgnoreCase("FREE"));
-        model.addAttribute("isNotice",boardType.equalsIgnoreCase("NOTICE"));
-
-        return "board/board-save";
-    }
-
     @GetMapping("/boards/{boardId}")
     public String showBoardDetail(@PathVariable(name="boardId") Long boardId,
                                   Model model) {
@@ -69,10 +58,21 @@ public class BoardController {
         return "board/board-detail";
     }
 
+    @GetMapping("/boards/save")
+    public String saveBoardPage(@RequestParam(defaultValue = "FREE") String boardType,
+                                Model model) {
+
+        model.addAttribute("boardType",boardType);
+        model.addAttribute("isFree",boardType.equalsIgnoreCase("FREE"));
+        model.addAttribute("isNotice",boardType.equalsIgnoreCase("NOTICE"));
+
+        return "board/board-save";
+    }
+
     @PostMapping("boards/save")
     public String saveBoard(BoardRequest.SaveBoardDTO saveBoardDTO,
                             HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute("sessionMember");
+        Member sessionMember = (Member) session.getAttribute("sessionUser");
         boardService.saveBoard(sessionMember,saveBoardDTO);
 
         return "redirect:/boards";
