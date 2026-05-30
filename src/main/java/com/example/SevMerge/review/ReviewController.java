@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RequiredArgsConstructor
@@ -13,20 +14,20 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 리뷰목록 화면
-    @GetMapping("review/list")
-    public String reviewPage() {
+    @GetMapping("/reviews")
+    public String reviewList() {
          return "review/review-list";
     }
 
     // 리뷰작성 화면
-    @GetMapping("review/review-save")
-    public String reviewSavePage() {
+    @GetMapping("/reviews/save")
+    public String saveReviewForm() {
         return  "review/review-save";
     }
 
-    // 리뷰 작성 기능
-    @PostMapping("review/save")
-    public String reviewSaveProc(ReviewRequest.SaveReviewDTO reviewDTO, Model model, HttpSession session) {
+    // 리뷰 작성 후 저장
+    @PostMapping("/reviews/save")
+    public String saveReview(ReviewRequest.SaveReviewDTO reviewDTO, Model model, HttpSession session) {
 
         Member member = (Member) session.getAttribute("sessionMember"); // 누가 쓸건지 특정
 
@@ -42,7 +43,14 @@ public class ReviewController {
 
 
     // 리뷰조회 해당전문가 누적 별점 , 리뷰목록 공개
+    @GetMapping("/reviews/{id}" )
+    public String reviewDetail(@PathVariable(name = "id") Integer id){
 
+
+
+
+        return "/review/review-detail";
+    }
 
 
 
