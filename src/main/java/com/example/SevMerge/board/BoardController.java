@@ -21,7 +21,6 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    ;
     private final CommentService commentService;
 
     // todo: 추후 메인 페이지 요청하는 곳 생성되면 삭제예정
