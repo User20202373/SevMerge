@@ -3,6 +3,7 @@ package com.example.SevMerge.chatRoom;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.project.Project;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,5 +33,12 @@ public class ChatRoom {
     private Member expert;
 
     @CreationTimestamp
-    private Timestamp createAt;
+    private Timestamp createdAt;
+
+    @Builder
+    public ChatRoom(Project project, Member client, Member expert) {
+        this.project = project;
+        this.client = client;
+        this.expert = expert;
+    }
 }
