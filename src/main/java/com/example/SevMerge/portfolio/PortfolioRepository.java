@@ -8,7 +8,7 @@ import java.util.List;
 public interface PortfolioRepository extends JpaRepository<Portfolio,Long> {
 
     @Query("""
-        SELECT po FROM Portfolio po JOIN FETCH po.expertProfile WHERE po.expertProfile.member.id= :expertId
+        SELECT po FROM Portfolio po JOIN FETCH po.expertProfile WHERE po.expertProfile.member.id= :expertId AND isActive=true
 """)
-    List<PortfolioResponse.ListDTO> findByMemberId(Long expertId);
+    List<PortfolioResponse.ListDTO> findByExpertIdIsActive(Long expertId);
 }

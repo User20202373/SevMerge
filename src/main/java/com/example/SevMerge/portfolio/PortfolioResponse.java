@@ -11,17 +11,33 @@ public class PortfolioResponse {
         private String title;
         private String description;
         private String imgUrl;
-        private String projectUrl;
+        private String expertName;
         private String createdAt;
 
         @Builder
-        public ListDTO(Long id, String title, String description, String imgUrl, String projectUrl, String createdAt) {
+        public ListDTO(Portfolio portfolio) {
             this.id = id;
             this.title = title;
             this.description = description;
             this.imgUrl = imgUrl;
-            this.projectUrl = projectUrl;
+            this.expertName = expertName;
             this.createdAt = createdAt;
+        }
+    }
+
+    @Data
+    public static class DetailDTO {
+        private String title;
+        private String description;
+        private String expertName;
+        private String projectUrl;
+
+        @Builder
+        public DetailDTO(Portfolio portfolio) {
+            this.title = title;
+            this.description = description;
+            this.expertName = expertName;
+            this.projectUrl = projectUrl;
         }
     }
 

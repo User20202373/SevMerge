@@ -44,6 +44,7 @@ public class BoardController {
         // 페이징 + 키워드 서비스 호출
         Page<BoardResponse.ListDTO> boardPage = boardService.findAllByBoardType(BoardType.valueOf(boardType.toUpperCase()), keyword, page);
 
+        // todo-추후 페이지 번호 추가
         model.addAttribute("isFree", boardType.equalsIgnoreCase("FREE"));
         model.addAttribute("isNotice", boardType.equalsIgnoreCase("NOTICE"));
         model.addAttribute("isInquiry", boardType.equalsIgnoreCase("INQUIRY"));
