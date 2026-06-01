@@ -38,7 +38,7 @@ public class BoardService {
                 () -> new NotFoundException("멤버를 찾을 수 없습니다.")
         );
 
-        List<BoardResponse.ListDTO> inquiryBoards = new ArrayList<>();
+        List<BoardResponse.ListDTO> inquiryBoards;
 
         if (member.getRole().equals(Role.ADMIN)) {
            inquiryBoards = boardRepository.findAllByBoardTypeIsActive(boardType)
