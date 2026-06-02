@@ -52,6 +52,11 @@ public class MemberService {
                 .toList();
     }
 
+    // 이번 달 가입한 신규 회원 수 조회 기능
+    @Transactional(readOnly = true)
+    public long getNewMemberCountThisMonth() {
+        return memberRepository.countNewMembersThisMonth();
+    }
 
     //회원가입
     @Transactional
