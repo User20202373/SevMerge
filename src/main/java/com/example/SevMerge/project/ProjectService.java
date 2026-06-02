@@ -28,6 +28,13 @@ public class ProjectService {
                 .collect(Collectors.toList());
     }
 
+    // 진행중인 프로젝트 개수 조회 (관리자용)
+//    @Transactional(readOnly = true)
+//    public long getActiveProjectsCount() {
+//        log.info("진행중인 프로젝트 개수 조회 서비스 시작");
+//        return projectRepository.countActiveProjects();
+//    }
+
     // 프로젝트 상세조회 서비스
     public ProjectResponeDTO.DetailDTO findProjectById(Long id) {
         log.info("project 상세 서비스 시작");
