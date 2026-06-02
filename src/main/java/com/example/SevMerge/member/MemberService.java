@@ -158,10 +158,9 @@ public class MemberService {
                 .stream().map(MemberResponse::from).toList();
     }
 
-
-
-    //내부 유틸
-    private Member findMemberById(Long memberId) {
+    //유틸
+    @Transactional(readOnly = true) //단독수행
+    public Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 회원입니다."));
     }
