@@ -2,15 +2,12 @@ package com.example.SevMerge.chatRoom;
 
 import lombok.Data;
 
-
+@Data
 public class ChatRoomRequest {
-    @Data
-    public static class ChatRoomDTO {
-        private Long projectId;
+    private Long projectId;
 
-        private Long clientId;
+    private Long clientId;
 
-        private String expertId;
-    }
+    private Long expertId;
 
 }

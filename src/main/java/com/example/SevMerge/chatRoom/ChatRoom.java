@@ -1,5 +1,6 @@
 package com.example.SevMerge.chatRoom;
 
+import com.example.SevMerge.core.exception.ForbiddenException;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.project.Project;
 import jakarta.persistence.*;
@@ -36,9 +37,20 @@ public class ChatRoom {
     private Timestamp createdAt;
 
     @Builder
-    public ChatRoom(Project project, Member client, Member expert) {
+    public ChatRoom(Long id, Project project, Member client, Member expert, Timestamp createdAt) {
+        this.id = id;
         this.project = project;
         this.client = client;
         this.expert = expert;
+        this.createdAt = createdAt;
     }
+
+    public boolean validate(Member sessionMember) {
+        if (this.getClient().getId().equals(sessionMember.getId()) || this.getExpert().getId().equals(sessionMember.getId())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
