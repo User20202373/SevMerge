@@ -86,16 +86,16 @@ public class ReviewController {
 //    }
 //
 //
-//    // 리뷰상세 화면 해당전문가 누적 별점 , 리뷰목록 공개 기능
-//    @GetMapping("/reviews/{id}" )
-//    public String reviewDetail(@PathVariable(name = "id") Long id,Model model){
-//
-//        ReviewResponse.ReviewDetailDTO review = reviewService.detail(id);
-//
-//        model.addAttribute("review",review);
-//
-//        return "review/review-detail";
-//    }
+    // 리뷰상세 화면 해당전문가 누적 별점 , 리뷰목록 공개 기능
+    @GetMapping("/reviews/{id}" )
+    public String reviewDetail(@PathVariable(name = "id") Long id,Model model){
+
+        ReviewResponse.ReviewDetailDTO review = reviewService.detail(id);
+
+        model.addAttribute("review",review);
+
+        return "review/review-detail";
+    }
 //
 //
 //    // 리뷰 수정 화면
