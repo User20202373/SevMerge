@@ -43,7 +43,7 @@ public class MailService {
         if (savedCode != null && savedCode.equals(code)) {
             session.removeAttribute("code_" + email);
 
-            session.setAttribute("verified_", email);
+            session.setAttribute("verified_email", email);
             return true;
         }
         return false;

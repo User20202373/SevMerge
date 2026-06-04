@@ -29,7 +29,7 @@ public class MemberApiController {
     @PostMapping("/api/email/verify")
     public ResponseEntity<?> checkEmail(@RequestBody MemberRequest.EmailCheckDTO reqDTO) {
         reqDTO.validate();
-        if (reqDTO.getCode().isEmpty()) {
+        if (reqDTO.getCode() == null || reqDTO.getCode().isEmpty()) {
             throw new BadRequestException("인증번호를 입력해주세요.");
         }
 
