@@ -73,6 +73,8 @@ public class MemberController {
         model.addAttribute("isReviews", tab.equalsIgnoreCase("reviews"));
         model.addAttribute("isBids", tab.equalsIgnoreCase("bids"));
         model.addAttribute("isEdit", tab.equalsIgnoreCase("edit"));
+        model.addAttribute("isPortfolio",tab.equalsIgnoreCase("portfolios"));
+
 
         model.addAttribute("projectCount", projectService.myProjects(loginMember).size());
         if (loginMember.getRole() == Role.EXPERT) {
@@ -89,6 +91,8 @@ public class MemberController {
         } else if (tab.equals("edit")) {
             model.addAttribute("rawName", loginMember.getName());
             model.addAttribute("rawEmail", loginMember.getEmail());
+        } else if(tab.equals("portfolios")) {
+            model.addAttribute("portfolios",portfolioService.findByMemberId(loginMember.getId()));
         }
 
         return "member/mypage";
