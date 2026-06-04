@@ -30,6 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ExpertProfileRepository expertProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final HttpSession session;
 
 
     // application.yml에 등록된 카카오 환경 변수 가져오기
@@ -56,6 +57,11 @@ public class MemberService {
     //회원가입
     @Transactional
     public void join(MemberRequest.Join request) {
+        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+        if (verifiedEmail == null || !verifiedEmail.equals(request.getEmail())) {
+            throw new BadRequestException("이메일 인증이 완료되지 않았습니다.");
+        }
+
         if (memberRepository.existsByEmail(request.getEmail()))
             throw new BadRequestException("이미 사용 중인 이메일입니다.");
 
