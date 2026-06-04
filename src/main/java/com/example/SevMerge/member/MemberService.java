@@ -69,7 +69,10 @@ public class MemberService {
     //회원가입
     @Transactional
     public void join(MemberRequest.Join request) {
-        String verifiedEmail = (String) session.getAttribute("verifiedEmail");
+
+        log.info("세션에서 꺼낸 verified_email: {}", session.getAttribute("verified_email"));
+        log.info("요청 이메일: {}", request.getEmail());
+        String verifiedEmail = (String) session.getAttribute("verified_email");
         if (verifiedEmail == null || !verifiedEmail.equals(request.getEmail())) {
             throw new BadRequestException("이메일 인증이 완료되지 않았습니다.");
         }
@@ -84,6 +87,7 @@ public class MemberService {
                 .phone(request.getPhone())
                 .role(request.getRole())
                 .status(request.getRole() == Role.EXPERT ? Status.PENDING : Status.ACTIVE)
+
                 .build();
         memberRepository.save(member);
 
