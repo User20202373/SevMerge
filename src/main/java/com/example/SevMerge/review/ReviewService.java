@@ -56,16 +56,16 @@ public class ReviewService {
 
     }
 
-//    // 리뷰조회
-//    public ReviewResponse.ReviewDetailDTO detail(Long id) {
-//
-//        Review review = reviewRepository.findById(id).orElseThrow(() ->
-//                new BadRequestException("해당 리뷰는 존재하지 않습니다.")
-//        );
-//
-//        return new ReviewResponse.ReviewDetailDTO(review);
-//    }
-//
+    // 리뷰조회
+    public ReviewResponse.ReviewDetailDTO detail(Long id) {
+
+        Review review = reviewRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("해당 리뷰는 존재하지 않습니다.")
+        );
+
+        return new ReviewResponse.ReviewDetailDTO(review);
+    }
+
 //    public ReviewResponse.ReviewListPageDTO reviewsListPage(Long expertProfileId, int page, Member sessionMember) {
 //
 //        Pageable pageable = PageRequest.of(page - 1, 5);
@@ -111,7 +111,7 @@ public class ReviewService {
 //
 //        return reviewEntity;
 //    }
-//
+
 //    // 리뷰수정
 //    @Transactional
 //    public void updateReview(ReviewRequest.UpdateRequestDTO dto, Long reviewId) {

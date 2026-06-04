@@ -4,6 +4,7 @@ import com.example.SevMerge.expertprofile.ExpertProfile;
 import com.example.SevMerge.member.Member;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -28,112 +29,28 @@ public class ReviewResponse {
     }
 
 
-//    // 전문가가 의뢰인에게 작성하는 화면
-//    @Data
-//    public static class SaveExpertToClient {
-//
-//        private MemberDTO member;
-//        private ExpertProfileDTO expertProfile;
-//
-//        @Data
-//        @Builder
-//        public static class ExpertProfileDTO {
-//
-//            private Long id;
-//
-//        }
-//
-//        @Data
-//        @Builder
-//        public static class MemberDTO {
-//            private Long id; // member id
-//            private String name;
-//            private String email;
-//
-//        }
-//
-//        public SaveExpertToClient(Member member, ExpertProfile expertProfile) {
-//
-//            this.member = MemberDTO
-//                    .builder()
-//                    .id(member.getId())
-//                    .name(member.getName())
-//                    .email(member.getEmail())
-//                    .build();
-//
-//            this.expertProfile = ExpertProfileDTO
-//                    .builder()
-//                    .id(expertProfile.getId())
-//                    .build();
-//
-//        }
-//    }
-//
-//
-//    // 리뷰 상세화면
-//    @Data
-//    public static class ReviewDetailDTO {
-//
-//        private String content;
-//        private Timestamp createdAt;
-//        private Long id;
-//
-//        private ExpertDTO expertProfile;
-//        private DetailMemberDTO member;
-//
-//        @Data
-//        @Builder
-//        public static class ExpertDTO {   // 머스테치 파일의 {{review.expertProfile}}
-//            private Long id;
-//            private String name;
-//            private String career;
-//            private DetailExpertMemberDTO member;
-//
-//            @Data
-//            @Builder
-//            public static class DetailExpertMemberDTO {
-//
-//                private String name;
-//            }
-//
-//        }
-//
-//        @Data
-//        @Builder
-//        public static class DetailMemberDTO {  // 머스테치 파일의 {{review.member}}
-//
-//            private String name;
-//
-//        }
-//
-//        @Builder
-//        public ReviewDetailDTO(Review review) {
-//
-//            this.content = review.getContent();
-//            this.createdAt = review.getCreatedAt();
-//            this.id = review.getId();
-//
-//            this.member = DetailMemberDTO
-//                    .builder()
-//                    .name(review.getMember().getName())
-//                    .build();
-//
-//            this.expertProfile = ExpertDTO
-//                    .builder()
-//                    .id(review.getExpertProfile().getId())
-//                    .name(review.getExpertProfile().getMember().getName())
-//                    .member(ExpertDTO.DetailExpertMemberDTO
-//                            .builder()
-//                            .name(review.getExpertProfile().getMember().getName())
-//                            .build())
-//                    .career(review.getExpertProfile().getCareer())
-//                    .build();
-//
-//
-//        }
-//    }
-//
-//
+
+    // 리뷰 상세화면
+    @Data
+    public static class ReviewDetailDTO {
+        private Long id;
+        private String reviewerName;
+        private String targeterName;
+        private Integer countStar;
+        private String content;
+        private Timestamp createdAt;
+
+        public ReviewDetailDTO(Review review) {
+            this.id = review.getId();
+            this.reviewerName = review.getReviewer().getName();
+            this.targeterName = review.getTargeter().getName();
+            this.countStar = review.getCountStar();
+            this.content = review.getContent();
+            this.createdAt = review.getCreatedAt();
+        }
+    }
+
+
 //    // 리뷰 목록 화면
 //
 //    @Data
