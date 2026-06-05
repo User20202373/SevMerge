@@ -2,6 +2,7 @@ package com.example.SevMerge.member;
 
 import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.board.BoardService;
+import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.portfolio.PortfolioService;
 import com.example.SevMerge.project.ProjectService;
 import com.example.SevMerge.review.Review;
@@ -75,7 +76,7 @@ public class MemberController {
     @GetMapping("/mypage")
     public String mypage(@RequestParam(required = false) String tab,
                          HttpSession session, Model model) {
-        Member loginMember = (Member) session.getAttribute("sessionUser");
+        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
         // 세션 유저 방어(로그아웃 상태 시 로그인창으로)
         if (loginMember == null) {
             return "redirect:/login";
@@ -119,7 +120,7 @@ public class MemberController {
     // 회원 정보 수정 페이지 이동 (GET)
     @GetMapping("/mypage/update") //
     public String updateMemberPage(HttpSession session, Model model) {
-        Member loginMember = (Member) session.getAttribute("sessionUser");
+        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) {
             return "redirect:/login";
         }
@@ -140,7 +141,7 @@ public class MemberController {
         memberService.updateMyInfo(loginMember.getId(), request);
 
         Member updatedMember = memberService.findMemberById(loginMember.getId());
-        session.setAttribute("sessionUser", updatedMember);
+        session.setAttribute(Define.SESSION_USER, updatedMember);
 
         log.info("회원 정보 수정 완료 - memberId={}", loginMember.getId());
         return "redirect:/mypage";
@@ -215,7 +216,7 @@ public class MemberController {
         Member existing = memberService.findGoogleMember(googleId);
 
         if (existing != null) {
-            session.setAttribute("sessionUser", existing);
+            session.setAttribute(Define.SESSION_USER, existing);
             log.info("구글 기존 회원 로그인 - memberId={}", existing.getId());
             return "redirect:/";
         }
@@ -240,7 +241,7 @@ public class MemberController {
 
         if (existing != null) {
             // 기존 회원 → 바로 로그인
-            session.setAttribute("sessionUser", existing);
+            session.setAttribute(Define.SESSION_USER, existing);
             log.info("카카오 기존 회원 로그인 - memberId={}", existing.getId());
             return "redirect:/";
         }
@@ -296,7 +297,7 @@ public class MemberController {
         }
         if (member != null) {
             Member freshMember = memberService.findMemberById(member.getId());
-            session.setAttribute("sessionUser", freshMember);
+            session.setAttribute(Define.SESSION_USER, freshMember);
             log.info("소셜 회원가입 최종 완료 -> 온전한 세션 주입 완료 - memberId={}", freshMember.getId());
         }
 
