@@ -1,13 +1,13 @@
-INSERT IGNORE INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
+INSERT INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
 VALUES ('client01@sevmerge.com', '$2b$10$6om5ZhIXnA0qfyQwh7Y5xefzlXoacZzVMQEjBnpWskmVB/zWkhpJ2', '김의뢰', '010-1234-5678', 'CLIENT', 'ACTIVE', false,NOW());
 
-INSERT IGNORE INTO member_tb (email, password, name, phone, role, status,is_deleted, created_at)
+INSERT INTO member_tb (email, password, name, phone, role, status,is_deleted, created_at)
 VALUES ('expert01@sevmerge.com', '$2b$10$6om5ZhIXnA0qfyQwh7Y5xefzlXoacZzVMQEjBnpWskmVB/zWkhpJ2', '홍길동', '010-9876-5432', 'EXPERT', 'ACTIVE',false, NOW());
 
-INSERT IGNORE INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
+INSERT INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
 VALUES ('expert02@sevmerge.com', '$2b$10$6om5ZhIXnA0qfyQwh7Y5xefzlXoacZzVMQEjBnpWskmVB/zWkhpJ2', '김디자', '010-5555-4444', 'EXPERT', 'ACTIVE',false, NOW());
 
-INSERT IGNORE INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
+INSERT INTO member_tb (email, password, name, phone, role, status, is_deleted, created_at)
 VALUES ('admin@sevmerge.com', '$2b$10$6om5ZhIXnA0qfyQwh7Y5xefzlXoacZzVMQEjBnpWskmVB/zWkhpJ2', '최관리', '010-0000-0000', 'ADMIN', 'ACTIVE', false,NOW());
 
 
