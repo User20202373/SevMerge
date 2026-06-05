@@ -2,6 +2,7 @@ package com.example.SevMerge.project;
 
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
+import com.example.SevMerge.member.Role;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,16 +24,21 @@ public class ProjectController {
 
     // 프로젝트 등록 폼
     @GetMapping("/projects/save-form")
-    public String saveForm() {
+    public String saveForm(HttpSession session, Model model) {
         log.info("project 등록폼 요청");
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         return "project/project-save";
     }
 
     // 프로젝트 등록
     @PostMapping("/projects/save")
-    public String save(ProjectRequestDTO.SaveDTO req, HttpSession session) {
+    public String save(ProjectRequestDTO.SaveDTO req, HttpSession session, Model model) {
         log.info("project 등록 요청");
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         if (sessionUser == null) return "redirect:/login";
         req.validate();
         projectService.saveProject(req, sessionUser);
@@ -72,6 +78,8 @@ public class ProjectController {
         model.addAttribute("projects", projects);
         model.addAttribute("totalCount", projects.size());
         model.addAttribute("keyword", keyword != null ? keyword : "");
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 
         // 3. 카테고리 및 필터 탭 활성화 로직 업데이트
         // 다른 필터나 검색어가 없고, 낙찰완료 필터가 아닐떄 활성화
@@ -94,9 +102,12 @@ public class ProjectController {
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         ProjectResponeDTO.DetailDTO project = projectService.findProjectById(id);
         model.addAttribute("project", project);
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         // 로그인한 사용자가 프로젝트 작성자인지 확인
         boolean isOwner = sessionUser != null && sessionUser.getId().equals(project.getMemberId());
         model.addAttribute("isOwner", isOwner);
+
         return "project/project-detail";
     }
 
@@ -129,29 +140,34 @@ public class ProjectController {
 
     // 카테고리별 조회
     @GetMapping("/projects/category")
-    public String findByCategory(@RequestParam String category, Model model) {
+    public String findByCategory(@RequestParam String category, HttpSession session, Model model) {
         log.info("카테고리별 조회 요청");
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("projects", projectService.findByCategory(category));
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         return "project/project-list";
     }
 
     // 키워드 검색
     @GetMapping("/projects/search")
-    public String search(@RequestParam String keyword, Model model) {
+    public String search(@RequestParam String keyword,HttpSession session, Model model) {
         log.info("키워드별 검색 요청");
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         model.addAttribute("projects", projectService.findByKeyword(keyword));
         return "project/project-list";
     }
 
     // 프로젝트 삭제
     @PostMapping("/projects/{id}/delete")
-    public String delete(@PathVariable Long id, HttpSession session) {
+    public String delete(@PathVariable Long id, HttpSession session, Model model) {
         log.info("project 삭제 요청");
         Member sessionUser = (Member)session.getAttribute(Define.SESSION_USER);
+        // 관리자가 로그인하면 마이페이지가 아닌 '관리자' 글자가 뜨게 만들기
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         projectService.deleteProject(id,sessionUser);
         return "redirect:/projects/list";
     }
-
-
-
 }

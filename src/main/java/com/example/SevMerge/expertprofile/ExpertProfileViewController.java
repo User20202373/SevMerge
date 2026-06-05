@@ -1,6 +1,8 @@
 package com.example.SevMerge.expertprofile;
 
+import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
+import com.example.SevMerge.member.Role;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -31,8 +33,11 @@ public class ExpertProfileViewController {
      * → templates/expertProfile/expertProfile-list.mustache
      */
     @GetMapping
-    public String list(Model model) {
+    public String list(HttpSession session ,Model model) {
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("expertProfiles", expertProfileService.getAll());
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
+
         return "expertProfile/expertProfile-list";
     }
 
@@ -52,6 +57,7 @@ public class ExpertProfileViewController {
         Member sessionUser = (Member) session.getAttribute("sessionUser");
         boolean isOwner = sessionUser != null && sessionUser.getId().equals(memberId);
         model.addAttribute("isOwner", isOwner);
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 
         return "expertProfile/expertProfile-detail";
     }
