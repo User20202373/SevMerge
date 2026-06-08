@@ -16,8 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BidInterceptor implements HandlerInterceptor {
 
-    private final BidInterceptor bidInterceptor;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                    HttpSession session = request.getSession(false);

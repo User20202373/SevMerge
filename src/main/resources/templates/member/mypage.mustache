@@ -84,7 +84,7 @@
                     <a href="/my-pages?tab=portfolios" class="mypage-tab {{#isPortfolio}}active{{/isPortfolio}}">내 포트폴리오</a>
                 {{/member.isExpert}}
                 <a href="/my-pages?tab=boards" class="mypage-tab {{#isBoards}}active{{/isBoards}}">내 게시글</a>
-                <a href="/my-pages?tab=reviews" class="mypage-tab {{#isReview}}active{{/isReview}}">리뷰</a>
+                <a href="/my-pages?tab=reviews" class="mypage-tab {{#isReviews}}active{{/isReviews}}">리뷰</a>
                 <a href="/my-pages?tab=edit" class="mypage-tab {{#isEdit}}active{{/isEdit}}">정보 수정</a>
             </div>
 
@@ -283,4 +283,4 @@
         }
     </script>
 {{/isEdit}}
-{{pre layout/footer}}
+{{> layout/footer}}
