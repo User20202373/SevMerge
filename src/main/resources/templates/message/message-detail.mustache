@@ -1,0 +1,95 @@
+{{> layout/header}}
+
+<style>
+    .detail-section { padding: 48px 28px 80px; }
+    .detail-inner { max-width: 780px; margin: 0 auto; }
+    .detail-card { background: #fff; border-radius: 16px; border: 1.5px solid #eaecf4; overflow: hidden; }
+    .detail-header { padding: 28px 32px 20px; border-bottom: 1px solid #f3f4f8; }
+    .detail-title { font-size: 20px; font-weight: 800; color: #1c1e26; margin-bottom: 14px; }
+    .detail-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .detail-meta-item { font-size: 13px; color: #9ca3af; }
+    .detail-meta-item strong { color: #4b5563; font-weight: 600; }
+    .detail-project { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; background: #f0f4ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; text-decoration: none; }
+    .detail-project:hover { background: #dbeafe; }
+    .detail-body { padding: 28px 32px; min-height: 160px; }
+    .detail-content { font-size: 15px; color: #374151; line-height: 1.8; white-space: pre-wrap; }
+    .detail-actions { padding: 20px 32px; border-top: 1px solid #f3f4f8; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-sm { padding: 8px 18px; font-size: 13px; border-radius: 8px; }
+    .btn-danger { background: #fff; color: #ef4444; border: 1.5px solid #fca5a5; font-weight: 700; cursor: pointer; }
+    .btn-danger:hover { background: #fef2f2; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #9ca3af; text-decoration: none; margin-bottom: 20px; font-weight: 500; }
+    .back-link:hover { color: #2563eb; }
+
+    /* 답장 폼 */
+    .reply-card { background: #fff; border-radius: 16px; border: 1.5px solid #eaecf4; margin-top: 20px; overflow: hidden; }
+    .reply-header { padding: 18px 32px; border-bottom: 1px solid #f3f4f8; }
+    .reply-title { font-size: 15px; font-weight: 700; color: #1c1e26; }
+    .reply-body { padding: 20px 32px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e5ef; border-radius: 9px; font-size: 14px; font-family: inherit; color: #1c1e26; outline: none; box-sizing: border-box; transition: border-color .15s; }
+    .form-input:focus { border-color: #2563eb; }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .reply-actions { padding: 16px 32px; border-top: 1px solid #f3f4f8; display: flex; justify-content: flex-end; }
+</style>
+
+<section class="detail-section">
+    <div class="detail-inner">
+
+        <a href="/messages?box=received" class="back-link">← 받은 쪽지함으로</a>
+
+        <div class="detail-card">
+            <div class="detail-header">
+                <p class="detail-title">{{message.title}}</p>
+                <div class="detail-meta">
+                    <span class="detail-meta-item">보낸 사람 <strong>{{message.senderName}}</strong></span>
+                    <span class="detail-meta-item">받는 사람 <strong>{{message.receiverName}}</strong></span>
+                    <span class="detail-meta-item">날짜 <strong>{{message.createdAt}}</strong></span>
+                </div>
+                {{#projectTitle}}
+                <a href="/projects/{{message.projectId}}" class="detail-project">
+                    📁 관련 프로젝트: {{message.projectTitle}}
+                </a>
+                {{/projectTitle}}
+            </div>
+
+            <div class="detail-body">
+                <p class="detail-content">{{message.content}}</p>
+            </div>
+
+            <div class="detail-actions">
+                <form action="/messages/{{message.id}}/delete" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('쪽지를 삭제하시겠습니까?')">삭제</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 답장 폼 -->
+        <div class="reply-card">
+            <div class="reply-header">
+                <p class="reply-title">답장 보내기</p>
+            </div>
+            <div class="reply-body">
+                <form action="/messages/send" method="POST">
+                    <input type="hidden" name="receiverId" value="{{message.senderId}}" />
+                    <input type="hidden" name="projectId" value="{{message.projectId}}" />
+                    <div class="form-group">
+                        <label class="form-label">제목</label>
+                        <input type="text" name="title" class="form-input" value="RE: {{message.title}}" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">내용</label>
+                        <textarea name="content" class="form-input form-textarea" placeholder="답장 내용을 입력하세요."></textarea>
+                    </div>
+                    <div class="reply-actions">
+                        <button type="submit" class="btn btn-primary btn-sm">답장 보내기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{{> layout/footer}}

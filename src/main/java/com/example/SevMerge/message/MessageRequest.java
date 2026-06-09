@@ -11,4 +11,5 @@ public class MessageRequest {
         private String title;
         private String content;
     }
+
 }

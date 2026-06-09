@@ -38,7 +38,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         // 로그인 체크
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/users/**", "/my-pages", "/my-pages/**", "/projects/save-form")
+                .addPathPatterns("/users/**", "/my-pages", "/my-pages/**", "/projects/save-form", "/messages/**")
                 .excludePathPatterns(
                         "/",
                         "/login",
