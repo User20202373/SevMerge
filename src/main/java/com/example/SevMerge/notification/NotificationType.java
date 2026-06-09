@@ -7,5 +7,6 @@ public enum NotificationType {
     BID_REJECTED,       ///  전문가 | 내 제안서가 거부됨
     EXPERT_APPROVED,    ///  전문가 | 관리자가 전문가 신청 승인
     EXPERT_REJECTED,    ///  전문가 | 관리자가 전문가 신청 거부
-    PAYMENT_COMPLETED   ///  전문가 | 결제 완료 (작업 시작 가능)
+    PAYMENT_COMPLETED,  ///  전문가 | 결제 완료 (작업 시작 가능)
+    MESSAGE_RECEIVED    ///  수신자 | 새 쪽지 도착
 }

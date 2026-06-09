@@ -1,0 +1,90 @@
+{{> layout/header}}
+
+<style>
+    .send-section { padding: 48px 28px 80px; }
+    .send-inner { max-width: 680px; margin: 0 auto; }
+    .send-card { background: #fff; border-radius: 16px; border: 1.5px solid #eaecf4; overflow: hidden; }
+    .send-header { padding: 28px 32px 20px; border-bottom: 1px solid #f3f4f8; }
+    .send-title { font-size: 20px; font-weight: 800; color: #1c1e26; }
+    .send-desc { font-size: 13px; color: #9ca3af; margin-top: 4px; }
+    .send-body { padding: 28px 32px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 7px; }
+    .form-label .required { color: #ef4444; margin-left: 2px; }
+    .form-input { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e5ef; border-radius: 9px; font-size: 14px; font-family: inherit; color: #1c1e26; outline: none; box-sizing: border-box; transition: border-color .15s; }
+    .form-input:focus { border-color: #2563eb; }
+    .form-input:disabled { background: #f8f9fc; color: #9ca3af; cursor: not-allowed; }
+    .form-textarea { resize: vertical; min-height: 140px; }
+    .receiver-info { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8f9fc; border-radius: 10px; border: 1.5px solid #eaecf4; }
+    .receiver-avatar { width: 36px; height: 36px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
+    .receiver-name { font-size: 14px; font-weight: 600; color: #1c1e26; }
+    .receiver-role { font-size: 12px; color: #9ca3af; }
+    .project-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0f4ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+    .send-actions { padding: 20px 32px; border-top: 1px solid #f3f4f8; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-sm { padding: 10px 22px; font-size: 13px; border-radius: 8px; }
+    .btn-cancel { background: #fff; color: #6b7280; border: 1.5px solid #e2e5ef; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn-cancel:hover { background: #f8f9fc; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #9ca3af; text-decoration: none; margin-bottom: 20px; font-weight: 500; }
+    .back-link:hover { color: #2563eb; }
+</style>
+
+<section class="send-section">
+    <div class="send-inner">
+
+        <a href="javascript:history.back()" class="back-link">← 뒤로 가기</a>
+
+        <div class="send-card">
+            <div class="send-header">
+                <p class="send-title">쪽지 보내기</p>
+                <p class="send-desc">입찰이 완료된 프로젝트의 상대방에게 쪽지를 보낼 수 있습니다.</p>
+            </div>
+
+            <div class="send-body">
+                <form action="/messages/send" method="POST">
+                    <input type="hidden" name="receiverId" value="{{receiverId}}" />
+                    <input type="hidden" name="projectId" value="{{projectId}}" />
+
+                    <!-- 받는 사람 -->
+                    <div class="form-group">
+                        <label class="form-label">받는 사람</label>
+                        <div class="receiver-info">
+                            <div class="receiver-avatar">{{receiverInitial}}</div>
+                            <div>
+                                <p class="receiver-name">{{receiverName}}</p>
+                                <p class="receiver-role">{{receiverRole}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 관련 프로젝트 -->
+                    {{#projectTitle}}
+                    <div class="form-group">
+                        <label class="form-label">관련 프로젝트</label>
+                        <div class="project-badge">📁 {{projectTitle}}</div>
+                    </div>
+                    {{/projectTitle}}
+
+                    <!-- 제목 -->
+                    <div class="form-group">
+                        <label class="form-label">제목 <span class="required">*</span></label>
+                        <input type="text" name="title" class="form-input" placeholder="쪽지 제목을 입력하세요." maxlength="100" required />
+                    </div>
+
+                    <!-- 내용 -->
+                    <div class="form-group">
+                        <label class="form-label">내용 <span class="required">*</span></label>
+                        <textarea name="content" class="form-input form-textarea" placeholder="쪽지 내용을 입력하세요." required></textarea>
+                    </div>
+
+                    <div class="send-actions">
+                        <a href="javascript:history.back()" class="btn btn-cancel btn-sm">취소</a>
+                        <button type="submit" class="btn btn-primary btn-sm">쪽지 보내기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{{> layout/footer}}

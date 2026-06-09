@@ -1,0 +1,124 @@
+{{> layout/header}}
+
+<style>
+    .page-header { background: #fff; border-bottom: 1px solid #eaecf4; padding: 40px 28px 0; }
+    .page-header-inner { max-width: 1140px; margin: 0 auto; }
+    .page-title { font-size: 26px; font-weight: 900; color: #1c1e26; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .page-desc { font-size: 14px; color: #9ca3af; font-weight: 400; margin-bottom: 28px; }
+    .board-tabs { display: flex; gap: 0; }
+    .board-tab { padding: 12px 24px; font-size: 14px; font-weight: 700; color: #9ca3af; border-bottom: 3px solid transparent; cursor: pointer; transition: all .15s; display: inline-block; }
+    .board-tab:hover { color: #1c1e26; }
+    .board-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+    .board-section { padding: 36px 28px 80px; }
+    .board-inner { max-width: 1140px; margin: 0 auto; }
+    .board-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .board-count { font-size: 14px; color: #9ca3af; font-weight: 500; }
+    .board-count strong { color: #1c1e26; font-weight: 700; }
+    .board-table { width: 100%; background: #fff; border-radius: 14px; border: 1.5px solid #eaecf4; overflow: hidden; margin-bottom: 12px; }
+    .board-table-head { display: grid; grid-template-columns: 1fr 140px 100px 80px; gap: 12px; padding: 13px 24px; background: #f8f9fc; border-bottom: 1px solid #eaecf4; font-size: 12px; font-weight: 700; color: #9ca3af; letter-spacing: .3px; }
+    .board-table-row { display: grid; grid-template-columns: 1fr 140px 100px 80px; gap: 12px; padding: 16px 24px; border-bottom: 1px solid #f3f4f8; align-items: center; transition: background .12s; cursor: pointer; text-decoration: none; color: inherit; }
+    .board-table-row:last-child { border-bottom: none; }
+    .board-table-row:hover { background: #f8f9ff; }
+    .cell-title { font-size: 14px; font-weight: 600; color: #1c1e26; display: flex; align-items: center; gap: 8px; }
+    .cell-title .unread-badge { font-size: 10px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 1px 7px; border-radius: 5px; font-weight: 700; flex-shrink: 0; }
+    .cell-author { font-size: 13px; color: #6b7280; font-weight: 500; }
+    .cell-date { font-size: 12px; color: #c4c9d9; }
+    .cell-status { text-align: center; }
+    .badge-unread { font-size: 11px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+    .badge-read { font-size: 11px; background: #f3f4f8; color: #9ca3af; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+    .empty-state { text-align: center; padding: 60px 0; }
+    .empty-msg { font-size: 15px; color: #c4c9d9; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 7px; }
+</style>
+
+<div class="page-header">
+    <div class="page-header-inner">
+        <h1 class="page-title">쪽지함</h1>
+        <p class="page-desc">프로젝트 관련 쪽지를 확인하세요.</p>
+        <div class="board-tabs">
+            <a href="/messages?box=received" class="board-tab {{#isReceived}}active{{/isReceived}}">받은 쪽지함</a>
+            <a href="/messages?box=sent" class="board-tab {{#isSent}}active{{/isSent}}">보낸 쪽지함</a>
+        </div>
+    </div>
+</div>
+
+<!-- 받은 쪽지함 -->
+{{#isReceived}}
+<section class="board-section">
+    <div class="board-inner">
+        <div class="board-action">
+            <span class="board-count">총 <strong>{{messageCount}}</strong>개의 쪽지</span>
+        </div>
+
+        <div class="board-table">
+            <div class="board-table-head">
+                <span>제목</span>
+                <span>보낸 사람</span>
+                <span>날짜</span>
+                <span style="text-align:center;">읽음</span>
+            </div>
+
+            {{#messages}}
+            <a href="/messages/{{id}}" class="board-table-row">
+                <span class="cell-title">
+                    {{^isRead}}<span class="unread-badge">NEW</span>{{/isRead}}
+                    {{title}}
+                </span>
+                <span class="cell-author">{{senderName}}</span>
+                <span class="cell-date">{{createdAt}}</span>
+                <span class="cell-status">
+                    {{#isRead}}<span class="badge-read">읽음</span>{{/isRead}}
+                    {{^isRead}}<span class="badge-unread">안읽음</span>{{/isRead}}
+                </span>
+            </a>
+            {{/messages}}
+
+            {{^messages}}
+            <div class="empty-state">
+                <p class="empty-msg">받은 쪽지가 없습니다.</p>
+            </div>
+            {{/messages}}
+        </div>
+    </div>
+</section>
+{{/isReceived}}
+
+<!-- 보낸 쪽지함 -->
+{{#isSent}}
+<section class="board-section">
+    <div class="board-inner">
+        <div class="board-action">
+            <span class="board-count">총 <strong>{{messageCount}}</strong>개의 쪽지</span>
+        </div>
+
+        <div class="board-table">
+            <div class="board-table-head">
+                <span>제목</span>
+                <span>받은 사람</span>
+                <span>날짜</span>
+                <span style="text-align:center;">읽음</span>
+            </div>
+
+            {{#messages}}
+            <a href="/messages/{{id}}" class="board-table-row">
+                <span class="cell-title">{{title}}</span>
+                <span class="cell-author">{{receiverName}}</span>
+                <span class="cell-date">{{createdAt}}</span>
+                <span class="cell-status">
+                    {{#isRead}}<span class="badge-read">읽음</span>{{/isRead}}
+                    {{^isRead}}<span class="badge-unread">안읽음</span>{{/isRead}}
+                </span>
+            </a>
+            {{/messages}}
+
+            {{^messages}}
+            <div class="empty-state">
+                <p class="empty-msg">보낸 쪽지가 없습니다.</p>
+            </div>
+            {{/messages}}
+        </div>
+    </div>
+</section>
+{{/isSent}}
+
+{{> layout/footer}}

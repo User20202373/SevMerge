@@ -3,6 +3,7 @@ package com.example.SevMerge.message;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.project.Project;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -28,7 +29,6 @@ public class Message {
     @JoinColumn(name = "receiver_id", nullable = false)
     private Member receiver;
 
-    // null 허용, 관리자 쪽지 발송 시 null 허용
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
@@ -43,12 +43,28 @@ public class Message {
     private Boolean isRead = false;
 
     @ColumnDefault("false")
-    private Boolean deletedBySender = false;
+    private Boolean isDeletedBySender = false;
 
     @ColumnDefault("false")
-    private Boolean deletedByReceiver = false;
+    private Boolean isDeletedByReceiver = false;
 
     @CreationTimestamp
     private Timestamp createdAt;
-}
 
+    @Builder
+    public Message(Member sender, Member receiver, Project project,
+                   String title, String content) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.project = project;
+        this.title = title;
+        this.content = content;
+        this.isRead = false;
+        this.isDeletedBySender = false;
+        this.isDeletedByReceiver = false;
+    }
+
+    public void read()             { this.isRead = true; }
+    public void deleteBySender()   { this.isDeletedBySender = true; }
+    public void deleteByReceiver() { this.isDeletedByReceiver = true; }
+}

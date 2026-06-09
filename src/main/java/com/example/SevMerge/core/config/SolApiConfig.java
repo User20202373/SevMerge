@@ -15,7 +15,7 @@ public class SolApiConfig {
     private String apiSecret;
 
     @Bean
-    public DefaultMessageService messageService() {
+    public DefaultMessageService defaultMessageService() {
         return SolapiClient.INSTANCE.createInstance(apiKey, apiSecret);
     }
 
