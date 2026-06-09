@@ -1,10 +1,7 @@
 package com.example.SevMerge.core.config;
 
 
-import com.example.SevMerge.core.interceptor.AdminInterceptor;
-import com.example.SevMerge.core.interceptor.LoginInterceptor;
-import com.example.SevMerge.core.interceptor.ProjectInterceptor;
-import com.example.SevMerge.core.interceptor.SessionInterceptor;
+import com.example.SevMerge.core.interceptor.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final AdminInterceptor adminInterceptor;
     private final SessionInterceptor sessionInterceptor;
     private final ProjectInterceptor projectInterceptor;
+    private final BidInterceptor bidInterceptor;
 
 
     @Override
@@ -36,11 +34,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/",
                         "/login",
-                        "/login-form",
-                        "/join-form",
+                        "/join",
                         "/logout",
                         "/projects/list",
                         "/projects/{id}/detail",
+                        "/google-redirect",    // 구글 로그인 통과
+                        "/kakao-redirect",     // 카카오 로그인 통과
+                        "/social-role",        // 소셜 가입 페이지 통과
                         "/css/**",
                         "/js/**",
                         "/images/**",
@@ -61,6 +61,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/projects/{id}/edit", // 수정 폼
                         "/projects/{id}", // 수정 처리, 삭제 처리
                         "/projects/{id}/done" // 검토 확인
+                );
+
+        // 전문가 제안서 (bid)
+        registry.addInterceptor(bidInterceptor)
+                .addPathPatterns(
+                        "/bid/save-form",
+                        "/bid/save",
+                        "/bid/my-list",
+                        "/bid/{id}/update-form",
+                        "/bid/{id}"
+
+                ).excludePathPatterns(
+                        "/bid/list",
+                        "/bid/{id}/select"
                 );
 
     }
