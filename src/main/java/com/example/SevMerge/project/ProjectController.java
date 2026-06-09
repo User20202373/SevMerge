@@ -3,6 +3,7 @@ package com.example.SevMerge.project;
 import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
+import com.example.SevMerge.member.Role;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,5 +176,42 @@ public class ProjectController {
         return "redirect:/my-pages?tab=projects";
     }
 
+    // 관리자용 프로젝트 관리 목록전체조회
+    @GetMapping("/admin/projects")
+    public String adminProjects(@RequestParam(value = "keyword", required = false) String keyword, HttpSession session, Model model) {
+        Member sessionUser = (Member)session.getAttribute(Define.SESSION_USER);
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
+
+        List<ProjectResponeDTO.ListDTO> adminProjects;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            adminProjects = projectService.findAdminProjectsByKeyword(keyword.trim());
+        } else {
+            adminProjects = projectService.findAllProjects();
+        }
+
+        model.addAttribute("projects", adminProjects);
+        model.addAttribute("isFree", false);
+        model.addAttribute("isNotice", false);
+        model.addAttribute("isInquiry", false);
+        model.addAttribute("keyword", keyword != null ? keyword : "");
+
+        return "admin/admin-project";
+    }
+
+    // 관리자 전용 삭제
+    @PostMapping("/admin/projects/{id}/delete")
+    public String deleteProjectByAdmin(@PathVariable("id") Long id, HttpSession session) {
+        Member sessionUser = (Member)session.getAttribute(Define.SESSION_USER);
+
+        if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) {
+            return "redirect:/login";
+        }
+
+        projectService.deleteProjectByAdmin(id);
+
+        return "redirect:/admin/projects";
+
+    }
 
 }

@@ -22,7 +22,7 @@ public class AdminController {
     private final MemberService memberService;
     private final ProjectService projectService;
 
-    @GetMapping("/admin")
+    @GetMapping("/admin/main")
     public String dashboardPage(HttpSession session, Model model) {
 
         long newMemberCount = memberService.getNewMemberCountThisMonth();
