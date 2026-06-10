@@ -61,6 +61,7 @@ public class MemberController {
     public String join(MemberRequest.Join request) {
         memberService.join(request);
 
+
         if (request.getRole() != null && "EXPERT".equalsIgnoreCase(request.getRole().toString())) {
             return "redirect:/social-pending";
         }
