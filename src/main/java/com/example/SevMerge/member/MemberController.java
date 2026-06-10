@@ -99,12 +99,12 @@ public class MemberController {
         }
 
         model.addAttribute("member", memberService.getMyInfo(loginMember.getId()));
-        model.addAttribute("isProjects", tab.equalsIgnoreCase("projects"));
-        model.addAttribute("isBoards", tab.equalsIgnoreCase("boards"));
-        model.addAttribute("isReviews", tab.equalsIgnoreCase("reviews"));
-        model.addAttribute("isBids", tab.equalsIgnoreCase("bids"));
-        model.addAttribute("isEdit", tab.equalsIgnoreCase("edit"));
-        model.addAttribute("isPortfolio",tab.equalsIgnoreCase("portfolios"));
+        model.addAttribute("isProjects",  tab.equalsIgnoreCase("projects"));
+        model.addAttribute("isBoards",    tab.equalsIgnoreCase("boards"));
+        model.addAttribute("isReviews",   tab.equalsIgnoreCase("reviews"));
+        model.addAttribute("isBids",      tab.equalsIgnoreCase("bids"));
+        model.addAttribute("isEdit",      tab.equalsIgnoreCase("edit"));
+        model.addAttribute("isPortfolio", tab.equalsIgnoreCase("portfolios"));
 
 
         model.addAttribute("projectCount", projectService.myProjects(loginMember).size());
