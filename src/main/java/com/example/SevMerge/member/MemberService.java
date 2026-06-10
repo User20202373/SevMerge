@@ -281,26 +281,19 @@ public class MemberService {
     @Transactional(readOnly = true)
     public List<ExpertProfileResponse> getExpertProfilesByStatus(Status status) {
 
-        // 1. 리포지토리 메서드가 안 먹히니, 확실하게 안전한 기본 내장 findAll()로 전 유저를 다 가져옵니다.
         List<Member> allMembers = memberRepository.findAll();
-
-        // 2. 결과를 담을 빈 상자 생성
         List<ExpertProfileResponse> responseList = new java.util.ArrayList<>();
 
-        // 3. 전체 유저를 한 명씩 검사합니다 (for-each)
         for (Member member : allMembers) {
-
-            // 4. 탈퇴하지 않은 유저 중, 권한이 EXPERT(전문가)이고 상태(Status)가 매개변수와 일치하는 사람만 필터링!
             if (!member.isDeleted() && member.getRole() == Role.EXPERT && member.getStatus() == status) {
 
-                // 5. 조건에 맞다면 프로필을 조회합니다.
                 ExpertProfile profile = expertProfileRepository.findByMemberId(member.getId()).orElse(null);
 
                 if (profile != null) {
-                    // 프로필 데이터가 존재하면 정상 변환해서 삽입
+
                     responseList.add(ExpertProfileResponse.from(profile));
                 } else {
-                    // 프로필 데이터 상자가 비어있다면 가상 상자를 빌드해서 무조건 이름이라도 나오게 방어 삽입!
+
                     ExpertProfile dummyProfile = ExpertProfile.builder()
                             .member(member)
                             .profileImage("default.png")
@@ -314,7 +307,6 @@ public class MemberService {
             }
         }
 
-        // 6. 필터링이 완벽하게 끝난 리스트를 반환합니다.
         return responseList;
     }
 
