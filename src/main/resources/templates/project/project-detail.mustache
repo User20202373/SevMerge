@@ -1,37 +1,53 @@
 {{> layout/header}}
 
 <style>
-    .detail-section { padding: 52px 28px 80px; }
-    .detail-inner { max-width: 900px; margin: 0 auto; }
-    .detail-nav { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; margin-bottom: 32px; }
-    .detail-nav a { color: #9ca3af; text-decoration: none; }
+    .detail-section { padding: 60px 24px 100px; background-color: #fcfcfd; }
+    .detail-inner { max-width: 1040px; margin: 0 auto; }
+    .detail-nav { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #9ca3af; margin-bottom: 28px; }
+    .detail-nav a { color: #9ca3af; text-decoration: none; transition: color 0.15s; }
     .detail-nav a:hover { color: #2563eb; }
-    .detail-header { padding-bottom: 24px; border-bottom: 1.5px solid #eaecf4; margin-bottom: 28px; }
-    .detail-category { font-size: 11px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 14px; }
-    .badge-certified { font-size: 10px; font-weight: 700; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; padding: 3px 9px; border-radius: 6px; margin-left: 6px; }
-    .detail-title { font-size: 26px; font-weight: 900; color: #1c1e26; letter-spacing: -0.5px; line-height: 1.35; margin-bottom: 16px; }
-    .detail-meta { display: flex; align-items: center; gap: 20px; font-size: 13px; color: #9ca3af; flex-wrap: wrap; }
+    .detail-header { padding-bottom: 28px; border-bottom: 1.5px solid #f1f3f9; margin-bottom: 32px; }
+    .detail-category { font-size: 11px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 6px 12px; border-radius: 6px; display: inline-block; margin-bottom: 16px; }
+    .badge-certified { font-size: 10px; font-weight: 700; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; padding: 5px 10px; border-radius: 6px; margin-left: 6px; }
+    .detail-title { font-size: 28px; font-weight: 900; color: #1c1e26; letter-spacing: -0.5px; line-height: 1.4; margin-bottom: 18px; }
+    .detail-meta { display: flex; align-items: center; gap: 16px; font-size: 13px; color: #9ca3af; flex-wrap: wrap; }
     .detail-meta .author { color: #374151; font-weight: 700; }
     .detail-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: #d1d5db; }
-    .detail-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 28px; }
-    .detail-body { display: grid; grid-template-columns: 1fr 280px; gap: 40px; align-items: start; }
-    .detail-content { font-size: 15px; color: #374151; line-height: 1.9; white-space: pre-wrap; margin-bottom: 32px; }
-    .detail-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; border-top: 1px solid #eaecf4; }
-    .info-card { background: #fff; border: 1.5px solid #eaecf4; border-radius: 16px; padding: 24px; position: sticky; top: 80px; }
-    .info-card-title { font-size: 14px; font-weight: 900; color: #1c1e26; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #f3f4f8; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f8f9fc; font-size: 13px; }
+    .detail-actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 20px; }
+
+    /* 본문 & 사이드바 그리드 정렬 최적화 */
+    .detail-body { display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start; }
+    .detail-main-content { display: flex; flex-direction: column; }
+    .detail-description { font-size: 16px; color: #374151; line-height: 1.9; white-space: pre-wrap; min-height: 150px; margin-bottom: 40px; }
+
+    .detail-footer { display: flex; justify-content: space-between; align-items: center; padding-bottom: 40px; border-bottom: 1.5px solid #f1f3f9; }
+
+    /* 사이드바 및 카드 컴포넌트 */
+    .info-card { background: #fff; border: 1.5px solid #eaecf4; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02); }
+    .info-card-title { font-size: 14px; font-weight: 900; color: #1c1e26; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f8; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8f9fc; font-size: 13px; }
     .info-row:last-of-type { border-bottom: none; }
-    .info-label { color: #9ca3af; font-weight: 500; }
+    .info-label { color: #8892a0; font-weight: 500; }
     .info-value { color: #1c1e26; font-weight: 700; }
-    .info-value.highlight { color: #2563eb; font-size: 16px; }
+    .info-value.highlight { color: #2563eb; font-size: 16px; font-weight: 800; }
     .info-value.urgent { color: #ef4444; }
-    .bid-btn { display: block; width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 20px; text-align: center; text-decoration: none; }
+
+    .bid-btn { display: block; width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 20px; text-align: center; text-decoration: none; transition: background 0.15s; }
     .bid-btn:hover { background: #1d4ed8; }
-    .btn { display: inline-block; padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all .15s; text-decoration: none; }
+
+    /* 공통 버튼 */
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all .15s; text-decoration: none; }
     .btn-outline { background: #fff; border: 1.5px solid #e2e5ef; color: #4b5563; }
-    .btn-outline:hover { border-color: #2563eb; color: #2563eb; }
+    .btn-outline:hover { border-color: #2563eb; color: #2563eb; background: #fdfeff; }
     .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 7px; }
     .btn-danger { background: #fff3f3; color: #ef4444; border: 1.5px solid #fecaca; }
+    .btn-danger:hover { background: #ffeeec; }
+
+    /* 제안서 리스트 섹션 정렬 */
+    .bid-list-container { margin-top: 40px; }
+    .bid-list-title { font-size: 18px; font-weight: 900; color: #1c1e26; margin-bottom: 24px; display: flex; align-items: center; gap: 6px; }
+    .bid-item-card { background: #fff; border: 1.5px solid #eaecf4; border-radius: 14px; padding: 24px; display: flex; justify-content: space-between; align-items: stretch; transition: border-color 0.15s; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01); }
+    .bid-item-card:hover { border-color: #cbd5e1; }
 </style>
 
 <section class="detail-section">
@@ -46,7 +62,9 @@
         <div class="detail-header">
             <div>
                 <span class="detail-category">{{project.categoryName}}</span>
-                {{#project.isCertifiedOnly}}<span class="badge-certified">⭐ 인증 전문가만</span>{{/project.isCertifiedOnly}}
+                {{#project.isCertifiedOnly}}
+                    <span class="badge-certified">⭐ 인증 전문가만</span>
+                {{/project.isCertifiedOnly}}
             </div>
             <h1 class="detail-title">{{project.title}}</h1>
             <div class="detail-meta">
@@ -59,30 +77,77 @@
         </div>
 
         {{#isOwner}}
-        <div class="detail-actions">
-            <a href="/projects/{{project.id}}/edit" class="btn btn-outline btn-sm">수정</a>
-            <button onclick="deleteProject({{project.id}})" class="btn btn-sm btn-danger">삭제</button>
-        </div>
+            <div class="detail-actions">
+                <a href="/projects/{{project.id}}/edit" class="btn btn-outline btn-sm">수정</a>
+                <button onclick="deleteProject({{project.id}})" class="btn btn-sm btn-danger">삭제</button>
+            </div>
         {{/isOwner}}
 
         <div class="detail-body">
-            <div>
+
+            <div class="detail-main-content">
                 <div class="detail-description">{{project.description}}</div>
+
                 <div class="detail-footer">
                     <a href="/projects" class="btn btn-outline">← 목록으로</a>
                     {{#isAdmin}}
                         <form action="/admin/projects/{{project.id}}/delete" method="POST" onsubmit="return confirm('정말로 이 프로젝트를 삭제하시겠습니까?');" style="margin: 0;">
-                            <button type="submit" class="btn btn-danger" style="padding: 10px 16px; background-color: #ef4444; color: #ffffff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; height: 100%; transition: background 0.15s;">
-                                삭제
+                            <button type="submit" class="btn btn-danger" style="font-weight: bold;">
+                                관리자 권한 삭제
                             </button>
                         </form>
                     {{/isAdmin}}
                 </div>
+
+                {{#isOwner}}
+                    <div class="bid-list-container">
+                        <h2 class="bid-list-title">📄 접수된 전문가 제안서 목록</h2>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            {{#bids}}
+                                <div class="bid-item-card">
+                                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div>
+                                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                                                <span style="font-weight: 800; color: #1c1e26; font-size: 15px;">{{expert.name}} 전문가</span>
+                                                <div class="detail-meta-dot"></div>
+                                                <span style="font-size: 12px; color: #9ca3af;">{{createdAt}}</span>
+                                            </div>
+                                            <p style="font-size: 14px; color: #4b5563; line-height: 1.6; margin: 0; white-space: pre-wrap;">{{coverLetter}}</p>
+                                        </div>
+
+                                        {{#approach}}
+                                            <div style="margin-top: 12px; background: #f8f9fc; padding: 10px 14px; border-radius: 8px;">
+                                                <span style="font-size: 13px; color: #475569; line-height: 1.5; display: block;">🎯 <strong>접근 방식:</strong> {{approach}}</span>
+                                            </div>
+                                        {{/approach}}
+                                    </div>
+
+                                    <div style="text-align: right; margin-left: 24px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; min-width: 110px;">
+                                        <div style="font-size: 17px; font-weight: 800; color: #2563eb;">{{proposedPrice}} 만원</div>
+
+                                        {{^project.isClosed}}
+                                            <form action="/projects/{{project.id}}/bids/{{id}}/select" method="POST" style="margin:0; width: 100%;">
+                                                <button type="submit" class="btn btn-outline btn-sm" style="width: 100%; border-color: #2563eb; color: #2563eb; font-weight: 700; background: #fff;" onclick="return confirm('이 전문가를 낙찰하시겠습니까?');">낙찰하기</button>
+                                            </form>
+                                        {{/project.isClosed}}
+                                    </div>
+                                </div>
+                            {{/bids}}
+
+                            {{^bids}}
+                                <div style="text-align: center; color: #9ca3af; padding: 48px 0; border: 1.5px dashed #eaecf4; border-radius: 14px; font-size: 14px; background: #fff;">
+                                    현재 도착한 전문가 제안서가 없습니다.
+                                </div>
+                            {{/bids}}
+                        </div>
+                    </div>
+                {{/isOwner}}
             </div>
 
-            <div style="position: sticky; top: 80px; display: flex; flex-direction: column; gap: 20px;">
+            <div style="position: sticky; top: 100px; display: flex; flex-direction: column; gap: 20px;">
 
-                <div class="info-card" style="position: static; padding: 24px;">
+                <div class="info-card">
                     <div class="info-card-title">프로젝트 정보</div>
                     <div class="info-row">
                         <span class="info-label">예산</span>
@@ -98,43 +163,43 @@
                     </div>
                     <div class="info-row">
                         <span class="info-label">입찰 수</span>
-                        <span class="info-value">{{bidCount}}개</span>
+                        <span class="info-value" style="color: #2563eb;">{{bidCount}}개</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">인증 전문가</span>
                         <span class="info-value">{{#project.isCertifiedOnly}}필수{{/project.isCertifiedOnly}}{{^project.isCertifiedOnly}}무관{{/project.isCertifiedOnly}}</span>
                     </div>
                     {{^isOwner}}
-                    <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
+                        <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
                     {{/isOwner}}
                 </div>
 
                 {{#expertCard}}
-                <div class="info-card" style="position: static; padding: 24px; border-color: #2563eb;">
-                    <div class="info-card-title" style="color: #2563eb; border-bottom-color: #eff6ff; margin-bottom: 16px;">
-                        🏆 낙찰된 전문가 정보
+                    <div class="info-card" style="border-color: #2563eb; background: #fdfeff;">
+                        <div class="info-card-title" style="color: #2563eb; border-bottom-color: #eff6ff; margin-bottom: 16px;">
+                            🏆 낙찰된 전문가 정보
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">이름</span>
+                            <span class="info-value" style="color: #2563eb;">{{expertName}}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">이메일</span>
+                            <span class="info-value" style="font-size: 12px; font-weight: 600; color: #4b5563;">{{expertEmail}}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">작업명</span>
+                            <span class="info-value" style="max-width: 150px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{taskTitle}}">{{taskTitle}}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">시작기간</span>
+                            <span class="info-value">{{startDate}}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">마감기간</span>
+                            <span class="info-value">{{endDate}}</span>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">이름</span>
-                        <span class="info-value">{{expertName}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">이메일</span>
-                        <span class="info-value" style="font-size: 12px; font-weight: 500; color: #4b5563;">{{expertEmail}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">작업명</span>
-                        <span class="info-value" style="max-width: 140px; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{taskTitle}}">{{taskTitle}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">시작기간</span>
-                        <span class="info-value">{{startDate}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">마감기간</span>
-                        <span class="info-value">{{endDate}}</span>
-                    </div>
-                </div>
                 {{/expertCard}}
 
             </div>
@@ -144,16 +209,16 @@
 </section>
 
 <script>
-function deleteProject(id) {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-    fetch('/projects/' + id, {
-        method: 'DELETE'
-    }).then(res => {
-        if (res.ok) {
-            window.location.href = '/projects';
-        }
-    });
-}
+    function deleteProject(id) {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        fetch('/projects/' + id, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok) {
+                window.location.href = '/projects';
+            }
+        });
+    }
 </script>
 
 {{> layout/footer}}
