@@ -1,5 +1,7 @@
 package com.example.SevMerge.project;
 
+import com.example.SevMerge.bid.Bid;
+import com.example.SevMerge.bid.BidRepository;
 import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
@@ -21,6 +23,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final BidService bidService;
+    private final BidRepository bidRepository;
 
     // 프로젝트 등록 폼
     @GetMapping("/projects/save-form")
@@ -102,6 +105,12 @@ public class ProjectController {
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         ProjectResponeDTO.DetailDTO project = projectService.findProjectById(id);
         model.addAttribute("project", project);
+
+        // 제안서 상세조회
+        List<Bid> bids = bidRepository.findByProjectId(id);
+        model.addAttribute("bids",bids);
+        model.addAttribute("bidCount", bids.size());
+
         // 로그인한 사용자가 프로젝트 작성자인지 확인
         boolean isOwner = sessionUser != null && sessionUser.getId().equals(project.getMemberId());
 
