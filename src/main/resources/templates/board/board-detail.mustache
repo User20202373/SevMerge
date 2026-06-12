@@ -298,23 +298,21 @@
                  style="margin-bottom: 0; padding-bottom: 2px; flex-shrink: 0; display: flex; gap: 8px; align-items: center;">
                 <!-- 1. 작성자 본인일 때만 뜨는 수정/삭제 -->
                 {{^isNotice}}
-                {{#isOwner}}
-                    <a href="/boards/{{board.id}}/edit" class="btn btn-outline btn-sm">수정</a>
-                {{/isOwner}}
+                    {{#isOwner}}
+                        <a href="/boards/{{board.id}}/edit" class="btn btn-outline btn-sm">수정</a>
+                    {{/isOwner}}
                 {{/isNotice}}
                 {{#isNotice}}
-                {{#isAdmin}}
-                    <a href="/admin/notices/{{board.id}}/update" class="btn btn-primary btn-sm">수정</a>
-                {{/isAdmin}}
+                    {{#isAdmin}}
+                        <a href="/admin/notices/{{board.id}}/update" class="btn btn-primary btn-sm">수정</a>
+                    {{/isAdmin}}
                 {{/isNotice}}
                 <!-- 관리자가 아닐 때만 일반 회원용 삭제 버튼 노출 -->
                 {{#isOwner}}
                     {{^isAdmin}}
-                        <form action="/boards/{{board.id}}/delete" method="POST" style="display:inline; margin: 0;">
-                            <button type="submit" class="btn btn-sm"
-                                    style="background:#fff3f3; color:#ef4444; border:1.5px solid #fecaca;">삭제
-                            </button>
-                        </form>
+                        <button type="button" onclick="deleteBoard({{board.id}})" class="btn btn-sm"
+                                style="background:#fff3f3; color:#ef4444; border:1.5px solid #fecaca;">삭제
+                        </button>
                     {{/isAdmin}}
                 {{/isOwner}}
 
@@ -394,14 +392,21 @@
                             </div>
 
                             <div id="comment-edit-form-{{id}}" style="display: none; width: 100%; margin-top: 10px;">
-                                <form action="/comments/{{id}}/update" method="POST" style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                                <form action="/comments/{{id}}/update" method="POST"
+                                      style="display: flex; align-items: center; width: 100%; gap: 10px;">
                                     <input type="hidden" name="boardId" value="{{boardId}}">
 
                                     <input type="text" name="comment" value="{{comment}}" required
                                            style="flex: 1; padding: 6px 10px; border: 1px solid #007bff; border-radius: 4px; font-size: 14px;">
 
-                                    <button type="submit" class="comment-btn" style="background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px;">수정완료</button>
-                                    <button type="button" class="comment-btn" onclick="toggleEdit('{{id}}')" style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px;">취소</button>
+                                    <button type="submit" class="comment-btn"
+                                            style="background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px;">
+                                        수정완료
+                                    </button>
+                                    <button type="button" class="comment-btn" onclick="toggleEdit('{{id}}')"
+                                            style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px;">
+                                        취소
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -423,6 +428,23 @@
                             textView.style.display = 'block';
                             if (actions) actions.style.display = 'block';
                         }
+                    }
+
+                    async function deleteBoard(boardId) {
+                      try {
+                        if (!confirm("정말 삭제하시겠습니까?")) {
+                          return;
+                        }
+                        const res = await fetch("/boards/" + boardId, {
+                          method: "DELETE",
+                        });
+
+                        if (res.ok) {
+                          location.href = "/boards";
+                        }
+                      } catch (e) {
+                        alert(e.message);
+                      }
                     }
                 </script>
                 {{^comments}}
