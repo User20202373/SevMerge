@@ -748,7 +748,7 @@
         <!-- 우측 사용자 상태 바 -->
         <div class="nav-actions">
             {{#isLoggedIn}}
-                {{^isAdmin}}
+                {{#isAdmin}}
                     <span class="nav-username">{{sessionUser.name}}님</span>
                     <div class="nav-balance-wrap">
                         <span class="nav-balance-label">잔액</span>
