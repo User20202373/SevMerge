@@ -39,12 +39,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
         // 로그인 체크
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/users/**", "/my-pages", "/my-pages/**", "/projects/save-form", "/messages/**")
+                .addPathPatterns("/users/**", "/my-pages", "/my-pages/**", "/projects/save-form", "/messages/**","/boards/**")
                 .excludePathPatterns(
                         "/",
                         "/login",
                         "/join",
                         "/logout",
+                        "/boards",
+                        "/boards/{id}",
                         "/projects",
                         "/projects/{id}",
                         "/google-redirect",    // 구글 로그인 통과
