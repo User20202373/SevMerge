@@ -42,6 +42,10 @@ public class Notification {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
     public void read() {
         this.isRead = true;
     }
