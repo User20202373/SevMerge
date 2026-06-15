@@ -4,6 +4,7 @@ import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.core.exception.ForbiddenException;
 import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.member.Member;
+import com.example.SevMerge.notification.NotificationService;
 import com.example.SevMerge.payment.Payment;
 import com.example.SevMerge.payment.PaymentRepository;
 import com.example.SevMerge.payment.PaymentService;
@@ -30,6 +31,7 @@ public class BidService {
     private final ProjectRepository projectRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
+    private final NotificationService  notificationService;
 
     // 제안서 작성
     @Transactional
@@ -76,6 +78,7 @@ public class BidService {
                 .build();
         bidRepository.save(bid);
 
+        notificationService.notifyNewBid(project.getMember(), session.getEmail(), project.getTitle(), project.getId());
     }
 
     // 제안서 조회 (의뢰인)
@@ -199,6 +202,7 @@ public class BidService {
 
         // 제안서 상태를 SELECTED로 변경
         bid.select();
+        notificationService.notifyBidSelected(bid.getExpert(), bid.getProject().getTitle());
 
         // 나머지 대기중인 제안서 전부 탈락 처리
         List<Bid> otherBids = bidRepository.findByProjectId(bid.getProject().getId());
@@ -206,6 +210,7 @@ public class BidService {
             if (!other.getId().equals(bid.getId()) &&
                     (other.getStatus() == BidStatus.PENDING || other.getStatus() == BidStatus.HOLD)) {
                 other.fail();
+                notificationService.notifyBidRejected(other.getExpert(), bid.getProject().getTitle());
             }
         }
 
@@ -216,6 +221,7 @@ public class BidService {
                 bid.getExpert().getId(),
                 bid.getProposedPrice().intValue()
         );
+        notificationService.notifyPaymentCompleted(session, bid.getExpert(), bid.getProject().getTitle());
         // [핵심 추가] 프로젝트 상태를 CLOSED로 변경
         Project project = bid.getProject();
         project.updateStatus(ProjectStatus.CLOSED);
@@ -293,6 +299,7 @@ public class BidService {
             throw new BadRequestException("처리가 된 제안서 입니다");
         }
         bid.reject();
+        notificationService.notifyBidRejected(bid.getExpert(), bid.getProject().getTitle());
     }
 
     public Optional<Bid> findSelectedBidByProjectId(Long projectId) {
