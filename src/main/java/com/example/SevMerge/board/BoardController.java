@@ -28,56 +28,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
-    private final BoardRepository boardRepository;
-    private final ExpertProfileService expertProfileService;
-
-    // todo: 추후 메인 페이지 요청하는 곳 생성되면 삭제예정
-    @GetMapping("/")
-    public String mainPage(Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
-
-        if (sessionUser != null && sessionUser.getRole() == Role.ADMIN) {
-            model.addAttribute("isAdmin", true);
-        } else {
-            model.addAttribute("isAdmin", false);
-        }
-
-        return "main";
-    }
-
-    @GetMapping("/intro")
-    public String introPage() {
-        return "intro";
-    }
-
-    @GetMapping("/exmain")
-    public String exmainPage(Model model) {
-        List<ExpertProfileResponse> all = expertProfileService.getAll();
-
-        // 섹션 1 — 오분대기조: avgRating 높은 순 상위 6명
-        List<ExpertProfileResponse> fastExperts = all.stream()
-                .sorted(Comparator.comparing(ExpertProfileResponse::getAvgRating).reversed())
-                .limit(6)
-                .toList();
-
-        // 섹션 2 — 바가지 수사대: totalReviews(완료 건수) 많은 순 상위 6명
-        List<ExpertProfileResponse> valueExperts = all.stream()
-                .sorted(Comparator.comparingInt(ExpertProfileResponse::getTotalReviews).reversed())
-                .limit(6)
-                .toList();
-
-        // 섹션 3 — 만족 취조실: isCertified 우선 정렬, 그 다음 avgRating 순
-        List<ExpertProfileResponse> asExperts = all.stream()
-                .sorted(Comparator.comparing(ExpertProfileResponse::isCertified).reversed()
-                        .thenComparing(Comparator.comparing(ExpertProfileResponse::getAvgRating).reversed()))
-                .limit(6)
-                .toList();
-
-        model.addAttribute("fastExperts", fastExperts);
-        model.addAttribute("valueExperts", valueExperts);
-        model.addAttribute("asExperts", asExperts);
-        return "exmain";
-    }
 
     @GetMapping("/boards")
     public String showBoard(@RequestParam(defaultValue = "FREE") String boardType,
@@ -85,19 +35,19 @@ public class BoardController {
                             @RequestParam(defaultValue = "1") int page,
                             Model model, HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
 
         model.addAttribute("isFree", boardType.equalsIgnoreCase("FREE"));
         model.addAttribute("isNotice", boardType.equalsIgnoreCase("NOTICE"));
         model.addAttribute("isInquiry", boardType.equalsIgnoreCase("INQUIRY"));
-        model.addAttribute("isAdmin", sessionMember != null && sessionMember.getRole() == Role.ADMIN);
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         model.addAttribute("keyword", keyword);
         model.addAttribute("boardType", boardType);
 
         // 1:1 문의 분기
         if (boardType.equalsIgnoreCase("INQUIRY")) {
-            if (sessionMember == null) return "redirect:/login-form";
-            List<BoardResponse.ListDTO> inquiryBoards = boardService.findAllInquiry(BoardType.INQUIRY, sessionMember);
+            if (sessionUser == null) return "login-form";
+            List<BoardResponse.ListDTO> inquiryBoards = boardService.findAllInquiry(BoardType.INQUIRY, sessionUser);
             model.addAttribute("boards", inquiryBoards);
             model.addAttribute("boardCount", inquiryBoards.size());
             model.addAttribute("totalPages", 1);
@@ -123,17 +73,18 @@ public class BoardController {
     public String showBoardDetail(@PathVariable(name = "boardId") Long boardId,
                                   Model model, HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+
         boardService.increaseViewCount(boardId);
-        String sessionUserRole = (sessionMember != null && sessionMember.getRole() != null) ? sessionMember.getRole().name() : "GUEST";
+        String sessionUserRole = (sessionUser != null && sessionUser.getRole() != null) ? sessionUser.getRole().name() : "GUEST";
         BoardResponse.DetailDTO board = boardService.detailBoard(boardId);
         Long boardOwner = board.getMemberId();
-        Long sessionUserId = (sessionMember != null) ? sessionMember.getId() : null;
+        Long sessionUserId = (sessionUser != null) ? sessionUser.getId() : null;
         List<CommentResponse.ListDTO> commentList = commentService.findComments(boardId,sessionUserId, sessionUserRole);
         model.addAttribute("board", board);
         model.addAttribute("comments", commentList);
-        model.addAttribute("isOwner", sessionMember != null && boardOwner.equals(sessionMember.getId()));
-        model.addAttribute("isAdmin", sessionMember != null && sessionMember.getRole() == Role.ADMIN);
+        model.addAttribute("isOwner", sessionUser != null && boardOwner.equals(sessionUser.getId()));
+        model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         boolean isNoticeBoard = "NOTICE".equals(board.getBoardType()) || "NOTICE".equals(String.valueOf(board.getBoardType()));
         model.addAttribute("isNotice", isNoticeBoard);
         return "board/board-detail";
@@ -144,6 +95,7 @@ public class BoardController {
                                 Model model, HttpSession session) throws BadRequestException {
 
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+
         // 공지사항은 어드민만
         if (boardType.equalsIgnoreCase("NOTICE")) {
             if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) {
@@ -155,7 +107,7 @@ public class BoardController {
         if (boardType.equalsIgnoreCase("FREE") ||
                 boardType.equalsIgnoreCase("INQUIRY")) {
             if (sessionUser == null) {
-                return "redirect:/login-form";
+                return "login-form";
             }
         }
 
@@ -170,16 +122,17 @@ public class BoardController {
     @PostMapping("boards/save")
     public String saveBoard(BoardRequest.SaveBoardDTO saveBoardDTO,
                             HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
 
         saveBoardDTO.validate();
 
-        boardService.saveBoard(sessionMember, saveBoardDTO);
+        boardService.saveBoard(sessionUser, saveBoardDTO);
 
         if (saveBoardDTO.getBoardType() == BoardType.INQUIRY) {
             return "redirect:/boards?boardType=INQUIRY";
+        } else if (saveBoardDTO.getBoardType() == BoardType.NOTICE) {
+            return "redirect:/boards?boardType=NOTICE";
         }
-
         return "redirect:/boards";
     }
 
@@ -202,17 +155,17 @@ public class BoardController {
                                          @RequestBody BoardRequest.UpdateBoardDTO updateBoardDTO,
                                          HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
 
-        boardService.updateBoard(boardId, updateBoardDTO, sessionMember.getId());
+        boardService.updateBoard(boardId, updateBoardDTO, sessionUser.getId());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/boards/{boardId}")
     @ResponseBody
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
-        boardService.deleteBoard(boardId, sessionMember.getId());
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        boardService.deleteBoard(boardId, sessionUser.getId());
         return ResponseEntity.ok().build();
     }
 

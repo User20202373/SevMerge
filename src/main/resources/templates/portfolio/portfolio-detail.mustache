@@ -42,7 +42,7 @@
         <div class="portfolio-card">
             <div class="portfolio-img">
                 {{#portfolio.imageUrl}}
-                <img src="{{portfolio.imageUrl}}" alt="{{portfolio.title}}" onerror="handleImageError(this)" />
+                <img src="/images/portfolio/{{portfolio.imageUrl}}" alt="{{portfolio.title}}" onerror="handleImageError(this)" />
                 {{/portfolio.imageUrl}}
                 {{^portfolio.imageUrl}}
                 🖼️
@@ -63,6 +63,9 @@
                     <span class="portfolio-link-label">🔗 프로젝트 링크</span>
                     <a href="{{portfolio.projectUrl}}" target="_blank" class="portfolio-link-url">{{portfolio.projectUrl}}</a>
                 </div>
+                {{/portfolio.projectUrl}}
+                {{^portfolio.projectUrl}}
+                    <span class="no-link">등록된 프로젝트가 없습니다.</span>
                 {{/portfolio.projectUrl}}
                 <div class="portfolio-actions">
                     <a href="/portfolios?expertId={{portfolio.expertId}}" class="btn btn-outline">← 목록으로</a>
