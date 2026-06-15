@@ -89,10 +89,10 @@ public class MemberController {
             return "redirect:/expert-rejected";
         }
 
-        if (member.getRole() == Role.EXPERT) {
-            return "redirect:/experts/dashboard";
-        }
-        return "redirect:/";
+//        if (member.getRole() == Role.EXPERT) {
+//            return "redirect:/experts/dashboard";
+//        }
+        return "redirect:/exmain";
     }
 
     @GetMapping("/logout")
@@ -161,7 +161,7 @@ public class MemberController {
         } else if (tab.equals("boards")) {
             model.addAttribute("boards", boardService.findAllByMyBoard(loginMember.getId()));
         } else if (tab.equals("reviews")) {
-            model.addAttribute("reviews", reviewService.findMyReviews(loginMember.getId()));
+            model.addAttribute("reviews", reviewService.findMySaveReviews(loginMember.getId()));
         } else if (tab.equals("edit")) {
             model.addAttribute("rawName", loginMember.getName());
             model.addAttribute("rawEmail", loginMember.getEmail());

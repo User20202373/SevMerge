@@ -6,6 +6,7 @@ import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.expertprofile.ExpertProfileRepository;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.MemberRepository;
+import com.example.SevMerge.portfolio.utile.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -68,25 +69,26 @@ public class PortfolioService {
 
 
     @Transactional
-    public void save(PortfolioRequest.SaveDTO saveDTO)  {
-
-
+    public void save(PortfolioRequest.SaveDTO saveDTO, Long sessionUserId) {
 
         saveDTO.validate();
-
-        System.out.println("saveDTO: "+saveDTO);
-        Portfolio newPortfolio = Portfolio
-                .builder()
-                .expertProfile(expertProfileRepository
-                        .findByMemberId(saveDTO.getExpertId()).orElseThrow(() -> new BadRequestException("전문가를 찾지못했습니다.")))
-                .title(saveDTO.getTitle())
-                .description(saveDTO.getDescription())
-                .imageUrl(saveDTO.getImageUrl())
-                .projectUrl(saveDTO.getProjectUrl())
-                .isActive(true)
-                .build();
-
-        portfolioRepository.save(newPortfolio);
+        try {
+            Portfolio newPortfolio = null;
+            String savedFileName = FileUtil.saveFile(saveDTO.getImageFile());
+            newPortfolio = Portfolio
+                    .builder()
+                    .expertProfile(expertProfileRepository
+                            .findByMemberId(saveDTO.getExpertId()).orElseThrow(() -> new BadRequestException("전문가를 찾지못했습니다.")))
+                    .title(saveDTO.getTitle())
+                    .description(saveDTO.getDescription())
+                    .imageUrl(savedFileName)
+                    .projectUrl(saveDTO.getProjectUrl())
+                    .isActive(true)
+                    .build();
+            portfolioRepository.save(newPortfolio);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -95,6 +97,8 @@ public class PortfolioService {
     @Transactional
     public void update(Long portfolioId, PortfolioRequest.UpdateDTO updateDTO,Long sessionUserId) {
 
+        String newImageFile = null; // 파일경로
+        updateDTO.validate();
         Portfolio portfolio = portfolioRepository.findById(portfolioId).orElseThrow(() ->
                 new BadRequestException("포트폴리오를 찾을수 없습니다.")
         );
@@ -103,12 +107,24 @@ public class PortfolioService {
             throw new ForbiddenException("수정 권한이 없습니다.");
         }
 
-
-        updateDTO.validate();
-
+        // 리퀘스트로 파일이 있을때
+        if(updateDTO.getImageFile() != null && !updateDTO.getImageFile().isEmpty()){
+            try {
+                if(!FileUtil.isImageFile(updateDTO.getImageFile())){
+                    throw new BadRequestException("이미지 파일만 업로드 가능 합니다.");
+                }
+                 // 새이미지 로컬 폴더에 저장 (중복되지 않을 이미지 파일 이름을 리턴)
+                // 이미지 파일 경로 반환
+                newImageFile = FileUtil.saveFile(updateDTO.getImageFile());
+            }  catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(newImageFile != null){
+            portfolio.setImageUrl(newImageFile);
+        }
         portfolio.setDescription(updateDTO.getDescription());
         portfolio.setTitle(updateDTO.getTitle());
-        portfolio.setImageUrl(updateDTO.getImageUrl());
         portfolio.setProjectUrl(updateDTO.getProjectUrl());
 
     }
