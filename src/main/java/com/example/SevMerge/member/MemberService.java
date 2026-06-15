@@ -5,6 +5,7 @@ import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.core.util.FileUtil;
 import com.example.SevMerge.expertprofile.*;
+import com.example.SevMerge.notification.NotificationService;
 import com.example.SevMerge.notification.SolApiService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,8 @@ public class MemberService {
 
     //문자 발송
     private final SolApiService solApiService;
+
+    private final NotificationService notificationService;
 
 
     // 카카오 환경 변수
@@ -270,6 +273,7 @@ public class MemberService {
         log.info("전문가 승인 완료 - memberId={}", memberId);
         sendStatusSms(member,
                 "[Sev Merge] " + member.getName() + " 전문가님, 전문가 신청이 승인되었습니다. 지금 바로 활동을 시작해보세요!");
+        notificationService.notifyExpertApproved(member);
     }
 
     // 전문가 거절
@@ -293,6 +297,7 @@ public class MemberService {
         log.info("전문가 거부 처리 - memberId={}", memberId);
         sendStatusSms(member,
                 "[Sev Merge] " + member.getName() + " 전문가님, 전문가 신청이 거부되었습니다. 자세한 내용은 고객센터를 이용해주세요.");
+        notificationService.notifyExpertRejected(member);
     }
 
     // 재신청용 기존 프로필 조회

@@ -292,7 +292,10 @@
         if (opening && !card.classList.contains('read')) {
             const id = card.dataset.id;
             fetch('/notifications/' + id + '/read', {method: 'POST'})
-                    .then(() => card.classList.add('read'))
+                    .then(() => {
+                        card.classList.add('read');
+                        refreshBellDot();
+                    })
                     .catch(() => {
                     });
         }
@@ -304,8 +307,20 @@
         const id = card.dataset.id;
         fetch('/notifications/' + id + '/delete', { method: 'POST' })
                 .then(res => res.json())
-                .then(body => { if (body.success) card.remove(); })
+                .then(body => {
+                    if (body.success)
+                    card.remove();
+                    refreshBellDot();
+                })
                 .catch(() => {});
+    }
+
+    function refreshBellDot() {
+        const hasUnread = document.querySelector('.noti-card:not(.read)') !== null;
+        if (!hasUnread) {
+            const dot = document.querySelector('.nav-bell-dot');
+            if (dot) dot.remove();
+        }
     }
 
 </script>
