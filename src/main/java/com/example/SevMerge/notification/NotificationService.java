@@ -65,6 +65,12 @@ public class NotificationService {
             throw new UnauthorizedException("알림을 삭제할 권한이 없습니다.");
         }
 
+        notification.delete();
+
+    }
+
+    public void deleteAllNotifications(Member receiver) {
+        notificationRepository.deleteAll();
     }
 
 }
