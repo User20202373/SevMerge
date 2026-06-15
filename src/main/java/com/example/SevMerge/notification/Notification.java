@@ -49,4 +49,8 @@ public class Notification {
     public void read() {
         this.isRead = true;
     }
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
