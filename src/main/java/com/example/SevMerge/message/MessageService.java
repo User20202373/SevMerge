@@ -6,6 +6,7 @@ import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.core.exception.UnauthorizedException;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.MemberRepository;
+import com.example.SevMerge.notification.NotificationService;
 import com.example.SevMerge.project.Project;
 import com.example.SevMerge.project.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final BidRepository bidRepository;
+    private final NotificationService notificationService;
 
     // 쪽지함 리스트 페이징 처리 조회
     public Page<MessageResponse.ListDTO> findMessages(Member member, String box, int page, String sort, String keyword) {
@@ -100,6 +102,7 @@ public class MessageService {
                 .title(reqDTO.getTitle())
                 .content(reqDTO.getContent())
                 .build());
+        notificationService.notifyMessageReceived(receiver, sender.getName(), reqDTO.getTitle());
     }
 
     // 메세지 삭제 기능

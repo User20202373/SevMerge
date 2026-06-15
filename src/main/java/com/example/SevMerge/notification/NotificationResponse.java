@@ -1,7 +1,7 @@
 package com.example.SevMerge.notification;
 
 import lombok.Data;
-
+import com.example.SevMerge.core.util.MyDateUtil;
 import java.sql.Timestamp;
 
 public class NotificationResponse {
@@ -13,7 +13,7 @@ public class NotificationResponse {
         private String content;
         private String url;  // 관련 페이지 이동 경로
         private boolean isRead;
-        private Timestamp createdAt;
+        private String createdAt;
 
         public ListDTO(Notification notification) {
             this.id = notification.getId();
@@ -21,7 +21,7 @@ public class NotificationResponse {
             this.content = notification.getContent();
             this.url = notification.getUrl();
             this.isRead = notification.isRead();
-            this.createdAt = notification.getCreatedAt();
+            this.createdAt = MyDateUtil.timestampFormat(notification.getCreatedAt());
         }
     }
 }

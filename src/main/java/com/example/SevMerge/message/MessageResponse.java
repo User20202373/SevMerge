@@ -1,5 +1,6 @@
 package com.example.SevMerge.message;
 
+import com.example.SevMerge.core.util.MyDateUtil;
 import com.example.SevMerge.bid.BidStatus;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.Role;
@@ -19,7 +20,7 @@ public class MessageResponse {
         private String receiverName;
         private String title;
         private Boolean isRead;
-        private Timestamp createdAt;
+        private String createdAt;
 
         public ListDTO(Message message) {
             this.id = message.getId();
@@ -27,7 +28,7 @@ public class MessageResponse {
             this.receiverName = message.getReceiver().getName();
             this.title = message.getTitle();
             this.isRead = message.getIsRead();
-            this.createdAt = message.getCreatedAt();
+            this.createdAt = MyDateUtil.timestampFormat(message.getCreatedAt());
         }
     }
 
@@ -43,7 +44,7 @@ public class MessageResponse {
         private String title;
         private String content;
         private Boolean isRead;
-        private Timestamp createdAt;
+        private String createdAt;
         public DetailDTO(Message message) {
             this.id = message.getId();
             this.senderId = message.getSender().getId();
@@ -54,7 +55,7 @@ public class MessageResponse {
             this.title = message.getTitle();
             this.content = message.getContent();
             this.isRead = message.getIsRead();
-            this.createdAt = message.getCreatedAt();
+            this.createdAt = MyDateUtil.timestampFormat(message.getCreatedAt());
         }
     }
 
