@@ -89,10 +89,10 @@ public class MemberController {
             return "redirect:/expert-rejected";
         }
 
-        if (member.getRole() == Role.EXPERT) {
-            return "redirect:/experts/dashboard";
-        }
-        return "redirect:/";
+//        if (member.getRole() == Role.EXPERT) {
+//            return "redirect:/experts/dashboard";
+//        }
+        return "redirect:/exmain";
     }
 
     @GetMapping("/logout")

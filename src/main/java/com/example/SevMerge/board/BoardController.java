@@ -28,55 +28,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final CommentService commentService;
-    private final ExpertProfileService expertProfileService;
-
-    // todo: 추후 메인 페이지 요청하는 곳 생성되면 삭제예정
-    @GetMapping("/")
-    public String mainPage(Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
-
-        if (sessionUser != null && sessionUser.getRole() == Role.ADMIN) {
-            model.addAttribute("isAdmin", true);
-        } else {
-            model.addAttribute("isAdmin", false);
-        }
-
-        return "main";
-    }
-
-    @GetMapping("/intro")
-    public String introPage() {
-        return "intro";
-    }
-
-    @GetMapping("/exmain")
-    public String exmainPage(Model model) {
-        List<ExpertProfileResponse> all = expertProfileService.getAll();
-
-        // 섹션 1 — 오분대기조: avgRating 높은 순 상위 6명
-        List<ExpertProfileResponse> fastExperts = all.stream()
-                .sorted(Comparator.comparing(ExpertProfileResponse::getAvgRating).reversed())
-                .limit(6)
-                .toList();
-
-        // 섹션 2 — 바가지 수사대: totalReviews(완료 건수) 많은 순 상위 6명
-        List<ExpertProfileResponse> valueExperts = all.stream()
-                .sorted(Comparator.comparingInt(ExpertProfileResponse::getTotalReviews).reversed())
-                .limit(6)
-                .toList();
-
-        // 섹션 3 — 만족 취조실: isCertified 우선 정렬, 그 다음 avgRating 순
-        List<ExpertProfileResponse> asExperts = all.stream()
-                .sorted(Comparator.comparing(ExpertProfileResponse::isCertified).reversed()
-                        .thenComparing(Comparator.comparing(ExpertProfileResponse::getAvgRating).reversed()))
-                .limit(6)
-                .toList();
-
-        model.addAttribute("fastExperts", fastExperts);
-        model.addAttribute("valueExperts", valueExperts);
-        model.addAttribute("asExperts", asExperts);
-        return "exmain";
-    }
 
     @GetMapping("/boards")
     public String showBoard(@RequestParam(defaultValue = "FREE") String boardType,

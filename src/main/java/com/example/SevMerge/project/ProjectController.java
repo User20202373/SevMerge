@@ -148,23 +148,27 @@ public class ProjectController {
     @PutMapping("/projects/{id}")
     @ResponseBody
     public ResponseEntity<?> update(@PathVariable Long id,
-                                    @RequestBody ProjectRequestDTO.UpdateDTO req
+                                    @RequestBody ProjectRequestDTO.UpdateDTO req,
+                                    HttpSession session
     ) {
         log.info("project 수정 요청");
 
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+
         req.validate();
         // 세션유저 검증이 필요없음으로 null
-        projectService.updateProject(id, req, null);
+        projectService.updateProject(id, req, sessionUser);
         return ResponseEntity.ok().build();
     }
 
     // 프로젝트 삭제 (DELETE - JS 비동기)
     @DeleteMapping("/projects/{id}")
     @ResponseBody
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id,
+                                    HttpSession session) {
         log.info("project 삭제 요청");
-
-        projectService.deleteProject(id, null);
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        projectService.deleteProject(id, sessionUser);
         return ResponseEntity.ok().build();
     }
 
