@@ -2,9 +2,11 @@ package com.example.SevMerge.member;
 
 import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.board.BoardService;
+import com.example.SevMerge.charge.ChargeService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.message.MessageRepository;
 import com.example.SevMerge.message.MessageService;
+import com.example.SevMerge.payment.PaymentResponse;
 import com.example.SevMerge.payment.PaymentService;
 import com.example.SevMerge.portfolio.PortfolioService;
 import com.example.SevMerge.project.ProjectResponeDTO;
@@ -42,6 +44,7 @@ public class MemberController {
     private final MessageService messageService;
     private final MessageRepository messageRepository;
     private final PaymentService paymentService;
+    private final ChargeService chargeService;
 
     @GetMapping("/join-start")
     public String joinStart(Model model) {
@@ -146,12 +149,14 @@ public class MemberController {
         model.addAttribute("isProjects", tab.equalsIgnoreCase("projects"));
         model.addAttribute("isBoards", tab.equalsIgnoreCase("boards"));
         model.addAttribute("isReviews", tab.equalsIgnoreCase("reviews"));
+        model.addAttribute("isChats", tab.equalsIgnoreCase("chats"));
         model.addAttribute("isEdit", tab.equalsIgnoreCase("edit"));
         // 준비중 메뉴 (포인트 충전/출금/결제내역)
         model.addAttribute("isCharge", tab.equalsIgnoreCase("charge"));
         model.addAttribute("isWithdraw", tab.equalsIgnoreCase("withdraw"));
         model.addAttribute("isPayments", tab.equalsIgnoreCase("payments"));
-
+        model.addAttribute("isChargeHistory", tab.equalsIgnoreCase("chargeHistory"));
+        model.addAttribute("isRefundHistory", tab.equalsIgnoreCase("refundHistory"));
         // 통계 (등록 프로젝트 수, 완료 프로젝트 수)
         List<ProjectResponeDTO.ListDTO> myProjects = projectService.myProjects(loginMember);
         model.addAttribute("projectCount", myProjects.size());
@@ -182,6 +187,22 @@ public class MemberController {
             } catch (Exception e) {
                 log.warn("결제 내역 조회 실패 - {}", e.getMessage());
                 model.addAttribute("payments", List.of());
+            }
+        } else if (tab.equals("chargeHistory")) {
+            try {
+                model.addAttribute("chargeHistories",
+                        chargeService.getMyCharges(loginMember.getId()));
+            } catch (Exception e) {
+                log.warn("충전 내역 조회 실패 - {}", e.getMessage());
+                model.addAttribute("chargeHistories", List.of());
+            }
+        }else if (tab.equals("refundHistory")) {
+            try {
+                List<PaymentResponse> all = paymentService.getClientPayments(loginMember.getId());
+                model.addAttribute("refunds", all.stream().filter(PaymentResponse::isRefunded).toList());
+            } catch (Exception e) {
+                log.warn("환불 내역 조회 실패 - {}", e.getMessage());
+                model.addAttribute("refunds", List.of());
             }
         }
 
