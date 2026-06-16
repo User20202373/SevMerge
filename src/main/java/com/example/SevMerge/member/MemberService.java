@@ -1,5 +1,6 @@
 package com.example.SevMerge.member;
 
+import com.example.SevMerge.bid.BidRepository;
 import com.example.SevMerge.core.exception.AdminException;
 import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.core.exception.NotFoundException;
@@ -37,6 +38,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final HttpSession session;
     private final ExpertReviewLogRepository expertReviewLogRepository;
+    private final BidRepository bidRepository;
 
     //문자 발송
     private final SolApiService solApiService;
@@ -353,7 +355,18 @@ public class MemberService {
     // 회원 정지처리
     @Transactional
     public void suspendMember(Long memberId) {
-        findMemberById(memberId).suspend();
+        Member member = findMemberById(memberId);
+        member.suspend();
+
+        // 전문가 계정 정지 시 진행 중인 프로젝트 의뢰인에게 알림
+        if (member.isExpert()) {
+            bidRepository.findSelectedBidsByExpertId(memberId)
+                    .forEach(bid -> notificationService.notifyExpertSuspended(
+                            bid.getProject().getMember(),
+                            member.getName(),
+                            bid.getProject().getTitle()
+                    ));
+        }
         log.info("회원 정지 처리 - memberId={}", memberId);
     }
 
