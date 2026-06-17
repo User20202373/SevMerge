@@ -26,6 +26,8 @@ public class FooterController {
         model.addAttribute("isAbout", "about".equals(tab));
         model.addAttribute("isCareers", "careers".equals(tab));
         model.addAttribute("isPartnership", "partnership".equals(tab));
+        model.addAttribute("isExpert", "expert".equals(tab));
+
         return "footerProc/support";
     }
     // 이용약관
