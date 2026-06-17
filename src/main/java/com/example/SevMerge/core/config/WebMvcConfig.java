@@ -43,12 +43,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/my-pages/**",
                         "/projects/save-form",
                         "/messages",
-                        "/messages/** ",
+                        "/messages/**",
                         "/notifications",
                         "/notifications/**",
                         "/boards/**",
                         "/admin/**",
-                        "/bids/**,",
+                        "/bids/**",
                         "/charge/**",
                         "/experts/**",
                         "/comments/**",
@@ -60,7 +60,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/report/**",
                         "/reviews/**",
                         "/withdrawal/**"
-
                         )
                 .excludePathPatterns(
                         "/",
@@ -72,14 +71,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/projects",
                         "/portfolios",
                         "/projects/{id}",
+                        "/experts",
+                        "/experts/{id}",
                         "/google-redirect",    // 구글 로그인 통과
                         "/kakao-redirect",     // 카카오 로그인 통과
+                        "/social-role",        // 소셜 가입 페이지 통과
+                        "/banned-info",
                         "/social-role",// 소셜 가입 페이지 통과
                         "/html/**",
                         "/css/**",
                         "/js/**",
                         "/images/**",
-                        "/favicon.ico"
+                        "/favicon.ico",
+                        "/notifications/subscribe"
                 );
 
         // 관리자 체크
