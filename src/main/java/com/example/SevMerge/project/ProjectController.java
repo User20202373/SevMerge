@@ -6,6 +6,9 @@ import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.Role;
+import com.example.SevMerge.payment.PaymentResponse;
+import com.example.SevMerge.payment.PaymentService;
+import com.example.SevMerge.review.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +27,8 @@ public class ProjectController {
     private final ProjectService projectService;
     private final BidService bidService;
     private final BidRepository bidRepository;
+    private final PaymentService paymentService;
+    private final ReviewService reviewService;
 
     // 프로젝트 등록 폼
     @GetMapping("/projects/save-form")
@@ -182,7 +187,17 @@ public class ProjectController {
             return "redirect:/login";
         }
 
-        projectService.doneProject(id, sessionUser);
+        try {
+            PaymentResponse payment = paymentService.getByProjectId(id);
+            if (payment.isPaid()) {  // PAID 상태일 때만 정산 시도
+                paymentService.settle(payment.getId(), sessionUser.getId());
+            }
+            if (!"DONE".equals(projectService.findProjectById(id).getProjectStatus())) {
+                projectService.doneProject(id, sessionUser);
+            }
+        } catch (Exception e) {
+            log.warn("결제 승인 처리 중 - {}", e.getMessage());
+        }
         return "redirect:/my-pages?tab=projects";
     }
 

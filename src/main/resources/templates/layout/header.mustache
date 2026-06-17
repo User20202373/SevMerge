@@ -455,6 +455,15 @@
                     </div>
 
                     <a href="/admin/experts" class="admin-main-item">전문가 승인</a>
+                    <a href="/admin/blacklists" class="admin-main-item">블랙리스트</a>
+                    <div class="admin-dropdown-container" style="position: relative; display: inline-block;">
+                        <span class="admin-dropdown-trigger" style="cursor: pointer;">전문가 승인</span>
+                        <div class="nav-submenu">
+                            <a href="/admin/experts/withdraw" class="submenu-link">출금 요청 관리</a>
+                            <a href="/admin/experts?status=PENDING" class="submenu-link">전문가 승인 관리</a>
+                            <a href="/admin/experts/grade" class="submenu-link">등급별 전문가 관리</a>
+                        </div>
+                    </div>
                 {{/isAdmin}}
 
                 <!-- 2. 기존 일반 회원용 메뉴 -->
@@ -525,6 +534,40 @@
         {{/isExpert}}
     </div>
 </header>
+
+{{#isLoggedIn}}
+    <script>
+        const sse = new EventSource('/notifications/subscribe');
+
+        sse.addEventListener('notification', function (e) {
+            const data = JSON.parse(e.data);
+            showNotiToast(data);
+
+            const bell = document.querySelector('.nav-bell');
+            if (bell && !bell.querySelector('.nav-bell-dot')) {
+                const dot = document.createElement('span');
+                dot.className = 'nav-bell-dot';
+                bell.appendChild(dot);
+            }
+        });
+
+        // 페이지 떠날 때 SSE 연결 종료 (연결 누적 방지)
+        window.addEventListener('beforeunload', function () {
+            sse.close();
+        });
+
+        function showNotiToast(data) {
+            const toast = document.createElement('div');
+            toast.className = 'noti-toast';
+            toast.innerHTML =
+                '<div class="noti-toast-label">' + data.typeLabel + '</div>' +
+                '<div class="noti-toast-content">' + data.content + '</div>';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+{{/isLoggedIn}}
+
 <script>
     function toggleProfileMenu(e, dropdownId) {
         e.stopPropagation();
@@ -552,6 +595,7 @@
             const currentPath = window.location.pathname;
 
             if (currentPath.startsWith("/admin")) {
+                // 1. 일반 메뉴 (대시보드, 회원관리, 프로젝트관리 등)
                 const adminItems = document.querySelectorAll(".nav-links > .admin-main-item");
                 adminItems.forEach(function (link) {
                     if (link.getAttribute("href") === currentPath) {
@@ -559,14 +603,24 @@
                     }
                 });
 
+                // 2. 드롭다운 서브메뉴 활성화 로직
                 const submenuLinks = document.querySelectorAll(".nav-submenu .submenu-link");
                 submenuLinks.forEach(function (link) {
                     const linkHref = link.getAttribute("href");
 
+                    // 기존 게시판/공지사항 매칭 로직
                     const isBoardMatch = linkHref.includes("boards") && (currentPath.includes("board") || currentPath.includes("boards"));
                     const isNoticeMatch = linkHref.includes("notices") && (currentPath.includes("notice") || currentPath.includes("notices"));
 
-                    if (isBoardMatch || isNoticeMatch) {
+
+                   // [수정된 전문가 승인 관리 매칭 로직]
+                   const isExpertMatch = (
+                       (linkHref.includes("withdraw") && currentPath.includes("/admin/experts/withdraw")) ||
+                       (linkHref.includes("status=PENDING") && currentPath.includes("/admin/experts") && !currentPath.includes("withdraw") && !currentPath.includes("grade")) ||
+                       (linkHref.includes("grade") && currentPath.includes("/admin/experts/grade"))
+                   );
+
+                    if (isBoardMatch || isNoticeMatch || isExpertMatch) {
                         link.classList.add("active-link");
 
                         const parentSubmenu = link.closest(".nav-submenu");
