@@ -89,7 +89,7 @@
             <a href="/supports?tab=about" class="tab {{#isAbout}}active{{/isAbout}}">회사소개</a>
             <a href="/supports?tab=careers" class="tab {{#isCareers}}active{{/isCareers}}">인재채용</a>
             <a href="/supports?tab=partnership" class="tab {{#isPartnership}}active{{/isPartnership}}">제휴 문의</a>
-            <a href="/supports?tab=expert" class="tab {{#isExpert}}active{{/isExpert}}">전문가 등록방법</a>
+            <a href="/supports?tab=expert" class="tab {{#tabExpert}}active{{/tabExpert}}">전문가 등록방법</a>
         </div>
     </div>
 </section>
@@ -270,7 +270,7 @@
         </div>
     {{/isPartnership}}
 
-    {{#isExpert}}
+    {{#tabExpert}}
         <div>
             <h2 style="font-size:20px; font-weight:900; color:#1c1e26;">전문가 등록 방법</h2>
             <p style="font-size:13px; color:#6b7280; margin-top:8px; margin-bottom:28px;">SevMerge 전문가로 등록하고 다양한 프로젝트를 수주해 보세요.</p>
@@ -332,16 +332,15 @@
             </div>
 
             <div style="text-align:center;">
-                <a href="/join" class="btn btn-primary btn-lg">전문가로 등록 신청하기 →</a>
+                <a href="/join?role=EXPERT" class="btn btn-primary btn-lg">전문가로 등록 신청하기 →</a>
             </div>
         </div>
-    {{/isExpert}}
+    {{/tabExpert}}
 
 
 </section>
 
 <script>
-
 
 
     function partner(event) {

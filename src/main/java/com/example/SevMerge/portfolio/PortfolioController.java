@@ -70,6 +70,9 @@ public class PortfolioController {
         if (member == null) {
             return "redirect:/login";
         }
+        if (!member.isExpert()){
+            throw new BadRequestException("전문가만 포트폴리오를 작성할수 있습니다.");
+        }
         ExpertProfileResponse expertProfileEntity = expertProfileService.getByMemberId(member.getId());
 
         model.addAttribute("expertProfile", expertProfileEntity);
@@ -84,7 +87,7 @@ public class PortfolioController {
         if (member == null) {
             return "redirect:/login";
         }
-        if (member.isExpert() == false) {
+        if (!member.isExpert()) {
             throw new BadRequestException("전문가만 포트폴리오를 작성할수 있습니다.");
         }
         portfolioService.save(saveDTO,member.getId());
@@ -99,6 +102,9 @@ public class PortfolioController {
         Member member = (Member) session.getAttribute(Define.SESSION_USER);
         if (member == null) {
             return "redirect:/login";
+        }
+        if(!member.isExpert()){
+            throw new BadRequestException("전문가만 포트폴리오를 수정할수 있습니다.");
         }
         PortfolioResponse.DetailDTO detailPortfolio = portfolioService.findPortfolio(portfolioId);
 
@@ -115,6 +121,9 @@ public class PortfolioController {
         if (member == null) {
             return "redirect:/login";
         }
+        if(!member.isExpert()){
+            throw new BadRequestException("전문가만 포트폴리오를 수정할수 있습니다.");
+        }
         portfolioService.update(portfolioId, updateDTO, member.getId());
 
         return "redirect:/portfolios?expertId=" + expertId;
@@ -128,7 +137,7 @@ public class PortfolioController {
         if (sessionMember == null) {
             return "redirect:/login";
         }
-        if (sessionMember.getId() != expertId) {
+        if (sessionMember.getId() != expertId) { // expertId 전문가의 멤버의 아이디이다.
             throw new BadRequestException("삭제 권한이 없습니다.");
         }
 

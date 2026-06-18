@@ -3,9 +3,12 @@ package com.example.SevMerge.partnership;
 import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.portfolio.utile.FileUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -36,17 +39,32 @@ public class PartnerShipService {
     }
 
     // 제휴목록
-    public List<PartnerShipResponse> list(){
-       List<PartnerShip> partnerShipList = partnerShipRepository.findAll();
-       return partnerShipList.stream().map(PartnerShipResponse::new).toList();
+    public List<PartnerShipResponse> list() {
+        List<PartnerShip> partnerShipList = partnerShipRepository.findAll();
+        return partnerShipList.stream().map(PartnerShipResponse::new).toList();
     }
 
-    // 승인 거절 할 제휴 데이터 찾기
+    // 승인
+    @Transactional
+    public void findByIdAndApprove(Long id) {
+        PartnerShip partnerShipEntity = partnerShipRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("해당하는 제휴가 없습니다.")
+        );
+        partnerShipMailService.sendPartnerShipMailApprove(partnerShipEntity.getEmail());
 
-    public PartnerShip findById(Long id){
-        return partnerShipRepository.findById(id).orElseThrow(() ->
-                    new BadRequestException("해당하는 제휴가 없습니다.")
-                );
+        partnerShipEntity.setStatus(PartnerShipStatus.APPROVED);
+    }
+
+    @Transactional
+    public void findByIdAndReject(Long id) {
+        PartnerShip partnerShipEntity = partnerShipRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("해당하는 제휴가 없습니다.")
+        );
+        partnerShipMailService.sendPartnerShipMailReject(partnerShipEntity.getEmail());
+        partnerShipEntity.setStatus(PartnerShipStatus.REJECTED);
+        partnerShipEntity.deleteAt();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        partnerShipRepository.deletedAtByTime(now);
     }
 
 }

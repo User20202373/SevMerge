@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -38,6 +39,8 @@ public class PartnerShip {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    private Timestamp deletedAt;
+
 
     // 승인
     public void isApproved(){
@@ -55,4 +58,10 @@ public class PartnerShip {
     }
 
 
+    @Scheduled(fixedDelay = 10000)
+    public void deleteAt() {
+
+        deletedAt = new Timestamp(System.currentTimeMillis() + 20000);
+
+    }
 }
