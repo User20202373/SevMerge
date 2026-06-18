@@ -39,8 +39,8 @@ public class PartnerShipController {
     @GetMapping("/admin/TEST")
     public String TESTPage(HttpSession session, Model model) {
 
-        long newMemberCount = memberService.getNewMemberCountThisMonth();
 
+        long newMemberCount = memberService.getNewMemberCountThisMonth();
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser);
 
@@ -80,17 +80,34 @@ public class PartnerShipController {
 
     // 승인
     @PostMapping("/admin/partnerships/{partnerShipId}/approve")
-    private String approvePartnership(HttpSession session, @PathVariable Long partnerShipId){
+    public String approvePartnership(HttpSession session, @PathVariable Long partnerShipId){
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
-        if(!sessionUser.isAdmin()){
+
+        if(sessionUser == null){
+            throw new BadRequestException("로그인먼저 해주세요");
+        }
+
+        if( !sessionUser.isAdmin()){
             throw new BadRequestException("관리자만 승인을 할수 있습니다.");
         }
-        PartnerShip findedPartnerShip = partnerShipService.findById(partnerShipId);
-        findedPartnerShip.isApproved();
+        partnerShipService.findByIdAndApprove(partnerShipId);
         return "redirect:/admin/partnerships";
     }
     // 거절
+    @PostMapping("/admin/partnerships/{partnerShipId}/reject")
+    public String rejectPartnership(HttpSession session, @PathVariable Long partnerShipId){
+        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
 
+        if(sessionUser == null){
+            throw new BadRequestException("로그인먼저 해주세요");
+        }
+
+        if( !sessionUser.isAdmin()){
+            throw new BadRequestException("관리자만 승인을 할수 있습니다.");
+        }
+        partnerShipService.findByIdAndReject(partnerShipId);
+        return "redirect:/admin/partnerships";
+    }
 
 
 }
