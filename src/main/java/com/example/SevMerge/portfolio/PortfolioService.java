@@ -47,9 +47,7 @@ public class PortfolioService {
     }
     // 포트폴리오 리스트
     public List<Portfolio> findPortfolioList(Long memberId){
-
        return portfolioRepository.findByMemberId(memberId);
-
     }
 
     // 포트폴리오 아이디로 포트플리오 찾고 포트폴리오 DetailDTO 반환
@@ -67,6 +65,7 @@ public class PortfolioService {
     public void save(PortfolioRequest.SaveDTO saveDTO, Long sessionUserId) {
 
         saveDTO.validate();
+
         try {
             Portfolio newPortfolio = null;
             String savedFileName = FileUtil.saveFile(saveDTO.getImageFile());
@@ -89,7 +88,6 @@ public class PortfolioService {
 
     @Transactional
     public void update(Long portfolioId, PortfolioRequest.UpdateDTO updateDTO,Long sessionUserId) {
-
         String newImageFile = null; // 파일경로
         updateDTO.validate();
         Portfolio portfolio = portfolioRepository.findById(portfolioId).orElseThrow(() ->

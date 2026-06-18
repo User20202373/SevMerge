@@ -1,16 +1,11 @@
 package com.example.SevMerge.footer;
 
 
-import com.example.SevMerge.core.exception.BadRequestException;
-import com.example.SevMerge.core.util.Define;
-import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.MemberService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -26,8 +21,8 @@ public class FooterController {
         model.addAttribute("isAbout", "about".equals(tab));
         model.addAttribute("isCareers", "careers".equals(tab));
         model.addAttribute("isPartnership", "partnership".equals(tab));
-        model.addAttribute("isExpert", "expert".equals(tab));
-
+        model.addAttribute("tabExpert", "expert".equals(tab));
+        System.out.println("expert".equals(tab));
         return "footerProc/support";
     }
     // 이용약관
