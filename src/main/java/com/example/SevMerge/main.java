@@ -2,7 +2,8 @@ package com.example.SevMerge;
 
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
-import com.example.SevMerge.project.ProjectResponeDTO;
+import com.example.SevMerge.project.ProjectResponseDTO;
+import com.example.SevMerge.project.ProjectResponseDTO;
 import com.example.SevMerge.project.ProjectService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -41,27 +42,27 @@ public class main {
             model.addAttribute("isLoggedIn", false);
         }
 
-        List<ProjectResponeDTO.ListDTO> all = projectService.findAllProjects()
+        List<ProjectResponseDTO.ListDTO> all = projectService.findAllProjects()
                 .stream()
                 .filter(p -> "OPEN".equals(p.getProjectStatus()))
                 .toList();
 
         // 섹션 1 — 마감 임박 의뢰: dDay 오름차순 상위 6개
-        List<ProjectResponeDTO.ListDTO> urgentProjects = all.stream()
+        List<ProjectResponseDTO.ListDTO> urgentProjects = all.stream()
                 .filter(p -> p.getDDay() >= 0)
-                .sorted(Comparator.comparingInt(ProjectResponeDTO.ListDTO::getDDay))
+                .sorted(Comparator.comparingInt(ProjectResponseDTO.ListDTO::getDDay))
                 .limit(6)
                 .toList();
 
         // 섹션 2 — 합리적인 예산 의뢰: budgetMax 오름차순 상위 6개
-        List<ProjectResponeDTO.ListDTO> budgetProjects = all.stream()
-                .sorted(Comparator.comparingInt(ProjectResponeDTO.ListDTO::getBudgetMax))
+        List<ProjectResponseDTO.ListDTO> budgetProjects = all.stream()
+                .sorted(Comparator.comparingInt(ProjectResponseDTO.ListDTO::getBudgetMax))
                 .limit(6)
                 .toList();
 
         // 섹션 3 — 최신 의뢰: createdAt 최신순 상위 6개
-        List<ProjectResponeDTO.ListDTO> latestProjects = all.stream()
-                .sorted(Comparator.comparing(ProjectResponeDTO.ListDTO::getCreatedAt).reversed())
+        List<ProjectResponseDTO.ListDTO> latestProjects = all.stream()
+                .sorted(Comparator.comparing(ProjectResponseDTO.ListDTO::getCreatedAt).reversed())
                 .limit(6)
                 .toList();
 
