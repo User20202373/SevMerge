@@ -45,6 +45,10 @@ public class ExpertProfile {
     @Column(nullable = true)
     private String contactEmail;
 
+    @Enumerated(EnumType.STRING) // Enum을 DB에 문자열로 저장
+    @Column(nullable = false)
+    private Grade expertGrade; // 필드 추가
+
     @Column(nullable = false)
     private boolean isCertified;
 

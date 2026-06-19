@@ -1,5 +1,6 @@
 package com.example.SevMerge.expertprofile;
 
+import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.expertwish.ExpertWishRepository;
 import com.example.SevMerge.expertwish.ExpertWishService;
@@ -7,9 +8,6 @@ import com.example.SevMerge.member.Member;
 import com.example.SevMerge.project.ProjectResponseDTO;
 import com.example.SevMerge.member.MemberRequest;
 import com.example.SevMerge.member.MemberService;
-import com.example.SevMerge.portfolio.PortfolioResponse;
-import com.example.SevMerge.portfolio.PortfolioService;
-import com.example.SevMerge.project.ProjectResponeDTO;
 import com.example.SevMerge.project.ProjectService;
 import com.example.SevMerge.review.ReviewService;
 import com.example.SevMerge.member.Role;
