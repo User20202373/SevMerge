@@ -211,7 +211,7 @@ public class MemberController {
         model.addAttribute("isMessages", tab.equalsIgnoreCase("messages"));
         // 탭별 데이터
         if (tab.equals("projects")) {
-            List<ProjectResponeDTO.ListDTO> projects = myProjects.stream()
+            List<ProjectResponseDTO.ListDTO> projects = myProjects.stream()
                     .map(project -> {
                         if (project.getSelectedExpertId() != null) {
                             boolean hasReview = reviewRepository.existsByReviewerAndTargeterAndProject(
