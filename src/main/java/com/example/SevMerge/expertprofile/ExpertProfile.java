@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name = "expert_profile")
+@Table(name = "expert_profile_tb")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,20 +45,18 @@ public class ExpertProfile {
     @Column(nullable = true)
     private String contactEmail;
 
+    @Enumerated(EnumType.STRING) // Enum을 DB에 문자열로 저장
+    @Column(nullable = false)
+    private Grade expertGrade; // 필드 추가
+
     @Column(nullable = false)
     private boolean isCertified;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
-    @Builder.Default
-    private Grade expertGrade=Grade.NORMAL;
-
     // 전문가 등급 측정을 위한 편의 메서드
-    public void checkGrade(Double avgRating, Integer reviewCount ,Integer doneCount, Double globalAvg) {
+    public Grade checkGrade(Double avgRating, Integer reviewCount ,Integer doneCount, Double globalAvg) {
 
         if(reviewCount <= 0) {
-            this.expertGrade=Grade.NORMAL;
-            return;
+            return Grade.NORMAL;
         }
 
         if(globalAvg <3.5) {
@@ -74,11 +72,13 @@ public class ExpertProfile {
         if(score < 0 || score > 5.0) {
             throw new CalculateException("점수 산출에 실패했습니다. 관리자에게 문의하세요.");
         } else if (score >= 0 && score < 2.5) {
-            this.expertGrade = Grade.NORMAL;
-        } else if(score >= 2.5 && score < 4.0) {
-            this.expertGrade = Grade.SKILLED;
-        } else if (score > 4.0) {
-            this.expertGrade = Grade.MASTER;
+            return Grade.NORMAL;
+        } else if(score >= 2.5 && score < 3.0) {
+            return Grade.SKILLED;
+        } else if (score >= 3.0) {
+            return Grade.MASTER;
+        } else {
+            return Grade.NORMAL;
         }
 
     }

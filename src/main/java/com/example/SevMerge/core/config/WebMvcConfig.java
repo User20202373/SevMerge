@@ -75,6 +75,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/projects/{id}",
                         "/experts",
                         "/experts/{id}",
+                        "/experts/wish/{id}",
                         "/google-redirect",    // 구글 로그인 통과
                         "/kakao-redirect",     // 카카오 로그인 통과
                         "/social-role",        // 소셜 가입 페이지 통과
@@ -127,6 +128,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // 추후 C:upload/
                 // C:\\upload
                 .addResourceLocations("file:"+externalPath);
+
+        // 뱃지 이미지용 별도 핸들러
+        registry.addResourceHandler("/badges/**")
+                .addResourceLocations("classpath:/static/images/");
     }
     @Bean
     public PasswordEncoder passwordEncoder() {

@@ -32,6 +32,10 @@ public class ExpertProfileResponse {
         return String.format("%.1f", avgRating);
     }
 
+    public boolean isNormal()  { return "NORMAL".equals(grade); }
+    public boolean isSkilled() { return "SKILLED".equals(grade); }
+    public boolean isMaster()  { return "MASTER".equals(grade); }
+
     public static ExpertProfileResponse from(ExpertProfile profile) {
         return ExpertProfileResponse.builder()
                 .id(profile.getId())
@@ -45,7 +49,7 @@ public class ExpertProfileResponse {
                 .githubUrl(profile.getGithubUrl())
                 .contactEmail(profile.getContactEmail())
                 .isCertified(profile.isCertified())
-                .grade(profile.getExpertGrade().toString())
+                .grade(profile.getExpertGrade() != null ? profile.getExpertGrade().toString() : Grade.NORMAL.toString())
                 .build();
     }
 
