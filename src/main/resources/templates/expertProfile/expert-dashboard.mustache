@@ -124,7 +124,13 @@
     .proj-mini-budget { font-size: 12px; font-weight: 900; color: #1c1e26; }
     .proj-mini-dday   { font-size: 11px; font-weight: 600; color: #c4c9d9; }
     .proj-mini-dday.urgent { color: #ef4444; }
+
+    .grade-badge { display: inline-flex; align-items: center; padding: 0; border: none; background: transparent; }
+.grade-badge-img { width: 114px; height: 48px; object-fit: contain; flex-shrink: 0; margin-bottom:10px;}
+.grade-badge-wrap { display: flex; justify-content: center; margin: 0; }
+
 </style>
+
 
 <!-- ── 4컬럼 대시보드 ── -->
 <section class="dash-section">
@@ -136,12 +142,31 @@
                 <div class="dash-card">
                     <div class="dash-card-header">
                         <span class="dash-card-title">전문가 정보</span>
-                        <a href="/experts/my/form" class="dash-card-more">편집 →</a>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <a href="/experts/my/info-edit" class="dash-card-more" style="color:#6b7280;">개인정보 →</a>
+                            <a href="/experts/my/form" class="dash-card-more">프로필 →</a>
+                        </div>
                     </div>
                     <div class="dash-card-body">
                         <div class="expert-avatar">👨‍💻</div>
                         <div class="expert-name">{{sessionUser.name}}</div>
-                        <span class="expert-role-badge">{{expertProfile.grade}}</span>
+                        <div class="grade-badge-wrap">
+                            {{#expertProfile.normal}}
+                                <div class="grade-badge">
+                                    <img src="/normal.png" class="grade-badge-img" alt="일반 전문가"/>
+                                </div>
+                            {{/expertProfile.normal}}
+                            {{#expertProfile.skilled}}
+                                <div class="grade-badge">
+                                    <img src="/skilled.png" class="grade-badge-img" alt="숙련 전문가"/>
+                                </div>
+                            {{/expertProfile.skilled}}
+                            {{#expertProfile.master}}
+                                <div class="grade-badge">
+                                    <img src="/master.png" class="grade-badge-img" alt="마스터 전문가"/>
+                                </div>
+                            {{/expertProfile.master}}
+                        </div>
                         <div class="expert-stats">
                             <div class="expert-stat">
                                 <span class="expert-stat-val">{{reviews.size}}</span>
@@ -158,11 +183,11 @@
                 <div class="dash-card">
                     <div class="dash-card-header">
                         <span class="dash-card-title">기술스택 &amp; 약력</span>
-                        <a href="/experts/my/form" class="dash-card-more">수정 →</a>
                     </div>
                     <div class="dash-card-body">
                         <div class="quick-links">
-                            <a href="/experts/my/form"      class="quick-link"><span class="quick-link-icon">📝</span>프로필 등록 / 수정</a>
+                            <a href="/experts/my/info-edit" class="quick-link"><span class="quick-link-icon">👤</span>개인정보 수정</a>
+                            <a href="/experts/my/form"      class="quick-link"><span class="quick-link-icon">📝</span>전문가 프로필 수정</a>
                             <a href="/portfolios?expertId={{expertProfile.memberId}}" class="quick-link"><span class="quick-link-icon">🎨</span>포트폴리오 관리</a>
                             <a href="/portfolios/save?expertId={{expertProfile.memberId}}" class="quick-link"><span class="quick-link-icon">➕</span>포트폴리오 등록</a>
                         </div>
