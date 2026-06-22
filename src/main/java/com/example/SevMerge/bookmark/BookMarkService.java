@@ -75,8 +75,15 @@ public class BookMarkService {
     // 필터 검색 기능
     public List<BookMark> filterBookMarks(Long memberId, String keyword) {
         // 내가 등록한 북마크중에서 전문가 이름으로 검색
-        return bookMarkRepository.findFilterByName(keyword, memberId);
+        List<BookMark> filteredBookMarkList = bookMarkRepository.findFilterByName(keyword, memberId);
 
+        if(filteredBookMarkList.isEmpty() || filteredBookMarkList == null) {
+
+            throw new BadRequestException("해당 이름의 전문가 북마크는 존재하지 않습니다.");
+        }
+
+
+         return filteredBookMarkList;
     }
 
 
