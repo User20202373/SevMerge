@@ -99,7 +99,9 @@ public class PartnerShipController {
         if( !sessionUser.isAdmin()){
             throw new BadRequestException("관리자만 승인을 할수 있습니다.");
         }
+
         partnerShipService.findByIdAndReject(partnerShipId);
+
         return "redirect:/admin/partnerships";
     }
 
