@@ -23,6 +23,7 @@ public class main {
     private final ProjectService projectService;
     private final AdvertisementService advertisementService;
 
+
     @GetMapping("/")
     public String introPage(HttpSession session) {
         Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
@@ -47,29 +48,29 @@ public class main {
 
         advertisementService.expireOutdatedAds();
 
-        // 광고 배너 조회 (추가)
         List<AdvertisementResponse> mainAds = advertisementService.getActiveAds(AdvertisementPlacement.MAIN_BANNER);
         model.addAttribute("mainAds", mainAds);
+
+        // 캐러셀용 광고 — 각 프로젝트 캐러셀 앞에 끼워 넣을 용도
+        List<AdvertisementResponse> carouselAds = advertisementService.getActiveAds(AdvertisementPlacement.EXPERT_CAROUSEL);
+        model.addAttribute("carouselAds", carouselAds);
 
         List<ProjectResponseDTO.ListDTO> all = projectService.findAllProjects()
                 .stream()
                 .filter(p -> "OPEN".equals(p.getProjectStatus()))
                 .toList();
 
-        // 섹션 1 — 마감 임박 의뢰: dDay 오름차순 상위 6개
         List<ProjectResponseDTO.ListDTO> urgentProjects = all.stream()
                 .filter(p -> p.getDDay() >= 0)
                 .sorted(Comparator.comparingInt(ProjectResponseDTO.ListDTO::getDDay))
                 .limit(6)
                 .toList();
 
-        // 섹션 2 — 합리적인 예산 의뢰: budgetMax 오름차순 상위 6개
         List<ProjectResponseDTO.ListDTO> budgetProjects = all.stream()
                 .sorted(Comparator.comparingInt(ProjectResponseDTO.ListDTO::getBudgetMax))
                 .limit(6)
                 .toList();
 
-        // 섹션 3 — 최신 의뢰: createdAt 최신순 상위 6개
         List<ProjectResponseDTO.ListDTO> latestProjects = all.stream()
                 .sorted(Comparator.comparing(ProjectResponseDTO.ListDTO::getCreatedAt).reversed())
                 .limit(6)
