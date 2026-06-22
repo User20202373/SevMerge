@@ -177,20 +177,24 @@
                     <span>
                     {{#isPending}}<span class="status-pending">대기</span>{{/isPending}}
                         {{#isApproved}}<span class="status-approved">승인</span>{{/isApproved}}
-                        {{#isRejected}}
-                            <span class="status-rejected">거절</span>
-                        <form action="/admin/partnerships/{{id}}/delete" method="post" style="display:inline;">
-                            <button type="submit" class="btn-reject" onclick="deletedButton(event)">삭제</button>
-                        </form>
-                        {{/isRejected}}
+                    {{#isRejected}}
+                    <span class="status-rejected">거절</span>
+                    {{/isRejected}}
                 </span>
                     <div class="action-btns">
                         <form action="/admin/partnerships/{{id}}/approve" method="post" style="display:inline;">
                             <button type="submit" class="btn-approve">승인</button>
                         </form>
+                        {{#isRejected}}
+                            <form action="/admin/partnerships/{{id}}/delete" method="post" style="display:inline;">
+                                <button type="submit" class="btn-reject" onclick="deletedButton(event)">삭제</button>
+                            </form>
+                        {{/isRejected}}
+                        {{^isRejected}}
                         <form action="/admin/partnerships/{{id}}/reject" method="post" style="display:inline;">
                             <button type="submit" class="btn-reject">거절</button>
                         </form>
+                        {{/isRejected}}
                     </div>
                 </div>
             {{/partnerships}}
