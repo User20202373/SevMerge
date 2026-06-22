@@ -57,12 +57,19 @@ public class PartnerShipService {
 
     @Transactional
     public void findByIdAndReject(Long id) {
+        
         PartnerShip partnerShipEntity = partnerShipRepository.findById(id).orElseThrow(() ->
                 new BadRequestException("해당하는 제휴가 없습니다.")
         );
-        partnerShipMailService.sendPartnerShipMailReject(partnerShipEntity.getEmail());
-        partnerShipEntity.setStatus(PartnerShipStatus.REJECTED);
-        partnerShipEntity.deleteAt();
+
+        if(partnerShipEntity.getStatus().equals(PartnerShipStatus.REJECTED)) {
+            throw new BadRequestException("이미 거절된 제휴 입니다.");
+        }
+            partnerShipMailService.sendPartnerShipMailReject(partnerShipEntity.getEmail());
+            partnerShipEntity.setStatus(PartnerShipStatus.REJECTED);
+
+
+
         // 스케줄러 표시된 메서드는 알아서 스프링부트가 설정된 시간마다 메서드를 불러오기에 따로 호출 안해도 된다.
 //        deleteRejected();
     }
