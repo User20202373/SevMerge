@@ -47,4 +47,6 @@ public class BookMarkController {
         return "redirect:/my-pages?tab=bookmarks";
     }
 
+
+
 }

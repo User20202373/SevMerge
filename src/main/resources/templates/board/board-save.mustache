@@ -17,6 +17,15 @@
     .form-textarea::placeholder { color: #c4c9d9; }
     .form-textarea:focus { border-color: #2563eb; }
     .form-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+    .inquiry-type-btns { display: flex; gap: 8px; }
+    .inquiry-type-btn {
+        padding: 10px 22px; font-size: 13px; font-weight: 700;
+        border: 1.5px solid #e2e5ef; border-radius: 20px;
+        background: #fff; color: #9ca3af; cursor: pointer;
+        transition: all .15s; font-family: inherit;
+    }
+    .inquiry-type-btn:hover { border-color: #2563eb; color: #2563eb; }
+    .inquiry-type-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
 </style>
 
 <section class="save-section">
@@ -32,13 +41,27 @@
             <h1 class="save-title">공지사항 작성</h1>
             <p class="save-desc">공지사항을 작성합니다. 관리자만 작성 가능합니다.</p>
             {{/isNotice}}
+            {{#isInquiry}}
+                <h1 class="save-title">1:1 문의 작성</h1>
+                <p class="save-desc">1:1 문의를 작성합니다.</p>
+            {{/isInquiry}}
         </div>
 
         <form class="save-form" action="/boards/save" method="POST">
-
+            
             {{! boardType 히든 필드 — 컨트롤러에서 FREE or NOTICE 넘겨줘야 함 }}
             <input type="hidden" name="boardType" value="{{boardType}}" />
-
+            {{#isInquiry}}
+                <div class="form-group">
+                    <label class="form-label">문의 유형</label>
+                    <input type="hidden" name="inquiryScope" id="inquiryScopeInput" value="NORMAL" />
+                    <div class="inquiry-type-btns">
+                        <button type="button" class="inquiry-type-btn active" onclick="selectScope('NORMAL', this)">일반문의</button>
+                        <button type="button" class="inquiry-type-btn" onclick="selectScope('PAYMENT', this)">결제문의</button>
+                        <button type="button" class="inquiry-type-btn" onclick="selectScope('SECURITY', this)">계정관련</button>
+                    </div>
+                </div>
+            {{/isInquiry}}
             <div class="form-group">
                 <label class="form-label">제목</label>
                 <input
@@ -68,5 +91,11 @@
 
     </div>
 </section>
-
+<script>
+    function selectScope(scope, btn) {
+        document.querySelectorAll('.inquiry-type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('inquiryScopeInput').value = scope;
+    }
+</script>
 {{> layout/footer}}

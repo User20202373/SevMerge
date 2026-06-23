@@ -43,7 +43,7 @@ public class Board {
     private BoardInquiryScope inquiryScope; // 1:1 문의 게시판 종류
 
     @Builder
-    public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member,Boolean isActive) {
+    public Board(BoardInquiryScope inquiryScope, BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member,Boolean isActive) {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
@@ -51,12 +51,14 @@ public class Board {
         this.createdAt = createdAt;
         this.member = member;
         this.isActive = isActive;
+        this.inquiryScope = inquiryScope;
     }
 
     // 편의 메서드
     public void update(BoardRequest.UpdateBoardDTO updateBoardDTO) {
         this.title = updateBoardDTO.getTitle();
         this.content = updateBoardDTO.getContent();
+        this.inquiryScope = updateBoardDTO.getInquiryScope();
     }
 
     public void softDelete() {

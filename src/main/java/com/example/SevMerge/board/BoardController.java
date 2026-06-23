@@ -144,8 +144,9 @@ public class BoardController {
         BoardResponse.DetailDTO board = boardService.detailBoard(boardId);
         model.addAttribute("board", board);
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
-
-
+        model.addAttribute("isFree" ,board.getBoardType().equalsIgnoreCase("FREE"));
+        model.addAttribute("isNotice" ,board.getBoardType().equalsIgnoreCase("NOTICE"));
+        model.addAttribute("isInquiry", board.getBoardType().equalsIgnoreCase("INQUIRY"));
         return "board/board-update";
     }
 
@@ -156,6 +157,8 @@ public class BoardController {
                                          HttpSession session) {
 
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+
+        System.out.println("인쿼리 종류 들어오냐?" + updateBoardDTO.getInquiryScope());
 
         boardService.updateBoard(boardId, updateBoardDTO, sessionUser.getId());
         return ResponseEntity.ok().build();

@@ -13,10 +13,12 @@ public class BoardRequest {
         private String content;
         private Integer viewCount;
         private BoardType boardType;
+        private BoardInquiryScope inquiryScope;
 
         public Board toEntity(Member member) {
             return Board.builder()
                     .title(title)
+                    .inquiryScope(inquiryScope)
                     .content(content)
                     .boardType(boardType)
                     .viewCount(0)
@@ -40,7 +42,7 @@ public class BoardRequest {
     public static class UpdateBoardDTO {
         private String title;
         private String content;
-
+        private BoardInquiryScope inquiryScope;
         public void validate() {
             if(title == null || title.trim().isEmpty()) {
                 throw new BadRequestException("제목 입력은 필수 입니다.");

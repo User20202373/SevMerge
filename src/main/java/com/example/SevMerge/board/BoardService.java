@@ -59,7 +59,7 @@ public class BoardService {
                     .stream()
                     .map(BoardResponse.ListDTO::new)
                     .toList();
-            ;
+
         }
 
         return inquiryBoards;
@@ -148,7 +148,7 @@ public class BoardService {
         Member adminMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 관리자입니다. id = " + memberId));
 
-        Board board = new Board(BoardType.NOTICE, title, content, 0, null, adminMember, true);
+        Board board = new Board(null,BoardType.NOTICE, title, content, 0, null, adminMember, true);
 
         boardRepository.save(board);
     }
@@ -167,7 +167,7 @@ public class BoardService {
     public void deleteNotice(Long id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id = " + id));
-        boardRepository.delete(board);
+        board.softDelete();
     }
 
     @Transactional

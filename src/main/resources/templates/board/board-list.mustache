@@ -201,17 +201,27 @@
                 <a href="/boards/save?boardType=INQUIRY" class="btn btn-primary btn-sm">문의하기</a>
             </div>
 
-            {{#boards}}
-                <div class="board-table">
-                    <a href="/boards/{{id}}" class="board-table-row pinned col-free">
-                        <span class="cell-num">📌</span>
+            <!-- 문의 종류 탭 -->
+            <div class="inquiry-tabs">
+                <button class="inquiry-tab active" onclick="filterInquiry('ALL', this)">전체</button>
+                <button class="inquiry-tab" onclick="filterInquiry('NORMAL', this)">일반문의</button>
+                <button class="inquiry-tab" onclick="filterInquiry('PAYMENT', this)">결제문의</button>
+                <button class="inquiry-tab" onclick="filterInquiry('SECURITY', this)">계정관련</button>
+            </div>
+
+            <div class="board-table" id="inquiryList">
+                {{#boards}}
+                    <a href="/boards/{{id}}"
+                       class="board-table-row col-free inquiry-row"
+                       data-scope="{{inquiryScope}}">
+                        <span class="cell-num" style="color: gray">({{inquiryScopeLabel}})</span>
                         <span class="cell-title">{{title}}</span>
                         <span class="cell-author">{{memberName}}</span>
+                        <span class="cell-author">{{inquiryScopeLabel}}</span>
                         <span class="cell-date">{{createdAt}}</span>
-                        <span class="cell-view">{{viewCount}}</span>
                     </a>
-                </div>
-            {{/boards}}
+                {{/boards}}
+            </div>
 
             {{^boards}}
                 <div class="empty-state">
@@ -219,16 +229,32 @@
                 </div>
             {{/boards}}
 
-            <div class="paging">
-                {{#prevPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
-                {{#pageList}}
-                    <a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{num}}" class="page-btn {{#isCurrent}}active{{/isCurrent}}">{{num}}</a>
-                {{/pageList}}
-                {{#nextPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
-            </div>
-
         </div>
     </section>
+
+    <style>
+        .inquiry-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .inquiry-tab {
+            padding: 8px 20px; font-size: 13px; font-weight: 700;
+            border: 1.5px solid #e2e5ef; border-radius: 20px;
+            background: #fff; color: #9ca3af; cursor: pointer;
+            transition: all .15s; font-family: inherit;
+        }
+        .inquiry-tab:hover { border-color: #2563eb; color: #2563eb; }
+        .inquiry-tab.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    </style>
+
+    <script>
+        function filterInquiry(scope, btn) {
+            document.querySelectorAll('.inquiry-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('.inquiry-row').forEach(row => {
+                row.style.display = (scope === 'ALL' || row.dataset.scope === scope)
+                        ? '' : 'none';
+            });
+        }
+    </script>
 {{/isInquiry}}
 
 {{> layout/footer}}
