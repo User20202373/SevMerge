@@ -3,6 +3,7 @@ package com.example.SevMerge.core.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,7 +37,7 @@ public class GlobalExceptionHandler {
         return """
                 <script>
                     alert('%s');
-                    location.href='/login-form';
+                    location.href='/login';
                 </script>
                 """.formatted(message);
     }
@@ -47,7 +48,13 @@ public class GlobalExceptionHandler {
         log.warn("=== 403 Forbidden ===");
         log.warn("요청 URL : {}", request.getRequestURL());
         log.warn("에러 메시지 : {}", e.getMessage());
+
+
+
         String message = e.getMessage().replace("'", "\\'");
+
+
+
         return """
                 <script>
                     alert('%s');
@@ -74,6 +81,45 @@ public class GlobalExceptionHandler {
         return "err/500";
     }
 
+    @ExceptionHandler(AdminException.class)
+    @ResponseBody
+    public String adminException(AdminException e, HttpServletRequest request) {
+        log.warn("=== AdminException ===");
+        log.warn("요청 URL : {}", request.getRequestURL());
+        log.warn("에러 메시지 : {}", e.getMessage());
+
+
+
+        String message = e.getMessage().replace("'", "\\'");
+
+
+
+        return """
+                <script>
+                    alert('%s');
+                    history.back();
+                </script>
+                """.formatted(message);
+    }
+
+    @ExceptionHandler(CalculateException.class)
+    @ResponseBody
+    public String calculateException(CalculateException e, HttpServletRequest request) {
+        log.warn("=== CalculateException ===");
+        log.warn("요청 URL : {}", request.getRequestURL());
+        log.warn("에러 메시지 : {}", e.getMessage());
+
+        String message = e.getMessage().replace("'", "\\'");
+
+        return """
+                <script>
+                    alert('%s');
+                    history.back();
+                </script>
+                """.formatted(message);
+    }
+
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public String dataIntegrity(DataIntegrityViolationException e, HttpServletRequest request) {
         log.warn("=== DB 제약조건 위반 ===");
@@ -95,4 +141,26 @@ public class GlobalExceptionHandler {
         request.setAttribute("msg", "시스템 오류가 발생했습니다. 관리자에게 문의해주세요.");
         return "err/500";
     }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public String handelMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
+        log.warn("지원하지 않는 HTTP 메서드 요청: {}", request.getRequestURI());
+        return "redirect:/";
+    }
+
+    @ExceptionHandler(FileException.class)
+    @ResponseBody
+    public String fileException(FileException e, HttpServletRequest request) {
+        log.warn("=== File 전송 오류 ===");
+        log.warn("요청 URL : {}", request.getRequestURL());
+        log.warn("에러 메시지 : {}", e.getMessage());
+        String message = e.getMessage().replace("'", "\\'");
+        return """
+                <script>
+                    alert('%s');
+                    history.back();
+                </script>
+                """.formatted(message);
+    }
+
 }

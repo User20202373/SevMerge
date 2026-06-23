@@ -17,14 +17,46 @@ repositories {
     mavenCentral()
 }
 
+
+ext {
+    set('springAiVersion', "1.1.1")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+    }
+}
+
 dependencies {
+
+    implementation 'org.springframework.security:spring-security-crypto'
+    // [Security Patches] Full Spring Security for CSRF, headers, session management
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // 웹 소캣 통신 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // 이메일 발송 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // SOLAPI 문자, 카톡등 SMS 전송 라이브러리
+    implementation 'com.solapi:sdk:1.0.3'
+
+    // 관리자 차트
+    implementation 'org.webjars.npm:chart.js:4.4.1'
+    implementation 'org.webjars:webjars-locator-core'
+
+    // Spring AI - Gemini 챗봇
+    implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
+
+
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.springframework.boot:spring-boot-starter-mustache'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
@@ -32,6 +64,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
 }
 
 tasks.named('test') {

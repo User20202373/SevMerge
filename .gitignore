@@ -36,4 +36,13 @@ out/
 ### VS Code ###
 .vscode/
 .env
+.DS_Store
 
+# 개발환경 설정 파일
+application-local.yml
+data-local.sql
+.README_HS.md
+
+#
+skills-lock.json
+page-flow.html

@@ -6,13 +6,14 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
-@Table(name="user_tb")
+@Table(name="board_tb")
 @Entity
 public class Board {
 
@@ -21,30 +22,42 @@ public class Board {
     private Long id;
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
+    @Column(nullable = false, length = 200)
     private String title;
+    @Column(nullable = false)
     private String content;
-    private Integer viewCount;
+    @ColumnDefault("0")
+    private Integer viewCount = 0;
     @CreationTimestamp
     private Timestamp createdAt;
+
+    @ColumnDefault("true")
+    private Boolean isActive;
 
     // todo - 추후 Member Class추가
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinColumn(name="comment_id")
-    // todo - 추구 Comment Class 추가
-    //private Comment comment;
 
     @Builder
-    public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member) {
+    public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member,Boolean isActive) {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
         this.viewCount = viewCount;
         this.createdAt = createdAt;
         this.member = member;
-        //this.comment = comment;
+        this.isActive = isActive;
+    }
+
+    // 편의 메서드
+    public void update(BoardRequest.UpdateBoardDTO updateBoardDTO) {
+        this.title = updateBoardDTO.getTitle();
+        this.content = updateBoardDTO.getContent();
+    }
+
+    public void softDelete() {
+        this.isActive = false;
     }
 }

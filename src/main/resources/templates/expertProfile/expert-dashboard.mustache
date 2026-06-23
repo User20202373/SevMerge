@@ -1,0 +1,506 @@
+{{> layout/header}}
+
+<style>
+    /* ── 대시보드 본문 ── */
+    .dash-section { padding: 16px 28px 0; }
+    .dash-inner { max-width: 1200px; margin: 0 auto; }
+
+    .dash-grid {
+        display: grid;
+        grid-template-columns: 200px 1fr 260px 185px;
+        gap: 14px;
+        align-items: stretch;
+    }
+    .dash-col { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── 카드 공통 ── */
+    .dash-card {
+        background: #fff;
+        border: 1.5px solid #eaecf4;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .dash-col .dash-card:last-child { flex: 1; }
+
+    .dash-card-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid #f0f2f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .dash-card-title { font-size: 12px; font-weight: 700; color: #1c1e26; }
+    .dash-card-more  { font-size: 11px; color: #2563eb; font-weight: 600; }
+    .dash-card-more:hover { text-decoration: underline; }
+
+    .dash-card-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; }
+
+    /* ── 전문가 프로필 카드 ── */
+    .expert-avatar {
+        width: 52px; height: 52px; border-radius: 50%;
+        background: #eff6ff; border: 2px solid #bfdbfe;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; margin: 0 auto 8px;
+    }
+    .expert-name { text-align: center; font-size: 13px; font-weight: 700; color: #1c1e26; margin-bottom: 3px; }
+    .expert-role-badge {
+        display: block; text-align: center;
+        font-size: 10px; color: #2563eb;
+        background: #eff6ff; border: 1px solid #bfdbfe;
+        border-radius: 20px; padding: 2px 10px;
+        width: fit-content; margin: 0 auto 10px; font-weight: 600;
+    }
+    .expert-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .expert-stat  { background: #f8f9fc; border-radius: 8px; padding: 7px 4px; text-align: center; }
+    .expert-stat-val { display: block; font-size: 16px; font-weight: 900; color: #2563eb; margin-bottom: 1px; }
+    .expert-stat-lbl { font-size: 9px; color: #9ca3af; font-weight: 500; }
+
+    /* ── 빠른 링크 ── */
+    .quick-links { display: flex; flex-direction: column; gap: 6px; }
+    .quick-link {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 10px; border-radius: 8px;
+        font-size: 12px; font-weight: 600; color: #4b5563;
+        background: #f8f9fc; border: 1.5px solid #eaecf4;
+        transition: all .15s;
+    }
+    .quick-link:hover { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+    .quick-link-icon { font-size: 13px; flex-shrink: 0; }
+
+    /* ── 섹션 링크 카드 ── */
+    .section-links { display: flex; flex-direction: column; gap: 7px; }
+    .section-link-card {
+        display: block; padding: 9px 12px;
+        background: #f8f9fc; border: 1.5px solid #eaecf4;
+        border-radius: 9px; transition: all .2s;
+    }
+    .section-link-card:hover {
+        background: #eff6ff; border-color: #bfdbfe;
+        box-shadow: 0 2px 10px rgba(37,99,235,.07);
+        transform: translateX(2px);
+    }
+    .section-link-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .section-link-title { font-size: 12px; font-weight: 700; color: #1c1e26; display: flex; align-items: center; gap: 5px; }
+    .section-link-arrow { font-size: 16px; color: #c4c9d9; }
+    .section-link-desc  { font-size: 10px; color: #9ca3af; line-height: 1.4; }
+
+    /* ── 뱃지 ── */
+    .badge-live { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 20px; background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    .badge-ws   { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 20px; background: #fdf4ff; color: #9333ea; border: 1px solid #e9d5ff; }
+
+    /* ── 알림 ── */
+    .notification-empty { text-align: center; padding: 10px 0; font-size: 12px; color: #c4c9d9; }
+
+    /* ── 채팅 프리뷰 ── */
+    .chat-panel-preview { background: #f8f9fc; border-radius: 9px; padding: 10px 12px; margin-top: 8px; flex: 1; }
+    .chat-preview-header { font-size: 10px; font-weight: 700; color: #6b7280; margin-bottom: 7px; display: flex; align-items: center; gap: 5px; }
+    .chat-bubble { background: #fff; border: 1px solid #e8ecf8; border-radius: 7px; padding: 6px 10px; margin-bottom: 5px; }
+    .chat-bubble-name { font-size: 9px; font-weight: 700; color: #2563eb; margin-bottom: 2px; }
+    .chat-bubble-text { font-size: 11px; color: #4b5563; line-height: 1.4; }
+    .chat-open-btn { display: block; text-align: center; margin-top: 8px; font-size: 11px; color: #2563eb; font-weight: 600; }
+
+    /* ── 프로젝트 검색 ── */
+    .projects-section { background: #fff; border-top: 1px solid #eaecf4; padding: 24px 28px 40px; margin-top: 16px; }
+    .projects-inner { max-width: 1200px; margin: 0 auto; }
+    .proj-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .proj-title { font-size: 16px; font-weight: 900; color: #1c1e26; letter-spacing: -0.5px; }
+    .proj-view-all { font-size: 12px; color: #2563eb; font-weight: 600; }
+    .proj-view-all:hover { text-decoration: underline; }
+    .proj-search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+    .proj-search-input { flex: 1; padding: 10px 14px; background: #f8f9fc; border: 1.5px solid #e2e5ef; border-radius: 9px; font-size: 13px; font-family: inherit; color: #1c1e26; outline: none; transition: border-color .15s; }
+    .proj-search-input:focus { border-color: #2563eb; background: #fff; }
+    .proj-search-btn { padding: 10px 22px; background: #2563eb; color: #fff; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .proj-search-btn:hover { background: #1d4ed8; }
+    .proj-mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .proj-mini-card { display: block; background: #fff; border: 1.5px solid #eaecf4; border-radius: 12px; padding: 16px; transition: all .2s; }
+    .proj-mini-card:hover { border-color: #bfdbfe; box-shadow: 0 4px 14px rgba(37,99,235,.07); transform: translateY(-2px); }
+    .proj-mini-cat { font-size: 10px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 7px; border-radius: 5px; display: inline-block; margin-bottom: 8px; }
+    .proj-mini-title { font-size: 13px; font-weight: 700; color: #1c1e26; margin-bottom: 5px; line-height: 1.4; }
+    .proj-mini-desc  { font-size: 11px; color: #9ca3af; line-height: 1.5; margin-bottom: 10px; }
+    .proj-mini-bottom { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f3f4f8; padding-top: 8px; }
+    .proj-mini-budget { font-size: 12px; font-weight: 900; color: #1c1e26; }
+    .proj-mini-dday   { font-size: 11px; font-weight: 600; color: #c4c9d9; }
+    .proj-mini-dday.urgent { color: #ef4444; }
+
+    .grade-badge { display: inline-flex; align-items: center; padding: 0; border: none; background: transparent; }
+.grade-badge-img { width: 114px; height: 48px; object-fit: contain; flex-shrink: 0; margin-bottom:10px;}
+.grade-badge-wrap { display: flex; justify-content: center; margin: 0; }
+
+    /* ── FOOTER (exmain 스타일) ── */
+    :root {
+        --brand-blue:      #2D6BFF;
+        --brand-blue-deep: #1846C9;
+        --brand-sky:       #6BA0FF;
+        --brand-ink:       #0C1424;
+        --brand-slate:     #33415C;
+        --brand-muted:     #5A6B85;
+        --brand-mist:      #EBEEF4;
+        --brand-line:      #E2E7F0;
+        --brand-white:     #FFFFFF;
+    }
+    .footer {
+        background: var(--brand-ink) !important;
+        border-top: 1px solid rgba(255,255,255,.06) !important;
+        padding: 40px 32px 28px !important;
+    }
+    .footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    .footer-brand-logo {
+        font-size: 20px;
+        font-weight: 800;
+        color: rgba(255,255,255,.85);
+        letter-spacing: .05em;
+    }
+    .footer-brand-logo span { color: var(--brand-sky); }
+    .footer-actions { display: flex; gap: 8px; }
+    .footer-actions .btn-outline {
+        background: transparent;
+        border: 1.5px solid rgba(255,255,255,.18);
+        color: rgba(255,255,255,.55);
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 7px;
+        transition: border-color .15s, color .15s;
+    }
+    .footer-actions .btn-outline:hover {
+        border-color: var(--brand-sky);
+        color: var(--brand-sky);
+    }
+    .footer-nav {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+    .footer-nav a {
+        font-size: 13px;
+        color: rgba(255,255,255,.45);
+        transition: color .15s;
+    }
+    .footer-nav a:hover { color: rgba(255,255,255,.8); }
+    .footer-nav-sep {
+        display: inline-block;
+        width: 1px;
+        height: 12px;
+        background: rgba(255,255,255,.15);
+        vertical-align: middle;
+    }
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255,255,255,.07);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .footer-policy-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .footer-policy-links a {
+        font-size: 12px;
+        color: rgba(255,255,255,.32);
+        transition: color .15s;
+    }
+    .footer-policy-links a:hover { color: rgba(255,255,255,.6); }
+    .footer-policy-strong {
+        font-weight: 700;
+        color: rgba(255,255,255,.5) !important;
+    }
+    .footer-hours-inline {
+        font-size: 12px;
+        color: rgba(255,255,255,.22);
+    }
+    .footer-copy {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--brand-muted) !important;
+        letter-spacing: .02em;
+    }
+</style>
+
+
+<!-- ── 4컬럼 대시보드 ── -->
+<section class="dash-section">
+    <div class="dash-inner">
+        <div class="dash-grid">
+
+            <!-- ① 왼쪽: 전문가 정보 + 기술스택 & 약력 -->
+            <div class="dash-col">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">전문가 정보</span>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <a href="/experts/my/info-edit" class="dash-card-more" style="color:#6b7280;">개인정보 →</a>
+                            <a href="/experts/my/form" class="dash-card-more">프로필 →</a>
+                        </div>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="expert-avatar">👨‍💻</div>
+                        <div class="expert-name">{{sessionUser.name}}</div>
+                        <div class="grade-badge-wrap">
+                            {{#expertProfile.normal}}
+                                <div class="grade-badge">
+                                    <img src="/normal.png" class="grade-badge-img" alt="일반 전문가"/>
+                                </div>
+                            {{/expertProfile.normal}}
+                            {{#expertProfile.skilled}}
+                                <div class="grade-badge">
+                                    <img src="/skilled.png" class="grade-badge-img" alt="숙련 전문가"/>
+                                </div>
+                            {{/expertProfile.skilled}}
+                            {{#expertProfile.master}}
+                                <div class="grade-badge">
+                                    <img src="/master.png" class="grade-badge-img" alt="마스터 전문가"/>
+                                </div>
+                            {{/expertProfile.master}}
+                        </div>
+                        <div class="expert-stats">
+                            <div class="expert-stat">
+                                <span class="expert-stat-val">{{reviews.size}}</span>
+                                <span class="expert-stat-lbl">받은 리뷰</span>
+                            </div>
+                            <div class="expert-stat">
+                                <span class="expert-stat-val">{{avgRating}}</span>
+                                <span class="expert-stat-lbl">평균 평점</span>
+                            </div>
+                            <div class="expert-stat">
+                                <span class="expert-stat-val">{{wishCount}}</span>
+                                <span class="expert-stat-lbl">받은 찜</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">기술스택 &amp; 약력</span>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="quick-links">
+                            <a href="/experts/my/info-edit" class="quick-link"><span class="quick-link-icon">👤</span>개인정보 수정</a>
+                            <a href="/experts/my/form"      class="quick-link"><span class="quick-link-icon">📝</span>전문가 프로필 수정</a>
+                            <a href="/portfolios?expertId={{expertProfile.memberId}}" class="quick-link"><span class="quick-link-icon">🎨</span>포트폴리오 관리</a>
+                            <a href="/portfolios/save?expertId={{expertProfile.memberId}}" class="quick-link"><span class="quick-link-icon">➕</span>포트폴리오 등록</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ② 가운데: 제안서 관리 + 주문 관리 -->
+            <div class="dash-col">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">제안서 관리</span>
+                        <a href="/bids/my-list" class="dash-card-more">전체보기 →</a>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="section-links">
+                            <a href="/bids/my-list" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">📋 제안 내역</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">입찰 중 · 대기중 제안서 목록 확인</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">주문 관리</span>
+                        <a href="/bids/my-orders" class="dash-card-more">전체보기 →</a>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="section-links">
+                            <a href="/bids/my-orders" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">📦 수주 목록</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">진행중 · 완료 · 취소 주문 목록</div>
+                            </a>
+                            <a href="/chat/room" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">
+                                        💬 작업 대화
+                                        <span class="badge-live">실시간</span>
+                                        <span class="badge-ws">WebSocket</span>
+                                    </span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">주문별 의뢰인과 실시간 채팅</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ③ 오른쪽(메인): 제안 내용 + 수익&정산 -->
+            <div class="dash-col">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">제안 내용</span>
+                        <a href="/bids/my-list" class="dash-card-more">보기 →</a>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="section-links">
+                            <a href="/bids/my-list" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">📨 대기 중인 제안</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">의뢰인의 낙찰 결정 대기중</div>
+                            </a>
+                        </div>
+                        <div class="chat-panel-preview">
+                            <div class="chat-preview-header">
+                                💬 채팅 미리보기 <span class="badge-ws">WebSocket</span>
+                            </div>
+                            <div class="chat-bubble">
+                                <div class="chat-bubble-name">의뢰인</div>
+                                <div class="chat-bubble-text">제안서 잘 받았습니다. 일정 조율 가능할까요?</div>
+                            </div>
+                            <div class="chat-bubble">
+                                <div class="chat-bubble-name">나 (전문가)</div>
+                                <div class="chat-bubble-text">네, 가능합니다. 언제부터 시작하시겠어요?</div>
+                            </div>
+                            <a href="/chat/room" class="chat-open-btn">채팅방 열기 →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">수익 &amp; 정산</span>
+                        <a href="/payment/my" class="dash-card-more">상세보기 →</a>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="section-links">
+                            <a href="/payment/my" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">💰 수익 현황</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">미입금 수익 · 정산 현황</div>
+                            </a>
+                            <a href="/payment/my" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">📤 출금 신청</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">정산 금액 출금 요청</div>
+                            </a>
+                            <a href="/payment/my" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">📊 출금 내역</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">정산 및 출금 기록 조회</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ④ 우측배너: 평가 및 리뷰 + 알림 -->
+            <div class="dash-col">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">평가 및 리뷰</span>
+                        <a href="/reviews/my" class="dash-card-more">전체보기 →</a>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="section-links">
+                            <a href="/reviews/my" class="section-link-card">
+                                <div class="section-link-top">
+                                    <span class="section-link-title">⭐ 고객 평가 &amp; 리뷰</span>
+                                    <span class="section-link-arrow">›</span>
+                                </div>
+                                <div class="section-link-desc">받은 리뷰 및 평점 확인</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <span class="dash-card-title">알림</span>
+                    </div>
+                    <div class="dash-card-body">
+                        <div class="notification-empty">새 알림이 없습니다.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- 프로젝트 검색 및 목록 -->
+<section class="projects-section">
+    <div class="projects-inner">
+        <div class="proj-head">
+            <h2 class="proj-title">프로젝트 검색 및 목록</h2>
+            <a href="/projects" class="proj-view-all">전체보기 ({{totalProjectCount}}건) →</a>
+        </div>
+        <form action="/experts/dashboard" method="GET">
+            <div class="proj-search-bar">
+                <input type="text" name="keyword" value="{{keyword}}"
+                       placeholder="프로젝트 키워드로 검색해보세요..." class="proj-search-input"/>
+                <button type="submit" class="proj-search-btn">검색</button>
+            </div>
+            <div class="category-tabs" style="margin-bottom:16px;">
+                <a href="/experts/dashboard"                class="tab {{#isAll}}active{{/isAll}}">전체</a>
+                <a href="/experts/dashboard?category=WEB"   class="tab {{#isWeb}}active{{/isWeb}}">웹개발</a>
+                <a href="/experts/dashboard?category=APP"   class="tab {{#isApp}}active{{/isApp}}">앱개발</a>
+                <a href="/experts/dashboard?category=UI_UX"  class="tab {{#isUiux}}active{{/isUiux}}">UI/UX</a>
+                <a href="/experts/dashboard?category=DATA"  class="tab {{#isData}}active{{/isData}}">데이터</a>
+                <a href="/experts/dashboard?category=VIDEO" class="tab {{#isVideo}}active{{/isVideo}}">영상편집</a>
+                <a href="/experts/dashboard?category=ETC"   class="tab {{#isEtc}}active{{/isEtc}}">기타</a>
+            </div>
+        </form>
+        <div class="proj-mini-grid">
+
+            {{#projects}}
+            <a href="/projects/{{id}}" class="proj-mini-card">
+                <span class="proj-mini-cat">{{categoryName}}</span>
+                <div class="proj-mini-title">{{title}}</div>
+                <div class="proj-mini-desc">{{description}}</div>
+                <div class="proj-mini-bottom">
+                    <span class="proj-mini-budget">{{budgetMin}}~{{budgetMax}}만원</span>
+                    <span class="proj-mini-dday {{#isUrgent}}urgent{{/isUrgent}}">D-{{dDay}}</span>
+                </div>
+            </a>
+            {{/projects}}
+
+            {{^projects}}
+            <div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#c4c9d9; font-size:14px;">
+                검색 결과가 없습니다.
+            </div>
+            {{/projects}}
+
+        </div>
+    </div>
+</section>
+
+{{> layout/footer}}

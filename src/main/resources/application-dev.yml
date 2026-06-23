@@ -1,10 +1,25 @@
 spring:
   config:
     import: optional:file:.env[.properties]
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/sevmerge?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/sevmerge?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -21,27 +36,36 @@ spring:
 
   sql:
     init:
-      mode: never
+      mode: always
       data-locations:
         - classpath:db/data.sql
 
-  mustache:
-    servlet:
-      expose-session-attributes: true
-      expose-request-attributes: true
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-2.5-flash
+            temperature: 0.5
 
-server:
-  port: 8080
-  servlet:
-    session:
-      tracking-modes: cookie
-    encoding:
-      charset: utf-8
-      force: true
-    multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 20MB
+oauth:
+  kakao:
+    client-id: ${KAKAO_CLIENT_ID}
+    client-secret: ${KAKAO_CLIENT_SECRET}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: http://localhost:8080/google-redirect
+
+toss:
+  client-key: ${TOSS_CLIENT_KEY}
+  secret-key: ${TOSS_SECRET_KEY}
+
+solapi:
+  api-key: ${SOLAPI_KEY}
+  api-secret: ${SOLAPI_SECRET_KEY}
+  sender-number: ${SOLAPI_SENDER_NUMBER}
 
 logging:
   level:

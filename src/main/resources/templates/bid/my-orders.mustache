@@ -1,0 +1,217 @@
+{{> layout/header}}
+
+<style>
+    /* ── 본문 ── */
+    .page-section { padding: 40px 28px 80px; }
+    .page-inner { max-width: 1200px; margin: 0 auto; }
+    .page-head { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .page-title { font-size: 22px; font-weight: 900; color: #1c1e26; letter-spacing: -0.5px; }
+    .page-count { font-size: 13px; color: #9ca3af; font-weight: 500; }
+
+    /* ── 테이블 ── */
+    .order-table { width: 100%; background: #fff; border: 1.5px solid #eaecf4; border-radius: 16px; overflow: hidden; }
+    .order-table-head { display: grid; grid-template-columns: 1fr 120px 120px 90px 110px 140px; gap: 12px; padding: 13px 24px; background: #f8f9fc; border-bottom: 1px solid #eaecf4; font-size: 12px; font-weight: 700; color: #9ca3af; letter-spacing: .3px; }
+    .order-row { display: grid; grid-template-columns: 1fr 120px 120px 90px 110px 140px; gap: 12px; padding: 18px 24px; border-bottom: 1px solid #f3f4f8; align-items: center; transition: background .12s; }
+    .order-row:last-child { border-bottom: none; }
+    .order-row:hover { background: #f8f9ff; }
+    .cell { font-size: 13px; color: #4b5563; }
+    .cell-title { font-weight: 700; color: #1c1e26; font-size: 14px; }
+    .cell-price { font-weight: 700; color: #1c1e26; }
+    .cell-settle { font-weight: 700; color: #2563eb; }
+
+    /* ── 상태 뱃지 ── */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-progress { background: #dbeafe; color: #1d4ed8; }
+    .badge-waiting  { background: #fef3c7; color: #92400e; }
+    .badge-settled  { background: #ede9fe; color: #5b21b6; }
+
+    /* ── 버튼 ── */
+    .btn-done { padding: 6px 14px; background: #2563eb; color: #fff; border: none; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s; }
+    .btn-done:hover { background: #1d4ed8; }
+    .btn-view { padding: 6px 14px; background: #fff; border: 1.5px solid #e2e5ef; color: #4b5563; border-radius: 7px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block; transition: all .15s; }
+    .btn-view:hover { border-color: #2563eb; color: #2563eb; }
+    .cell-actions { display: flex; gap: 6px; align-items: center; }
+
+    /* ── 빈 상태 ── */
+    .empty-state { text-align: center; padding: 80px 0; }
+    .empty-icon { font-size: 36px; margin-bottom: 14px; }
+    .empty-msg { font-size: 14px; color: #c4c9d9; margin-bottom: 18px; }
+    /* ── FOOTER (exmain 스타일) ── */
+    :root {
+        --brand-blue:      #2D6BFF;
+        --brand-blue-deep: #1846C9;
+        --brand-sky:       #6BA0FF;
+        --brand-ink:       #0C1424;
+        --brand-slate:     #33415C;
+        --brand-muted:     #5A6B85;
+        --brand-mist:      #EBEEF4;
+        --brand-line:      #E2E7F0;
+        --brand-white:     #FFFFFF;
+    }
+    .footer {
+        background: var(--brand-ink) !important;
+        border-top: 1px solid rgba(255,255,255,.06) !important;
+        padding: 40px 32px 28px !important;
+    }
+    .footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    .footer-brand-logo {
+        font-size: 20px;
+        font-weight: 800;
+        color: rgba(255,255,255,.85);
+        letter-spacing: .05em;
+    }
+    .footer-brand-logo span { color: var(--brand-sky); }
+    .footer-actions { display: flex; gap: 8px; }
+    .footer-actions .btn-outline {
+        background: transparent;
+        border: 1.5px solid rgba(255,255,255,.18);
+        color: rgba(255,255,255,.55);
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 7px;
+        transition: border-color .15s, color .15s;
+    }
+    .footer-actions .btn-outline:hover {
+        border-color: var(--brand-sky);
+        color: var(--brand-sky);
+    }
+    .footer-nav {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+    .footer-nav a {
+        font-size: 13px;
+        color: rgba(255,255,255,.45);
+        transition: color .15s;
+    }
+    .footer-nav a:hover { color: rgba(255,255,255,.8); }
+    .footer-nav-sep {
+        display: inline-block;
+        width: 1px;
+        height: 12px;
+        background: rgba(255,255,255,.15);
+        vertical-align: middle;
+    }
+    .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255,255,255,.07);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .footer-policy-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .footer-policy-links a {
+        font-size: 12px;
+        color: rgba(255,255,255,.32);
+        transition: color .15s;
+    }
+    .footer-policy-links a:hover { color: rgba(255,255,255,.6); }
+    .footer-policy-strong {
+        font-weight: 700;
+        color: rgba(255,255,255,.5) !important;
+    }
+    .footer-hours-inline {
+        font-size: 12px;
+        color: rgba(255,255,255,.22);
+    }
+    .footer-copy {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--brand-muted) !important;
+        letter-spacing: .02em;
+    }
+</style>
+
+<section class="page-section">
+    <div class="page-inner">
+
+        <div class="page-head">
+            <h1 class="page-title">📦 주문 관리</h1>
+            <span class="page-count">총 <strong>{{orderCount}}</strong>건</span>
+        </div>
+
+        <div class="order-table">
+            <div class="order-table-head">
+                <span>프로젝트</span>
+                <span>제안 금액</span>
+                <span>정산 예정액</span>
+                <span>예상 기간</span>
+                <span>상태</span>
+                <span>액션</span>
+            </div>
+
+            {{#orders}}
+            <div class="order-row">
+                <span class="cell cell-title">{{projectTitle}}</span>
+                <span class="cell cell-price">{{proposedPrice}}원</span>
+                <span class="cell cell-settle">{{payment.netAmount}}원</span>
+                <span class="cell">{{estimatedDays}}일</span>
+                <span class="cell">
+                    {{#isInProgress}}<span class="badge badge-progress">진행중</span>{{/isInProgress}}
+                    {{#isDone}}
+                        {{^payment.isSettled}}<span class="badge badge-waiting">승인 대기</span>{{/payment.isSettled}}
+                        {{#payment.isSettled}}<span class="badge badge-settled">정산완료</span>{{/payment.isSettled}}
+                    {{/isDone}}
+                </span>
+                <span class="cell cell-actions">
+                    <a href="/projects/{{projectId}}" class="btn-view">보기</a>
+                    {{#isInProgress}}
+                        <button class="btn-done" data-bid-id="{{id}}">✓ 완료</button>
+                    {{/isInProgress}}
+                </span>
+            </div>
+            {{/orders}}
+
+            {{^orders}}
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p class="empty-msg">아직 진행중인 주문이 없습니다.</p>
+            </div>
+            {{/orders}}
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.querySelectorAll('.btn-done').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const bidId = this.dataset.bidId;
+            if (!confirm('작업 완료 처리하시겠습니까?\n의뢰인에게 승인 요청이 전송됩니다.')) return;
+            fetch(`/bids/${bidId}/complete`, { method: 'POST' })
+                .then(res => {
+                    if (res.ok) {
+                        alert('작업 완료 신고가 전송되었습니다. 의뢰인의 승인을 기다려주세요.');
+                        location.reload();
+                    } else {
+                        res.json().then(d => alert(d.message || '처리 중 오류가 발생했습니다.'));
+                    }
+                })
+                .catch(() => alert('서버와 통신 중 오류가 발생했습니다.'));
+        });
+    });
+</script>
+
+{{> layout/footer}}

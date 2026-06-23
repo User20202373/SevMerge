@@ -14,14 +14,22 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * PaymentService
- * 요구사항: PAY-001 ~ PAY-006
+ * PaymentService — 에스크로 관리
+ *
+ * [역할]
+ * - 클라이언트의 잔액(balance)을 에스크로로 묶어두고,
+ *   프로젝트 완료 시 전문가에게 지급하는 흐름을 담당.
+ * - TossPayments API는 이 서비스에서 직접 호출하지 않음.
+ *   (실제 결제는 ChargeService에서만 처리)
+ *
+ * [에스크로 상태]
+ * PAID     → 클라이언트 balance 차감 완료, 에스크로 보관 중
+ * SETTLED  → 프로젝트 완료, 전문가 balance 증가
+ * REFUNDED → 환불 완료, 클라이언트 balance 복구
  *
  * [충돌 방지 전략]
- * - ProjectService/BidService 등 타 도메인 Service를 주입하지 않습니다.
- * - 프로젝트 상태 변경(PAY-003)은 EntityManager 네이티브 쿼리로 직접 처리합니다.
- *   → 팀장이 Project Entity를 완성해도 이 파일에 영향 없음.
- * - Notification 생성은 보조E 담당이므로 TODO 주석으로 연동 위치만 표시합니다.
+ * - 타 도메인 Service 직접 주입 없음
+ * - Member/Project 상태 변경은 JPQL/네이티브 쿼리로 처리
  */
 @Slf4j
 @Service
@@ -29,7 +37,6 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 public class PaymentService {
 
-    // 플랫폼 수수료율 10%
     private static final double PLATFORM_FEE_RATE = 0.10;
 
     private final PaymentRepository paymentRepository;
@@ -37,92 +44,85 @@ public class PaymentService {
     @PersistenceContext
     private EntityManager em;
 
-    // ===================== PAY-001 + PAY-003: 결제 요청 및 완료 처리 =====================
+    // ── 에스크로 생성 ──
 
     /**
-     * merchantUid 생성 (결제 페이지 진입 시 호출)
-     * 형식: "sev-project-{projectId}"
-     * - 포트원 SDK에 merchant_uid로 전달됩니다.
-     */
-    public String generateMerchantUid(Long projectId) {
-        return "sev-project-" + projectId;
-    }
-
-    /**
-     * PAY-001, PAY-003: 포트원 결제 완료 처리
-     * 포트원 SDK 결제 후 프론트가 imp_uid를 서버로 전달하면 실행됩니다.
-     *
-     * @param clientId 세션에서 추출한 의뢰인 ID
-     * @param req      포트원 결제 완료 확인 DTO
+     * 에스크로 생성
+     * - 클라이언트 잔액에서 amount 차감
+     * - Payment 레코드 PAID 상태로 저장 (= 에스크로 보관)
+     * - 프로젝트 상태 IN_PROGRESS 전환
      */
     @Transactional
-    public PaymentResponse completePayment(Long clientId, PaymentRequest.ConfirmRequest req) {
+    public PaymentResponse createEscrow(Long clientId,
+                                        Long projectId,
+                                        Long expertId,
+                                        Integer amount) {
 
-        // 1. merchantUid 파싱 → projectId 추출
-        Long projectId = parseProjectId(req.getMerchantUid());
-
-        // 2. 중복 결제 방지 (프로젝트당 1건 제한)
+        // 중복 계약 방지
         if (paymentRepository.existsByProjectId(projectId)) {
-            throw new BadRequestException("이미 결제가 완료된 프로젝트입니다.");
+            throw new BadRequestException("이미 계약이 체결된 프로젝트입니다.");
         }
 
-        // 3. TODO: 포트원 API 결제 금액 검증 (포트원 연동 시 아래 주석 해제)
-        //    Step 1) POST https://api.iamport.kr/users/getToken
-        //            Body: { imp_key: ${IMP_KEY}, imp_secret: ${IMP_SECRET} }
-        //            → response.access_token 획득
-        //    Step 2) GET  https://api.iamport.kr/payments/{imp_uid}
-        //            Header: Authorization: {access_token}
-        //            → response.amount 와 req.getPaidAmount() 비교
-        //    Step 3) 금액 불일치 시 → throw new BadRequestException("결제 금액이 일치하지 않습니다.");
-        log.info("[Payment] 포트원 결제 확인 - impUid={}, merchantUid={}, amount={}",
-                req.getImpUid(), req.getMerchantUid(), req.getPaidAmount());
+        // 클라이언트 잔액 확인
+        Integer clientBalance = (Integer) em
+                .createQuery("SELECT m.balance FROM Member m WHERE m.id = :id")
+                .setParameter("id", clientId)
+                .getSingleResult();
 
-        // 4. 수수료 계산
-        int platformFee = (int) (req.getPaidAmount() * PLATFORM_FEE_RATE);
-        int netAmount   = req.getPaidAmount() - platformFee;
+        if (clientBalance == null || clientBalance < amount) {
+            throw new BadRequestException(
+                    "잔액이 부족합니다. (현재 잔액: " + (clientBalance == null ? 0 : clientBalance) + "원)");
+        }
 
-        // 5. Payment 저장 (에스크로 보관 - PAY-002)
+        // 클라이언트 잔액 차감 (balance >= amount 조건으로 동시성 보호)
+        int updated = em
+                .createQuery("UPDATE Member m SET m.balance = m.balance - :amount " +
+                             "WHERE m.id = :id AND m.balance >= :amount")
+                .setParameter("amount", amount)
+                .setParameter("id", clientId)
+                .executeUpdate();
+
+        if (updated == 0) {
+            throw new BadRequestException("잔액 차감에 실패했습니다. 잔액을 확인해주세요.");
+        }
+
+        // 수수료 계산
+        int platformFee = (int) (amount * PLATFORM_FEE_RATE);
+        int netAmount = amount - platformFee;
+
+        // 에스크로 레코드 저장
         Payment payment = Payment.builder()
                 .projectId(projectId)
                 .clientId(clientId)
-                .expertId(req.getExpertId())
-                .amount(req.getPaidAmount())
+                .expertId(expertId)
+                .amount(amount)
                 .platformFee(platformFee)
                 .netAmount(netAmount)
-                .paymentKey(req.getImpUid())
-                .method(req.getPayMethod())
                 .status(PaymentStatus.PAID)
                 .build();
         paymentRepository.save(payment);
 
-        // 6. PAY-003: 프로젝트 상태 → IN_PROGRESS
-        //    Project Entity를 import하지 않고 네이티브 쿼리로 처리 (팀장 브랜치와 충돌 방지)
-        em.createNativeQuery("UPDATE project SET status = 'IN_PROGRESS' WHERE id = :pid")
+        // 프로젝트 상태 → IN_PROGRESS
+        em.createNativeQuery(
+                "UPDATE project_tb SET project_status = 'IN_PROGRESS' WHERE id = :pid")
                 .setParameter("pid", projectId)
                 .executeUpdate();
 
-        // 7. TODO: 전문가에게 결제 완료 알림 (보조E 담당 NotificationService 연동)
-        //    notificationService.create(req.getExpertId(), "PAYMENT", "결제가 완료되어 프로젝트가 시작되었습니다.");
-
-        log.info("[Payment] 결제 완료 - projectId={}, clientId={}, expertId={}, amount={}",
-                projectId, clientId, req.getExpertId(), req.getPaidAmount());
-
+        log.info("[Escrow] 생성 — projectId={}, clientId={}, amount={}", projectId, clientId, amount);
         return PaymentResponse.from(payment);
     }
 
-    // ===================== PAY-004: 정산 처리 =====================
+    // ── 정산 ──
 
     /**
-     * PAY-004: 정산 처리 (프로젝트 완료 확인 후 전문가에게 netAmount 지급)
-     *
-     * @param paymentId  결제 ID
-     * @param requesterId 세션 사용자 ID (의뢰인만 가능)
+     * 에스크로 → 전문가 지급
+     * PAID → SETTLED, expert.balance += netAmount
+     * 의뢰인이 프로젝트 완료 확인 시 호출
      */
     @Transactional
     public PaymentResponse settle(Long paymentId, Long requesterId) {
-        Payment payment = findPaymentById(paymentId);
+        Payment payment = findById(paymentId);
 
-        // 의뢰인 본인만 정산 요청 가능
         if (!Objects.equals(payment.getClientId(), requesterId)) {
             throw new ForbiddenException("정산 권한이 없습니다.");
         }
@@ -133,39 +133,45 @@ public class PaymentService {
             throw new BadRequestException(e.getMessage());
         }
 
-        // TODO: 실제 전문가 계좌 이체 API 연동 (포트원 정산 API 또는 내부 정산 시스템)
-        //    POST https://api.iamport.kr/settlements/{imp_uid}
-        log.info("[Payment] 정산 처리 - paymentId={}, expertId={}, netAmount={}",
+        // 전문가 잔액 증가
+        em.createQuery(
+                "UPDATE Member m SET m.balance = m.balance + :amount WHERE m.id = :id")
+                .setParameter("amount", payment.getNetAmount())
+                .setParameter("id", payment.getExpertId())
+                .executeUpdate();
+
+        // 프로젝트 상태 → DONE
+        em.createNativeQuery(
+                "UPDATE project_tb SET project_status = 'DONE' WHERE id = :pid")
+                .setParameter("pid", payment.getProjectId())
+                .executeUpdate();
+
+        log.info("[Escrow] 정산 완료 — paymentId={}, expertId={}, netAmount={}",
                 paymentId, payment.getExpertId(), payment.getNetAmount());
-
-        // TODO: 전문가에게 정산 완료 알림 (보조E 담당 NotificationService 연동)
-        //    notificationService.create(payment.getExpertId(), "SETTLEMENT", "정산이 완료되었습니다.");
-
         return PaymentResponse.from(payment);
     }
 
-    // ===================== PAY-005: 환불 처리 =====================
+    // ── 환불 ──
 
     /**
-     * PAY-005: 환불 처리
-     * - 프로젝트 시작 전(PAID 상태): 전액 환불
-     * - 정산 완료(SETTLED 상태): 분쟁 처리 안내 (관리자 개입 필요)
-     *
-     * @param paymentId   결제 ID
-     * @param requesterId 세션 사용자 ID (의뢰인만 가능)
+     * 에스크로 → 클라이언트 환불
+     * PAID → REFUNDED, client.balance += amount
+     * - 클라이언트 직접 요청 또는 관리자 분쟁 처리 시 호출
+     * - Toss API 호출 없음 (잔액으로 직접 환원)
      */
     @Transactional
     public PaymentResponse refund(Long paymentId, Long requesterId) {
-        Payment payment = findPaymentById(paymentId);
+        Payment payment = findById(paymentId);
 
-        // 의뢰인 본인만 환불 요청 가능
-        if (!Objects.equals(payment.getClientId(), requesterId)) {
+        boolean isClient = Objects.equals(payment.getClientId(), requesterId);
+        boolean isAdmin  = isAdminMember(requesterId);
+
+        if (!isClient && !isAdmin) {
             throw new ForbiddenException("환불 권한이 없습니다.");
         }
 
-        // 이미 정산된 경우 분쟁 처리 안내
         if (payment.getStatus() == PaymentStatus.SETTLED) {
-            throw new BadRequestException("이미 정산이 완료된 건입니다. 분쟁 처리는 관리자에게 문의해주세요.");
+            throw new BadRequestException("이미 정산 완료된 건입니다. 관리자에게 문의하세요.");
         }
 
         try {
@@ -174,72 +180,54 @@ public class PaymentService {
             throw new BadRequestException(e.getMessage());
         }
 
-        // TODO: 포트원 환불 API 호출
-        //    POST https://api.iamport.kr/payments/cancel
-        //    Body: { imp_uid: payment.getPaymentKey(), reason: "환불 요청" }
-        log.info("[Payment] 환불 처리 - paymentId={}, clientId={}, amount={}",
-                paymentId, requesterId, payment.getAmount());
+        // 클라이언트 잔액 복구
+        em.createQuery(
+                "UPDATE Member m SET m.balance = m.balance + :amount WHERE m.id = :id")
+                .setParameter("amount", payment.getAmount())
+                .setParameter("id", payment.getClientId())
+                .executeUpdate();
 
-        // 프로젝트 상태 → CANCELLED (팀장 브랜치와 충돌 방지: 네이티브 쿼리 사용)
-        em.createNativeQuery("UPDATE project SET status = 'CANCELLED' WHERE id = :pid")
+        // 프로젝트 상태 → CANCELLED
+        em.createNativeQuery(
+                "UPDATE project_tb SET project_status = 'CANCELLED' WHERE id = :pid")
                 .setParameter("pid", payment.getProjectId())
                 .executeUpdate();
 
-        // TODO: 의뢰인/전문가에게 환불 알림 (보조E 담당 NotificationService 연동)
-        //    notificationService.create(payment.getExpertId(), "REFUND", "프로젝트 결제가 취소되었습니다.");
-
+        log.info("[Escrow] 환불 — paymentId={}, clientId={}, amount={}",
+                paymentId, payment.getClientId(), payment.getAmount());
         return PaymentResponse.from(payment);
     }
 
-    // ===================== PAY-006: 결제 내역 조회 =====================
+    // ── 조회 ──
 
-    /**
-     * PAY-006: 의뢰인 결제 내역 조회
-     */
     public List<PaymentResponse> getClientPayments(Long clientId) {
         return paymentRepository.findByClientId(clientId)
-                .stream()
-                .map(PaymentResponse::from)
-                .toList();
+                .stream().map(PaymentResponse::from).toList();
     }
 
-    /**
-     * PAY-006: 전문가 정산 내역 조회
-     */
     public List<PaymentResponse> getExpertPayments(Long expertId) {
         return paymentRepository.findByExpertId(expertId)
-                .stream()
-                .map(PaymentResponse::from)
-                .toList();
+                .stream().map(PaymentResponse::from).toList();
     }
 
-    /**
-     * 프로젝트 ID로 결제 단건 조회
-     */
     public PaymentResponse getByProjectId(Long projectId) {
         return paymentRepository.findByProjectId(projectId)
                 .map(PaymentResponse::from)
                 .orElseThrow(() -> new NotFoundException("결제 정보를 찾을 수 없습니다."));
     }
 
-    // ===================== private 메서드 =====================
+    // ── private ──
 
-    private Payment findPaymentById(Long paymentId) {
+    private Payment findById(Long paymentId) {
         return paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new NotFoundException("결제 정보를 찾을 수 없습니다."));
     }
 
-    /**
-     * merchantUid에서 projectId 파싱
-     * 형식: "sev-project-{projectId}"
-     */
-    private Long parseProjectId(String merchantUid) {
-        try {
-            // "sev-project-123" → ["sev", "project", "123"] → index 2
-            String[] parts = merchantUid.split("-");
-            return Long.parseLong(parts[2]);
-        } catch (Exception e) {
-            throw new BadRequestException("유효하지 않은 주문번호입니다: " + merchantUid);
-        }
+    private boolean isAdminMember(Long memberId) {
+        String role = (String) em
+                .createNativeQuery("SELECT role FROM member_tb WHERE id = :id")
+                .setParameter("id", memberId)
+                .getSingleResult();
+        return "ADMIN".equals(role);
     }
 }

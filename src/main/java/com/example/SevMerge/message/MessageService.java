@@ -1,0 +1,199 @@
+package com.example.SevMerge.message;
+
+import com.example.SevMerge.bid.BidRepository;
+import com.example.SevMerge.bid.BidStatus;
+import com.example.SevMerge.core.exception.FileException;
+import com.example.SevMerge.core.exception.NotFoundException;
+import com.example.SevMerge.core.exception.UnauthorizedException;
+import com.example.SevMerge.core.util.FileUtil;
+import com.example.SevMerge.member.Member;
+import com.example.SevMerge.member.MemberRepository;
+import com.example.SevMerge.notification.NotificationService;
+import com.example.SevMerge.project.Project;
+import com.example.SevMerge.project.ProjectRepository;
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class MessageService {
+
+    private final MessageRepository messageRepository;
+    private final MessageFilesRepository messageFilesRepository;
+    private final MemberRepository memberRepository;
+    private final ProjectRepository projectRepository;
+    private final BidRepository bidRepository;
+    private final NotificationService notificationService;
+
+    // 쪽지함 리스트 페이징 처리 조회
+    public Page<MessageResponse.ListDTO> findMessages(Member member, String box, int page, String sort, String keyword) {
+        Sort sortOrder = "asc".equalsIgnoreCase(sort)
+                ? Sort.by("createdAt").ascending()
+                : Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(Math.max(0, page - 1), 10, sortOrder);
+
+        String newKeyword = (keyword == null || keyword.isBlank()) ? null : keyword.trim();
+
+        Page<Message> messagePage = box.equals("sent")
+                ? messageRepository.findAllSentMessagesByPages(member, newKeyword, pageable)
+                : messageRepository.findAllReceivedMessagesByPages(member, newKeyword, pageable);
+
+        return messagePage.map(MessageResponse.ListDTO::new);
+    }
+
+    // 메세지 상세 조회
+    @Transactional
+    public MessageResponse.DetailDTO findMessageByIdWithDetails(@Param("id") Long id, Member sessionMember) {
+        Message findMessage = messageRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new NotFoundException("쪽지를 찾을 수 없습니다."));
+
+        boolean isSender = findMessage.getSender().getId().equals(sessionMember.getId());
+        boolean isReceiver = findMessage.getReceiver().getId().equals(sessionMember.getId());
+
+        // 메세지를 읽는 사람이 보낸사람과 받은 사람 둘 다 아니라면 예외 처리
+        if (!isSender && !isReceiver) {
+            throw new UnauthorizedException("본인의 쪽지만 조회할 수 있습니다.");
+        }
+
+        // 메세지를 조회 했을 때 받은 사람이 세션멤버이고 메세지를 읽은 상태가 아니라면 메세지를 읽음 상태로 변경
+        if (isReceiver && !findMessage.getIsRead()) {
+            findMessage.read();
+        }
+
+        return new MessageResponse.DetailDTO(findMessage);
+    }
+
+    public List<MessageResponse.ContactDTO> findContacts(Member member) {
+        if (member.isClient()) {
+            return bidRepository.findByProjectMemberId(member.getId())
+                    .stream()
+                    .map(b -> MessageResponse.ContactDTO
+                            .from(b.getExpert(), b.getProject(), b.getStatus() == BidStatus.SELECTED)).toList();
+        } else if (member.isExpert()) {
+            return bidRepository.findByExpertId(member.getId())
+                    .stream()
+                    .map(b -> MessageResponse.ContactDTO
+                            .from(b.getProject().getMember(), b.getProject(), b.getStatus() == BidStatus.SELECTED)).toList();
+        }
+        return List.of();
+    }
+
+    public void sendMessage(Member sender, MessageRequest.SendDTO reqDTO) {
+        Member receiver = memberRepository.findById(reqDTO.getReceiverId())
+                .orElseThrow(() -> new NotFoundException("수신자를 찾을 수 없습니다."));
+
+        if (!bidRepository.existsBidRelation(sender.getId(), receiver.getId())) {
+            throw new UnauthorizedException("입찰 관계가 있는 상대에게만 쪽지를 보낼 수 있습니다.");
+        }
+
+        Project project = reqDTO.getProjectId() != null
+                ? projectRepository.findById(reqDTO.getProjectId()).orElse(null)
+                : null;
+
+        Message message = messageRepository.save(Message.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .project(project)
+                .title(reqDTO.getTitle())
+                .content(reqDTO.getContent())
+                .build());
+
+        saveFiles(message, reqDTO.getFiles());
+        messageRepository.save(message);
+
+        notificationService.notifyMessageReceived(receiver, sender.getName(), reqDTO.getTitle());
+    }
+
+    // 메세지 삭제 기능
+    @Transactional
+    public boolean deleteMessage(Long messageId, Member sessionMember) {
+        Message message = messageRepository.findByIdWithDetails(messageId)
+                .orElseThrow(() -> new NotFoundException("쪽지를 찾을 수 없습니다."));
+
+        boolean isSender = message.getSender().getId().equals(sessionMember.getId());
+        boolean isReceiver = message.getReceiver().getId().equals(sessionMember.getId());
+
+        if (!isSender && !isReceiver) {
+            throw new UnauthorizedException("본인의 메세지만 삭제할 수 있습니다.");
+        }
+
+        if (isSender) {
+            message.deleteBySender();
+        } else {
+            message.deleteByReceiver();
+        }
+        return isSender;
+    }
+
+    @Transactional
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long messageFilesId, Member sessionMember) {
+
+        MessageFiles messageFiles = messageFilesRepository.findById(messageFilesId)
+                .orElseThrow(() -> new NotFoundException("첨부파일을 찾을 수 없습니다."));
+
+        Message message = messageFiles.getMessage();
+        boolean isSender = message.getSender().getId().equals(sessionMember.getId());
+        boolean isReceiver = message.getReceiver().getId().equals(sessionMember.getId());
+
+        if (!isSender && !isReceiver) {
+            throw new UnauthorizedException("본인의 쪽지 첨부 파일만 다운로드 가능합니다.");
+        }
+
+        Path path = Paths.get(FileUtil.IMAGES_DIR).resolve(messageFiles.getSavedFilename());
+        Resource resource = new FileSystemResource(path);
+        if (!resource.exists()) {
+            throw new NotFoundException("존재 하지 않는 파일입니다.");
+        }
+
+        String encoded = URLEncoder.encode(messageFiles.getOriginalFilename(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encoded + "\"")
+                .body(resource);
+
+    }
+
+
+    private void saveFiles(Message message, List<MultipartFile> files) {
+        if (files == null) return;
+        for (MultipartFile file : files) {
+            if (file == null || file.isEmpty()) { continue; }
+            try {
+                String savedFilename = FileUtil.saveFile(file, FileUtil.IMAGES_DIR);
+
+                MessageFiles savedFile = MessageFiles.builder()
+                        .savedFilename(savedFilename)
+                        .originalFilename(file.getOriginalFilename())
+                        .fileSize(file.getSize())
+                        .build();
+
+                message.addMessageFile(savedFile);
+            } catch (IOException e) {
+                    throw new FileException("파일 저장 실패 : " + file.getOriginalFilename() + "\n[ error ] : " + e.getMessage());
+            }
+        }
+    }
+}
