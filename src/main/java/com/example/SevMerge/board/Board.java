@@ -39,6 +39,8 @@ public class Board {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    private BoardInquiryScope inquiryScope; // 1:1 문의 게시판 종류
 
     @Builder
     public Board(BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member,Boolean isActive) {

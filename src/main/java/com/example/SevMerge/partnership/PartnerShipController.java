@@ -60,6 +60,8 @@ public class PartnerShipController {
 //        return "TEST/admin-main";
 //    }
 
+
+    // 관리자 페이지의 제휴 페이지
     @GetMapping("/admin/partnerships")
     public String partnershipsPage(HttpSession session, Model model) {
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
@@ -85,6 +87,8 @@ public class PartnerShipController {
         if( !sessionUser.isAdmin()){
             throw new BadRequestException("관리자만 승인을 할수 있습니다.");
         }
+
+
         partnerShipService.findByIdAndApprove(partnerShipId);
         return "redirect:/admin/partnerships";
     }
@@ -97,7 +101,7 @@ public class PartnerShipController {
             throw new BadRequestException("로그인먼저 해주세요");
         }
         if( !sessionUser.isAdmin()){
-            throw new BadRequestException("관리자만 승인을 할수 있습니다.");
+            throw new BadRequestException("관리자만 거절 할수 있습니다.");
         }
 
         partnerShipService.findByIdAndReject(partnerShipId);

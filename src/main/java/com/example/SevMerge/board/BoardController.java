@@ -107,7 +107,7 @@ public class BoardController {
         if (boardType.equalsIgnoreCase("FREE") ||
                 boardType.equalsIgnoreCase("INQUIRY")) {
             if (sessionUser == null) {
-                return "login-form";
+                return "redirect:/login";
             }
         }
 

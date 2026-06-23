@@ -54,4 +54,31 @@ public class BoardResponse {
             this.viewCount = board.getViewCount();
         }
     }
+
+
+    // 1:1 문의 게시판 리스트
+    @Data
+    public static class InquiryListDTO {
+        private Long id;
+        private String title;
+        private String boardType;
+        private String memberName;
+        private String createdAt;
+        private Integer viewCount;
+        private String content;
+        private BoardInquiryScope inquiryScope;
+
+        public InquiryListDTO(Board board) {
+            this.id = board.getId();
+            this.title = board.getTitle();
+            this.boardType = board.getBoardType().name();
+            this.memberName = board.getMember().getName();
+            this.viewCount = board.getViewCount();
+            this.content = board.getContent();
+            this.inquiryScope = board.getInquiryScope();
+            if (board.getCreatedAt() != null) {
+                this.createdAt = MyDateUtil.timestampFormat(board.getCreatedAt());
+            }
+        }
+    }
 }
