@@ -13,7 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -63,16 +65,18 @@ public class PartnerShipController {
 
     // 관리자 페이지의 제휴 페이지
     @GetMapping("/admin/partnerships")
-    public String partnershipsPage(HttpSession session, Model model) {
+    public String partnershipsPage(@RequestParam(defaultValue = "1") int page,
+                                   HttpSession session, Model model) {
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        if (!sessionUser.isAdmin()) throw new BadRequestException("관리자만 들어갈수 있습니다.");
 
-        if(!sessionUser.isAdmin()){
-            throw new BadRequestException("관리자만 들어갈수 있습니다.");
-        }
-        List<PartnerShipResponse> partnerShipResponseList = partnerShipService.list();
-
-        model.addAttribute("partnerships",partnerShipResponseList);
-
+        List<PartnerShipResponse> all = partnerShipService.list();
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("partnerships", s < total ? all.subList(s, e) : new ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
         return "admin/admin-partnership";
     }
 

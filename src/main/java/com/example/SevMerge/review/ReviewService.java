@@ -63,6 +63,7 @@ public class ReviewService {
             throw new BadRequestException("이미 해당 프로젝트에 리뷰를 작성했습니다.");
         }
 
+
         System.out.println("projectId: " + reviewDTO.getProjectId());
         System.out.println("reviewerId: " + reviewer.getId());
         System.out.println("targeterId: " + targetEntity.getId());
@@ -123,6 +124,12 @@ public class ReviewService {
                 .stream()
                 .map(ReviewResponse.ReviewListDTO::new)
                 .toList();
+    }
+
+    // 전문가 리뷰 조회 (페이징)
+    public org.springframework.data.domain.Page<ReviewResponse.ReviewListDTO> findMyReviewsPage(Long targetId, org.springframework.data.domain.Pageable pageable) {
+        return reviewRepository.findMyReviewsPage(targetId, pageable)
+                .map(ReviewResponse.ReviewListDTO::new);
     }
 
     // 내가 작성한 리뷰 조회

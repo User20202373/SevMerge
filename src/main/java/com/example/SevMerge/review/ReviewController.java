@@ -18,6 +18,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,17 +32,23 @@ public class ReviewController {
 
     // 전문가 리뷰 확인
     @GetMapping("/reviews/my")
-    public String myReviews(HttpSession session,
-                            Model model) {
+    public String myReviews(HttpSession session, Model model,
+                            @RequestParam(defaultValue = "1") int page) {
 
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        if (sessionUser == null) return "login-form";
 
-        if (sessionUser == null) {
-            return "login-form";
-        }
+        PageRequest pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "id"));
+        Page<ReviewResponse.ReviewListDTO> reviewPage = reviewService.findMyReviewsPage(sessionUser.getId(), pageable);
 
-        List<ReviewResponse.ReviewListDTO> reviewList = reviewService.findMyReviews(sessionUser.getId());
-        model.addAttribute("reviews", reviewList);
+        int totalPages = reviewPage.getTotalPages() == 0 ? 1 : reviewPage.getTotalPages();
+        model.addAttribute("reviews", reviewPage.getContent());
+        model.addAttribute("totalReviews", reviewPage.getTotalElements());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < totalPages ? page + 1 : null);
+
         double avg = reviewService.avgRating(sessionUser.getId());
         model.addAttribute("avgStar", String.format("%.1f", avg));
 

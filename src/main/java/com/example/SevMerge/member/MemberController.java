@@ -239,6 +239,7 @@ public class MemberController {
     @GetMapping("/my-pages")
     public String mypage(@RequestParam(required = false) String tab,
                          @RequestParam(required = false) String keyword,
+                         @RequestParam(defaultValue = "1") int page,
                          HttpSession session, Model model,
                          HttpServletRequest request) {
         Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
@@ -281,8 +282,9 @@ public class MemberController {
         model.addAttribute("isWishlist", tab.equalsIgnoreCase("wishlist"));
         model.addAttribute("isBids", tab.equalsIgnoreCase("bids"));
         // 탭별 데이터
+        final int MY_PAGE_SIZE = 10;
         if (tab.equals("projects")) {
-            List<ProjectResponseDTO.ListDTO> projects = myProjects.stream()
+            List<ProjectResponseDTO.ListDTO> all = myProjects.stream()
                     .map(project -> {
                         if (project.getSelectedExpertId() != null) {
                             boolean hasReview = reviewRepository.existsByReviewerAndTargeterAndProject(
@@ -294,48 +296,84 @@ public class MemberController {
                         return project;
                     })
                     .toList();
-            model.addAttribute("projects", projects);
+            int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+            int s = (page - 1) * MY_PAGE_SIZE, e = Math.min(s + MY_PAGE_SIZE, all.size());
+            model.addAttribute("projects", s < all.size() ? all.subList(s, e) : List.of());
+            model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+            model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
         } else if (tab.equals("boards")) {
-            model.addAttribute("boards", boardService.findAllByMyBoard(loginMember.getId()));
+            List<?> all = boardService.findAllByMyBoard(loginMember.getId());
+            int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+            int s = (page - 1) * MY_PAGE_SIZE, e = Math.min(s + MY_PAGE_SIZE, all.size());
+            model.addAttribute("boards", s < all.size() ? all.subList(s, e) : List.of());
+            model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+            model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
         } else if (tab.equals("reviews")) {
-            model.addAttribute("reviews", reviewService.findMySaveReviews(loginMember.getId()));
+            List<?> all = reviewService.findMySaveReviews(loginMember.getId());
+            int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+            int s = (page - 1) * MY_PAGE_SIZE, e = Math.min(s + MY_PAGE_SIZE, all.size());
+            model.addAttribute("reviews", s < all.size() ? all.subList(s, e) : List.of());
+            model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+            model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
         } else if (tab.equals("edit")) {
             model.addAttribute("rawName", loginMember.getName());
             model.addAttribute("rawEmail", loginMember.getEmail());
         } else if (tab.equals("messages")) {
-            model.addAttribute("messages",
-                    messageService.findMessages(loginMember, "received", 1, "desc", null).getContent());
+            Page<?> msgPage = messageService.findMessages(loginMember, "received", page, "desc", null);
+            int tp = msgPage.getTotalPages() == 0 ? 1 : msgPage.getTotalPages();
+            model.addAttribute("messages", msgPage.getContent());
+            model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+            model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
         } else if (tab.equals("payments")) {
             try {
-                model.addAttribute("payments",
-                        paymentService.getClientPayments(loginMember.getId()));
-            } catch (Exception e) {
-                log.warn("결제 내역 조회 실패 - {}", e.getMessage());
+                List<?> all = paymentService.getClientPayments(loginMember.getId());
+                int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+                int s = (page - 1) * MY_PAGE_SIZE, e2 = Math.min(s + MY_PAGE_SIZE, all.size());
+                model.addAttribute("payments", s < all.size() ? all.subList(s, e2) : List.of());
+                model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+                model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
+            } catch (Exception ex) {
+                log.warn("결제 내역 조회 실패 - {}", ex.getMessage());
                 model.addAttribute("payments", List.of());
             }
         } else if (tab.equals("chargeHistory")) {
             try {
-                model.addAttribute("chargeHistories",
-                        chargeService.getMyCharges(loginMember.getId()));
-            } catch (Exception e) {
-                log.warn("충전 내역 조회 실패 - {}", e.getMessage());
+                List<?> all = chargeService.getMyCharges(loginMember.getId());
+                int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+                int s = (page - 1) * MY_PAGE_SIZE, e2 = Math.min(s + MY_PAGE_SIZE, all.size());
+                model.addAttribute("chargeHistories", s < all.size() ? all.subList(s, e2) : List.of());
+                model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+                model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
+            } catch (Exception ex) {
+                log.warn("충전 내역 조회 실패 - {}", ex.getMessage());
                 model.addAttribute("chargeHistories", List.of());
             }
         } else if (tab.equals("refundHistory")) {
             try {
-                model.addAttribute("refunds", refundApplicationService.getMyApplications(loginMember.getId()));
-            } catch (Exception e) {
-                log.warn("환불 내역 조회 실패 - {}", e.getMessage());
+                List<?> all = refundApplicationService.getMyApplications(loginMember.getId());
+                int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+                int s = (page - 1) * MY_PAGE_SIZE, e2 = Math.min(s + MY_PAGE_SIZE, all.size());
+                model.addAttribute("refunds", s < all.size() ? all.subList(s, e2) : List.of());
+                model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+                model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
+            } catch (Exception ex) {
+                log.warn("환불 내역 조회 실패 - {}", ex.getMessage());
                 model.addAttribute("refunds", List.of());
             }
         } else if (tab.equals("bookmarks")) {
+            List<?> all;
             if (keyword != null && !keyword.isBlank()) {
-                model.addAttribute("bookMarks", bookMarkService.filterBookMarks(loginMember.getId(), keyword));
+                all = bookMarkService.filterBookMarks(loginMember.getId(), keyword);
             } else {
-                model.addAttribute("bookMarks", bookMarkService.findAllMyBookMarks(loginMember.getId()));
+                all = bookMarkService.findAllMyBookMarks(loginMember.getId());
             }
+            int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+            int s = (page - 1) * MY_PAGE_SIZE, e2 = Math.min(s + MY_PAGE_SIZE, all.size());
+            model.addAttribute("bookMarks", s < all.size() ? all.subList(s, e2) : List.of());
+            model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+            model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
             model.addAttribute("keyword", keyword);
-        }else if (tab.equals("wishlist")) {
+        } else if (tab.equals("wishlist")) {
             int wishPage = 0;
             try {
                 String wishPageParam = request.getParameter("wishPage");
@@ -362,9 +400,14 @@ public class MemberController {
             model.addAttribute("wishTotalElements", wishResult.getTotalElements());
         } else if (tab.equals("bids")) {
             try {
-                model.addAttribute("clientBids", bidService.findBidsForClient(loginMember));
-            } catch (Exception e) {
-                log.warn("제안서 목록 조회 실패 - {}", e.getMessage());
+                List<?> all = bidService.findBidsForClient(loginMember);
+                int tp = Math.max(1, (int) Math.ceil((double) all.size() / MY_PAGE_SIZE));
+                int s = (page - 1) * MY_PAGE_SIZE, e2 = Math.min(s + MY_PAGE_SIZE, all.size());
+                model.addAttribute("clientBids", s < all.size() ? all.subList(s, e2) : List.of());
+                model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+                model.addAttribute("prevPage", page > 1 ? page - 1 : null); model.addAttribute("nextPage", page < tp ? page + 1 : null);
+            } catch (Exception ex) {
+                log.warn("제안서 목록 조회 실패 - {}", ex.getMessage());
                 model.addAttribute("clientBids", List.of());
             }
         }

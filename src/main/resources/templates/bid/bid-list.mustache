@@ -80,6 +80,10 @@
     .rejected-badge { font-size: 12px; background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 4px 12px; border-radius: 20px; font-weight: 700; display: inline-block; }
     .empty-state { text-align: center; padding: 60px 0; }
     .empty-msg   { font-size: 15px; color: #93aecf; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 32px; padding-bottom: 40px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .page-btn { padding: 9px 15px; border-radius: 8px; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #6b7280; text-decoration: none; transition: all .15s; }
+    .page-btn:hover { border-color: #93c5fd; color: #2563eb; background: rgba(255,255,255,.9); }
 </style>
 
 <div class="page-header">
@@ -153,25 +157,10 @@
     </div>
 </section>
 
-<!-- 페이징 UI -->
-<div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:32px; padding-bottom:40px;">
-    {{#hasPrev}}
-    <a href="/bids?projectId={{projectId}}&page={{prevPage}}"
-       style="padding:8px 18px; background:#fff; border:1.5px solid #e2e5ef; border-radius:8px; font-size:13px; font-weight:700; color:#4b5563; text-decoration:none;">
-        ← 이전
-    </a>
-    {{/hasPrev}}
-
-    <span style="font-size:13px; color:#9ca3af; font-weight:500;">
-        {{currentPage}} / {{totalPages}}
-    </span>
-
-    {{#hasNext}}
-    <a href="/bids?projectId={{projectId}}&page={{nextPage}}"
-       style="padding:8px 18px; background:#2563eb; border-radius:8px; font-size:13px; font-weight:700; color:#fff; text-decoration:none;">
-        다음 →
-    </a>
-    {{/hasNext}}
+<div class="pagination">
+    {{#hasPrev}}<a href="/bids?projectId={{projectId}}&page={{prevPage}}" class="page-btn">이전</a>{{/hasPrev}}
+    <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+    {{#hasNext}}<a href="/bids?projectId={{projectId}}&page={{nextPage}}" class="page-btn">다음</a>{{/hasNext}}
 </div>
 
 <script>

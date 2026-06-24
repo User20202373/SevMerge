@@ -301,12 +301,8 @@
         background: #fee2e2;
     }
 
-    .paging {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin-top: 24px;
-    }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
 
     .page-btn {
         padding: 9px 15px;
@@ -415,8 +411,12 @@
                 </div>
             {{/boards}}
         </div>
+        <div class="pagination">
+            {{#prevPage}}<a href="/admin/boards?page={{prevPage}}&boardType={{boardType}}&keyword={{keyword}}" class="page-btn">이전</a>{{/prevPage}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+            {{#nextPage}}<a href="/admin/boards?page={{nextPage}}&boardType={{boardType}}&keyword={{keyword}}" class="page-btn">다음</a>{{/nextPage}}
+        </div>
     </main>
 </div>
-
 
 {{> layout/footer}}

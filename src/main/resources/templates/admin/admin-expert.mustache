@@ -41,7 +41,8 @@
     .reject-btn { padding: 9px 18px; background: #fff; color: #ef4444; border: 1.5px solid #fecaca; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .reject-btn:hover { background: #fff3f3; }
     .empty-state { text-align: center; padding: 60px 0; font-size: 15px; color: #c4c9d9; }
-    .paging { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
     .page-btn { padding: 9px 15px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #6b7280; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); text-decoration: none; transition: all .15s; }
     .page-btn:hover { border-color: #2563eb; color: #2563eb; }
     .page-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
@@ -51,25 +52,6 @@
 <div class="bg-glow bg-glow-1"></div>
 <div class="bg-glow bg-glow-2"></div>
 <div class="admin-wrap">
-    <aside class="admin-sidebar">
-        <p class="sidebar-label">전문가 관리</p>
-        <a href="/admin/experts" class="sidebar-link active">
-            <span class="sidebar-icon">👨‍💻</span> 전문가 승인
-        </a>
-        <a href="/admin/experts/withdraw" class="sidebar-link">
-            <span class="sidebar-icon">💸</span> 출금요청 관리
-        </a>
-
-        <p class="sidebar-label">운영 관리</p>
-        <a href="/admin/main"       class="sidebar-link"><span class="sidebar-icon">📊</span> 대시보드</a>
-        <a href="/admin/members"    class="sidebar-link"><span class="sidebar-icon">👥</span> 회원 관리</a>
-        <a href="/admin/projects"   class="sidebar-link"><span class="sidebar-icon">📋</span> 프로젝트</a>
-        <a href="/admin/notices"    class="sidebar-link"><span class="sidebar-icon">📢</span> 공지사항</a>
-        <a href="/admin/boards"     class="sidebar-link"><span class="sidebar-icon">💬</span> 게시판</a>
-        <a href="/admin/blacklists" class="sidebar-link"><span class="sidebar-icon">🚫</span> 블랙리스트</a>
-        <a href="/admin/reports"    class="sidebar-link"><span class="sidebar-icon">⚠️</span> 신고 관리</a>
-    </aside>
-
     <main class="admin-content">
         <div class="admin-header">
             <h1 class="admin-title">전문가 승인 관리</h1>
@@ -131,12 +113,10 @@
             {{/experts}}
         </div>
 
-        <div class="paging">
-            {{#paging}}
-                {{#hasPrev}}<a href="/admin/experts?page={{prevPage}}" class="page-btn">이전</a>{{/hasPrev}}
-                {{#pageList}}<a href="/admin/experts?page={{num}}" class="page-btn {{#isCurrent}}active{{/isCurrent}}">{{num}}</a>{{/pageList}}
-                {{#hasNext}}<a href="/admin/experts?page={{nextPage}}" class="page-btn">다음</a>{{/hasNext}}
-            {{/paging}}
+        <div class="pagination">
+            {{#prevPage}}<a href="/admin/experts?page={{prevPage}}&status={{currentStatus}}" class="page-btn">이전</a>{{/prevPage}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+            {{#nextPage}}<a href="/admin/experts?page={{nextPage}}&status={{currentStatus}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
     </main>
 </div>
