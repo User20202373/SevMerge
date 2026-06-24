@@ -117,6 +117,19 @@
             </article>
             {{/projects}}
         </div>
+
+        <div class="pagination" style="text-align: center; margin-top: 40px; padding-bottom: 20px;">
+                        {{^page.first}}
+                            <a href="?page={{prevPage}}&size=6" style="padding: 10px 20px; border: 1px solid #e2e5ef; text-decoration: none; color: #6b7280; border-radius: 8px;">이전</a>
+                        {{/page.first}}
+
+                        <span style="margin: 0 20px; font-weight: 700;">{{page.number}} / {{page.totalPages}}</span>
+
+                        {{^page.last}}
+                            <a href="?page={{nextPage}}&size=6" style="padding: 10px 20px; border: 1px solid #e2e5ef; text-decoration: none; color: #6b7280; border-radius: 8px;">다음</a>
+                        {{/page.last}}
+                </div>
+
     </div>
 </section>
 

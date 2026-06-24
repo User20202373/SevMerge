@@ -12,6 +12,10 @@ import com.example.SevMerge.review.ReviewService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,23 +57,36 @@ public class ProjectController {
                        @RequestParam(required = false) String category,
                        @RequestParam(required = false) String statusFilter,
                        @RequestParam(required = false) String bidFilter,
+                       // 1. Pageable 추가: @PageableDefault로 기본값 설정
+                       @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                        HttpSession session) {
 
-        // 1. [핵심] 빈 문자열("")로 들어오는 파라미터를 null로 변경 (에러 방지)
+        // 2. 파라미터 null 처리
         if (keyword != null && keyword.isBlank()) keyword = null;
         if (category != null && category.isBlank()) category = null;
         if (statusFilter != null && statusFilter.isBlank()) statusFilter = null;
         if (bidFilter != null && bidFilter.isBlank()) bidFilter = null;
 
-        // 2. 서비스 호출
-        List<ProjectResponseDTO.ListDTO> projects =
-                projectService.findByFilters(keyword, category, statusFilter, bidFilter);
+        // 3. 서비스 호출 (Page 객체 반환)
+        Page<ProjectResponseDTO.ListDTO> projectPage =
+                projectService.findByFilters(keyword, category, statusFilter, bidFilter, pageable);
 
-        // 3. 모델 세팅 (기존과 동일)
-        model.addAttribute("projects", projects);
-        model.addAttribute("totalCount", projects.size());
+        // 4. 모델 세팅 (핵심: .getContent()로 리스트 추출)
+        model.addAttribute("projects", projectPage.getContent());
+        model.addAttribute("page", projectPage); // 페이지 정보 전달
+        model.addAttribute("totalCount", projectPage.getTotalElements()); // 전체 개수
+
+
+        // 페이징
+        model.addAttribute("currentPage", projectPage.getNumber());
+        model.addAttribute("totalPages", projectPage.getTotalPages());
+        model.addAttribute("isFirst", projectPage.isFirst());
+        model.addAttribute("isLast", projectPage.isLast());
+        model.addAttribute("prevPage", projectPage.getNumber() - 1);
+        model.addAttribute("nextPage", projectPage.getNumber() + 1);
+
+        // 기존 필터 상태 모델들 그대로 유지
         model.addAttribute("keyword", keyword != null ? keyword : "");
-
         model.addAttribute("isAll", category == null && keyword == null && statusFilter == null && bidFilter == null);
         model.addAttribute("isClosedFilter", "CLOSED".equals(statusFilter));
         model.addAttribute("isWeb", "WEB".equals(category));
@@ -84,8 +101,6 @@ public class ProjectController {
         if (sessionUser != null) {
             model.addAttribute("sessionUser", sessionUser);
         }
-
-        log.info("요청된 statusFilter 값: {}", statusFilter);
 
         return "project/project-list";
     }

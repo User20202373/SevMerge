@@ -15,6 +15,7 @@ import com.example.SevMerge.member.Role;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -169,12 +170,17 @@ public class ExpertProfileViewController {
 
         // 프로젝트 목록 — keyword/category 조건에 따라 분기
         List<ProjectResponseDTO.ListDTO> projects;
+        // 2. 서비스 메서드들을 페이징 처리된 결과를 반환하도록 수정하거나,
+//    Pageable.unpaged()를 넣어 호출하세요.
         if (keyword != null && !keyword.isBlank()) {
-            projects = projectService.findByKeyword(keyword);
+            // keyword 검색 결과가 Page라면 .getContent()로 List 추출
+            projects = projectService.findByKeyword(keyword, Pageable.unpaged());
         } else if (category != null && !category.isBlank()) {
-            projects = projectService.findByCategory(category);
+            // category 검색 결과가 Page라면 .getContent()로 List 추출
+            projects = projectService.findByCategory(category, Pageable.unpaged()).getContent();
         } else {
-            projects = projectService.findAllProjects();
+            // 전체 조회도 Page를 반환한다면 .getContent()로 List 추출
+            projects = projectService.findAllProjects(Pageable.unpaged());
         }
 
         // 최신 6건만 대시보드 미니 그리드에 표시
