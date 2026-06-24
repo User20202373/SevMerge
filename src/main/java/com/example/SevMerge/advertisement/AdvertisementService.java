@@ -41,8 +41,17 @@ public class AdvertisementService {
             throw new ForbiddenException("전문가만 광고를 구매할 수 있습니다.");
         }
 
-        int price = placement.getPrice();
+        // 중복 신청 방지
+        boolean hasActiveOrPending = advertisementRepository
+                .existsByExpertIdAndPlacementAndStatusIn(
+                        expertId, placement,
+                        List.of(AdvertisementStatus.ACTIVE, AdvertisementStatus.PENDING)
+                );
+        if (hasActiveOrPending) {
+            throw new BadRequestException("이미 진행 중이거나 승인 대기 중인 광고가 있습니다. 종료 후 다시 신청해 주세요.");
+        }
 
+        int price = placement.getPrice();
         try {
             expert.deductBalance(price);
         } catch (IllegalStateException e) {
@@ -59,14 +68,13 @@ public class AdvertisementService {
                 .price(price)
                 .startDate(startDate)
                 .endDate(endDate)
-                .status(AdvertisementStatus.ACTIVE)
+                .status(AdvertisementStatus.PENDING)
                 .customMessage(customMessage)
                 .bannerImage(bannerImage)
                 .build();
 
         advertisementRepository.save(ad);
-        log.info("[Advertisement] 구매 완료 - expertId={}, placement={}, price={}", expertId, placement, price);
-
+        log.info("[Advertisement] 신청 완료(승인 대기) - expertId={}, placement={}, price={}", expertId, placement, price);
         return toResponse(ad);
     }
 
@@ -97,6 +105,47 @@ public class AdvertisementService {
         if (!expired.isEmpty()) {
             log.info("[Advertisement] 만료 처리 - {}건", expired.size());
         }
+    }
+    // 승인 대기 광고 목록 조회 (관리자용)
+    public List<AdvertisementResponse> getPendingAds() {
+        return advertisementRepository.findPendingAds()
+                .stream().map(this::toResponse).toList();
+    }
+
+    // 광고 승인 시점부터 7일
+    @Transactional
+    public void approveAd(Long adId) {
+        Advertisement ad = advertisementRepository.findById(adId)
+                .orElseThrow(() -> new NotFoundException("광고를 찾을 수 없습니다."));
+        if (ad.getStatus() != AdvertisementStatus.PENDING) {
+            throw new BadRequestException("대기 중인 광고만 승인할 수 있습니다.");
+        }
+        ad.approve();
+        log.info("[Advertisement] 승인 완료 - adId={}", adId);
+    }
+
+    // 광고 거절
+    @Transactional
+    public void rejectAd(Long adId) {
+        Advertisement ad = advertisementRepository.findById(adId)
+                .orElseThrow(() -> new NotFoundException("광고를 찾을 수 없습니다."));
+        if (ad.getStatus() != AdvertisementStatus.PENDING) {
+            throw new BadRequestException("대기 중인 광고만 거절할 수 있습니다.");
+        }
+
+        // 포인트 환불
+        Member expert = memberRepository.findById(ad.getExpertId())
+                .orElseThrow(() -> new NotFoundException("전문가 정보를 찾을 수 없습니다."));
+        expert.addBalance(ad.getPrice());  // 환불
+        log.info("[Advertisement] 포인트 환불 - expertId={}, amount={}", ad.getExpertId(), ad.getPrice());
+
+        ad.reject();
+        log.info("[Advertisement] 거절 완료 - adId={}", adId);
+    }
+
+    public List<AdvertisementResponse> getProcessedAds() {
+        return advertisementRepository.findProcessedAds()
+                .stream().map(this::toResponse).toList();
     }
 
     // private

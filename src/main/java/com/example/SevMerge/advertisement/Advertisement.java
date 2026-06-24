@@ -66,4 +66,17 @@ public class Advertisement {
     public void expire() {
         this.status = AdvertisementStatus.EXPIRED;
     }
+
+    public void approve() {
+        long now = System.currentTimeMillis();
+        long durationMs = this.endDate.getTime() - this.startDate.getTime();
+        this.startDate = new Timestamp(now);
+        this.endDate = new Timestamp(now + durationMs);
+        this.status = AdvertisementStatus.ACTIVE;
+    }
+
+    public void reject() {
+        this.status = AdvertisementStatus.REJECTED;
+    }
+
 }

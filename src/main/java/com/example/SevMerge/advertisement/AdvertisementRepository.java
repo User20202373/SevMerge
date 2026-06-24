@@ -21,4 +21,19 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
 
     @Query("SELECT a FROM Advertisement a WHERE a.status = 'ACTIVE' AND a.endDate < :now")
     List<Advertisement> findExpiredButStillActive(@Param("now") Timestamp now);
+
+    // 승인 대기 광고 조회
+    @Query("SELECT a FROM Advertisement a WHERE a.status = 'PENDING' ORDER BY a.createdAt DESC")
+    List<Advertisement> findPendingAds();
+
+    @Query("SELECT a FROM Advertisement a WHERE a.status IN ('ACTIVE','REJECTED','EXPIRED') ORDER BY a.createdAt DESC")
+    List<Advertisement> findProcessedAds();
+
+
+    // 중복 신청 방지용
+    boolean existsByExpertIdAndPlacementAndStatusIn(
+            Long expertId,
+            AdvertisementPlacement placement,
+            List<AdvertisementStatus> statuses
+    );
 }

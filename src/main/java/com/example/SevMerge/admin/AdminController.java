@@ -3,6 +3,7 @@ package com.example.SevMerge.admin;
 import com.example.SevMerge.Report.BlackList;
 import com.example.SevMerge.Report.BlacklistRepository;
 import com.example.SevMerge.Report.ReportService;
+import com.example.SevMerge.advertisement.AdvertisementService;
 import com.example.SevMerge.board.*;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.expertprofile.ExpertProfileResponse;
@@ -43,6 +44,7 @@ public class AdminController {
     private final BlacklistRepository blacklistRepository;
     private final ReportService reportService;
     private final PartnerShipService partnerShipService;
+    private final AdvertisementService advertisementService;
 
     @GetMapping("/admin/main")
     public String dashboardPage(HttpSession session, Model model,
@@ -288,6 +290,31 @@ public class AdminController {
     public String adminExpertWithdraw(Model model) {
         // 여기에 출금 요청 목록을 가져오는 로직 추가 예정 )  memberService.getWithdrawList
         return "admin/admin-withdraw";
+    }
+
+    // 광고 승인 관리 페이지
+    @GetMapping("/admin/advertisements")
+    public String adminAdvertisementPage(Model model) {
+        model.addAttribute("pendingAds", advertisementService.getPendingAds());
+        model.addAttribute("pendingCount", advertisementService.getPendingAds().size());
+        model.addAttribute("processedAds", advertisementService.getProcessedAds());
+        return "admin/admin-advertisement";
+    }
+
+    // 광고 승인
+    @ResponseBody
+    @PatchMapping("/api/admin/advertisements/{adId}/approve")
+    public ResponseEntity<?> approveAd(@PathVariable Long adId) {
+        advertisementService.approveAd(adId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 광고 거절
+    @ResponseBody
+    @PatchMapping("/api/admin/advertisements/{adId}/reject")
+    public ResponseEntity<?> rejectAd(@PathVariable Long adId) {
+        advertisementService.rejectAd(adId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/admin/experts/grade")

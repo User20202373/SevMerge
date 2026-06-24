@@ -44,6 +44,8 @@ public class AdvertisementResponse {
 
     public boolean isActive()  { return "ACTIVE".equals(status); }
     public boolean isExpired() { return "EXPIRED".equals(status); }
+    public boolean isPending()  { return "PENDING".equals(status); }
+    public boolean isRejected() { return "REJECTED".equals(status); }
 
     public String getDisplayImageUrl() {
         String img = (bannerImage != null && !bannerImage.isBlank()) ? bannerImage : profileImage;
