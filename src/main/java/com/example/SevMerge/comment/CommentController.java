@@ -42,7 +42,9 @@ public class CommentController {
             return "redirect:/boards/" + commentId;
         }
 
-        commentService.updateComment(commentId, updateDTO.getComment(), sessionMember.getId());
+        boolean isAdmin = (sessionMember.getRole() == Role.ADMIN);
+
+        commentService.updateComment(commentId, updateDTO.getComment(), sessionMember.getId(), isAdmin);
         return "redirect:/boards/" + updateDTO.getBoardId();
     }
 
@@ -56,12 +58,13 @@ public class CommentController {
             return "redirect:/login";
         }
 
-        if (sessionMember.getRole() == Role.ADMIN) {
-            commentService.deleteCommentByAdmin(commentId);
-            return "redirect:/admin/comments";
-        }
-        commentService.deleteComment(commentId, sessionMember.getId());
+        boolean isAdmin = (sessionMember.getRole() == Role.ADMIN);
 
+        commentService.deleteComment(commentId, sessionMember.getId(), isAdmin);
+
+        if (isAdmin) {
+            return  "redirect:/boards/" + boardId;
+        }
         return "redirect:/boards/" + boardId;
     }
 

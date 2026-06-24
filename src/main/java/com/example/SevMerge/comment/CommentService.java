@@ -2,6 +2,7 @@ package com.example.SevMerge.comment;
 
 import com.example.SevMerge.board.Board;
 import com.example.SevMerge.board.BoardRepository;
+import com.example.SevMerge.core.exception.BadRequestException;
 import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.MemberRepository;
@@ -47,12 +48,12 @@ public class CommentService {
 
     // 댓글 수정
     @Transactional
-    public void updateComment(Long commentId, String newContent, Long sessionUserId) {
+    public void updateComment(Long commentId, String newContent, Long sessionUserId, boolean isAdmin) {
         Comment commentEntity = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NotFoundException("해당 댓글을 찾을 수 없습니다."));
 
-        if (!commentEntity.getMember().getId().equals(sessionUserId)) {
-            throw new IllegalArgumentException("댓글 수정 권한이 없습니다.");
+        if (!commentEntity.getMember().getId().equals(sessionUserId) && !isAdmin) {
+            throw new BadRequestException("댓글 수정 권한이 없습니다.");
         }
 
         commentEntity.updateContent(newContent);
@@ -60,15 +61,14 @@ public class CommentService {
 
     // 댓글 삭제
     @Transactional
-    public void deleteComment(Long commentId, Long sessionUserId) { // Integer -> Long 변환
-        // 1. 댓글 조회 (Reply -> Comment)
+    public void deleteComment(Long commentId, Long sessionUserId, boolean isAdmin) {
+        // 1. 댓글 조회
         Comment commentEntity = commentRepository.findById(commentId).orElseThrow(
-                () -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다"));
+                () -> new NotFoundException("해당 댓글을 찾을 수 없습니다"));
 
         // 2. 인가 처리 (본인 확인)
-        // 객체 비교(!=) 대신 안전한 Long 타입 값 비교(!equals)를 사용했습니다.
-        if (!commentEntity.getMember().getId().equals(sessionUserId)) {
-            throw new IllegalArgumentException("댓글 삭제 권한이 없습니다");
+        if (!commentEntity.getMember().getId().equals(sessionUserId) && !isAdmin) {
+            throw new BadRequestException("댓글 삭제 권한이 없습니다");
         }
 
         // 3. 댓글 삭제
