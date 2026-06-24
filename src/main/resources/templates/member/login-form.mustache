@@ -179,6 +179,34 @@
     }
     .auth-footer a { color: var(--blue); font-weight: 700; text-decoration: none; }
     .auth-footer a:hover { text-decoration: underline; }
+
+    .wave-hand {
+      width: 1em;
+      height: 1em;
+      color: #ffb020;
+      transform-origin: 70% 80%;
+      animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(-30deg); }
+      20% { transform: rotate(-15deg); }
+      40% { transform: rotate(-35deg); }
+      60% { transform: rotate(-20deg); }
+    }
+      /* 반시계 30도 */
+      transform: rotate(-30deg);
+
+      /* 회전 기준점 */
+      transform-origin: 70% 80%;
+
+  /* 디자인 */
+  filter:
+    drop-shadow(0 2px 4px rgba(0,0,0,0.15))
+    drop-shadow(0 0 8px rgba(255,176,32,0.35));
+
+  vertical-align: middle;
+}
 </style>
 
 <section class="auth-section">
@@ -191,7 +219,15 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 IT 프리랜서 매칭 플랫폼
             </div>
-            <h1 class="auth-hero-title">다시 만나서<br>반갑습니다 <span class="hl">👋</span></h1>
+            <h1 class="auth-hero-title">
+                다시 만나서<br>
+                반갑습니다
+                <span class="hl">
+                <svg class="wave-hand" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 23H7v-2h12v2ZM7 21H5v-2h2v2Zm14 0h-2v-2h2v2ZM5 19H3v-2h2v2Zm18 0h-2V7h2v12ZM3 17H1v-4h2v4Zm6 0H7v-2h2v2Zm-2-2H5v-2H3v-2h2V5h2v10Zm14-8h-2v5h-2V5h4v2Zm-10 4H9V5H7V3h4v8Zm6-6h-2v6h-2V3h4v2Zm-4-2h-2V1h2v2Z"/>
+                </svg>
+              </span>
+            </h1>
             <p class="auth-hero-desc">코드요와 함께 프로젝트를 시작하세요.<br>검증된 전문가와 의뢰인을 연결합니다.</p>
             <div class="trust-row">
                 <div class="trust-item">
