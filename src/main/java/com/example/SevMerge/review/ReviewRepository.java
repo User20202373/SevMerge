@@ -17,6 +17,10 @@ public interface ReviewRepository extends JpaRepository<Review , Long> {
     @Query("SELECT r FROM Review r JOIN FETCH r.reviewer WHERE r.targeter.id = :memberId AND r.isDelete = false")
     List<Review> findMyReviews(@Param("memberId") Long memberId);
 
+    @Query(value = "SELECT r FROM Review r JOIN FETCH r.reviewer WHERE r.targeter.id = :memberId AND r.isDelete = false",
+           countQuery = "SELECT COUNT(r) FROM Review r WHERE r.targeter.id = :memberId AND r.isDelete = false")
+    Page<Review> findMyReviewsPage(@Param("memberId") Long memberId, Pageable pageable);
+
     @Query("""
                 SELECT r FROM Review r JOIN FETCH r.targeter WHERE r.reviewer.id = :reviewerId AND r.isDelete = false
             """)

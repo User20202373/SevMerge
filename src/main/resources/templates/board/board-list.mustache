@@ -75,10 +75,10 @@
     .empty-msg { font-size: 15px; color: #93aecf; }
 
     /* 페이지네이션 */
-    .paging { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
-    .page-btn { padding: 9px 15px; border-radius: 10px; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #2d4a7a; text-decoration: none; transition: all .15s; }
-    .page-btn:hover { border-color: rgba(37,99,235,.3); color: #2563eb; }
-    .page-btn.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .page-btn { padding: 9px 15px; border-radius: 8px; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #6b7280; text-decoration: none; transition: all .15s; }
+    .page-btn:hover { border-color: #93c5fd; color: #2563eb; background: rgba(255,255,255,.9); }
 </style>
 
 <!-- 페이지 헤더 + 탭 -->
@@ -137,11 +137,9 @@
 
         </div>
 
-        <div class="paging">
+        <div class="pagination">
             {{#prevPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
-            {{#pageList}}
-                <a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{num}}" class="page-btn {{#isCurrent}}active{{/isCurrent}}">{{num}}</a>
-            {{/pageList}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
             {{#nextPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
 
@@ -189,11 +187,9 @@
 
         </div>
 
-        <div class="paging">
+        <div class="pagination">
             {{#prevPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
-            {{#pageList}}
-                <a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{num}}" class="page-btn {{#isCurrent}}active{{/isCurrent}}">{{num}}</a>
-            {{/pageList}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
             {{#nextPage}}<a href="/boards?boardType={{boardType}}&keyword={{keyword}}&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
     </section>

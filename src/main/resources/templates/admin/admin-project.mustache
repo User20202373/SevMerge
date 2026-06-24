@@ -269,12 +269,8 @@
         background: #fee2e2;
     }
 
-    .paging {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin-top: 24px;
-    }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
 
     .page-btn {
         padding: 9px 15px;
@@ -361,14 +357,10 @@
                 </div>
             {{/projects}}
         </div>
-        <div class="paging">
-            {{#paging}}
-                {{#hasPrev}}<a href="/admin/projects?page={{prevPage}}" class="page-btn">이전</a>{{/hasPrev}}
-                {{#pageList}}
-                    <a href="/admin/projects?page={{num}}" class="page-btn {{#isCurrent}}
-                    active{{/isCurrent}}">{{num}}</a>{{/pageList}}
-                {{#hasNext}}<a href="/admin/projects?page={{nextPage}}" class="page-btn">다음</a>{{/hasNext}}
-            {{/paging}}
+        <div class="pagination">
+            {{#prevPage}}<a href="/admin/projects?page={{prevPage}}&keyword={{keyword}}&statusFilter={{statusFilter}}" class="page-btn">이전</a>{{/prevPage}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+            {{#nextPage}}<a href="/admin/projects?page={{nextPage}}&keyword={{keyword}}&statusFilter={{statusFilter}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
     </main>
 </div>

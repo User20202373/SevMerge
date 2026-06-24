@@ -59,6 +59,7 @@ public class ExpertProfileViewController {
     @GetMapping
     public String list(@RequestParam(required = false) String career,
                        @RequestParam(required = false) String keyword,
+                       @RequestParam(defaultValue = "1") int page,
                        HttpSession session, Model model) {
 
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
@@ -90,7 +91,20 @@ public class ExpertProfileViewController {
             }
         }
 
-        model.addAttribute("expertProfiles", profiles);
+        // 인-메모리 페이징
+        int pageSize = 9;
+        int totalCount = profiles.size();
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalCount);
+        java.util.List<ExpertProfileResponse> pagedProfiles = start < totalCount ? profiles.subList(start, end) : new java.util.ArrayList<>();
+
+        model.addAttribute("expertProfiles", pagedProfiles);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < totalPages ? page + 1 : null);
         model.addAttribute("doneProject", projectService.getDoneProjectsCount());
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 

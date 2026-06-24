@@ -79,7 +79,8 @@ public class ProjectController {
 
         // 페이징
         model.addAttribute("currentPage", projectPage.getNumber());
-        model.addAttribute("totalPages", projectPage.getTotalPages());
+        model.addAttribute("displayPage", projectPage.getNumber() + 1);
+        model.addAttribute("totalPages", projectPage.getTotalPages() == 0 ? 1 : projectPage.getTotalPages());
         model.addAttribute("isFirst", projectPage.isFirst());
         model.addAttribute("isLast", projectPage.isLast());
         model.addAttribute("prevPage", projectPage.getNumber() - 1);
@@ -250,14 +251,19 @@ public class ProjectController {
     @GetMapping("/admin/projects")
     public String adminProjects(@RequestParam(value = "keyword", required = false) String keyword,
                                 @RequestParam(value = "statusFilter", defaultValue = "ALL") String statusFilter,
+                                @RequestParam(defaultValue = "1") int page,
                                 HttpSession session, Model model) {
         Member sessionUser = (Member)session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 
         String searchKeyword = (keyword != null) ? keyword.trim() : "";
-        List<ProjectResponseDTO.ListDTO> adminProjects = projectService.getAdminProjectsByStatusAndKeyword(statusFilter,searchKeyword);
-
-        model.addAttribute("projects", adminProjects);
+        List<ProjectResponseDTO.ListDTO> all = projectService.getAdminProjectsByStatusAndKeyword(statusFilter, searchKeyword);
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("projects", s < total ? all.subList(s, e) : new java.util.ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
         model.addAttribute("isFree", false);
         model.addAttribute("isNotice", false);
         model.addAttribute("isInquiry", false);
