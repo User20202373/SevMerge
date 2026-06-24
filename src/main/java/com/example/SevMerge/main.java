@@ -74,7 +74,7 @@ public class main {
 
         // 3. 실시간 프로젝트 + 인피드 광고 합치기
         List<ProjectResponseDTO.ListDTO> projects =
-                projectService.findAllProjects().stream()
+                projectService.findAllProjectsList().stream()
                         .filter(p -> "OPEN".equals(p.getProjectStatus()))
                         .sorted(Comparator.comparing(
                                 ProjectResponseDTO.ListDTO::getCreatedAt).reversed())

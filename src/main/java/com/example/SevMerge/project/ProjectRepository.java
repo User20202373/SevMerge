@@ -1,5 +1,7 @@
 package com.example.SevMerge.project;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,9 +12,9 @@ import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long>{
 
-    // 프로젝트 전체 조회(최신순 조회, DRAFT 제외)
-    @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE p.isDeleted = false AND p.projectStatus <> 'DRAFT' ORDER BY p.createdAt DESC")
-    List<Project> findAllProjects();
+    @Query(value = "SELECT p FROM Project p JOIN FETCH p.member WHERE p.isDeleted = false AND p.projectStatus <> 'DRAFT' ORDER BY p.createdAt DESC",
+            countQuery = "SELECT count(p) FROM Project p WHERE p.isDeleted = false AND p.projectStatus <> 'DRAFT'")
+    Page<Project> findAllProjects(Pageable pageable);
 
     @Query("SELECT p FROM Project p WHERE p.member.id = :memberId AND p.projectStatus = :status")
     Optional<Project> findByMemberIdAndProjectStatus(@Param("memberId") Long memberId,
@@ -44,26 +46,30 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
             """)
     Long monthDoneProjects();
 
-    // 입찰조회
-    @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE p.bidFilter = :bidFilter AND p.isDeleted = false ORDER BY p.createdAt DESC")
-    List<Project> findByBidFilter(@Param("bidFilter") BidFilter bidFilter);
+    // 1. 입찰조회
+    @Query(value = "SELECT p FROM Project p JOIN FETCH p.member WHERE p.bidFilter = :bidFilter AND p.isDeleted = false ORDER BY p.createdAt DESC",
+            countQuery = "SELECT count(p) FROM Project p WHERE p.bidFilter = :bidFilter AND p.isDeleted = false")
+    Page<Project> findByBidFilter(@Param("bidFilter") BidFilter bidFilter, Pageable pageable);
+
+    // 2. 카테고리별 조회
+    @Query(value = "SELECT p FROM Project p JOIN FETCH p.member WHERE p.category = :category AND p.isDeleted = false ORDER BY p.createdAt DESC",
+            countQuery = "SELECT count(p) FROM Project p WHERE p.category = :category AND p.isDeleted = false")
+    Page<Project> findByCategory(@Param("category") Category category, Pageable pageable);
 
 
-    // 프로젝트 카테고리별 조회
-    @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE p.category = :category AND p.isDeleted = false ORDER BY p.createdAt DESC")
-    List<Project> findByCategory(@Param("category") Category category);
-
-    // 키워드 검색
-    @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE (p.title LIKE %:keyword% OR p.description LIKE %:keyword%) AND p.isDeleted = false ORDER BY p.createdAt DESC")
-    List<Project> findByKeyword(@Param("keyword") String keyword);
+    // 3. 키워드 검색
+    @Query(value = "SELECT p FROM Project p JOIN FETCH p.member WHERE (p.title LIKE %:keyword% OR p.description LIKE %:keyword%) AND p.isDeleted = false ORDER BY p.createdAt DESC",
+            countQuery = "SELECT count(p) FROM Project p WHERE (p.title LIKE %:keyword% OR p.description LIKE %:keyword%) AND p.isDeleted = false")
+    Page<Project> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     // 의뢰인이 등록한 프로젝트 목록
     @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE p.member.id = :memberId AND p.isDeleted = false ORDER BY p.createdAt DESC")
     List<Project> findAllProjectByMemberId(@Param("memberId") Long memberId);
 
-    // 상태별 조회
-    @Query("SELECT p FROM Project p JOIN FETCH p.member WHERE p.projectStatus = :status AND p.isDeleted = false ORDER BY p.createdAt DESC")
-    List<Project> findByStatus(@Param("status") ProjectStatus status);
+    // 4. 상태별 조회
+    @Query(value = "SELECT p FROM Project p JOIN FETCH p.member WHERE p.projectStatus = :status AND p.isDeleted = false ORDER BY p.createdAt DESC",
+            countQuery = "SELECT count(p) FROM Project p WHERE p.projectStatus = :status AND p.isDeleted = false")
+    Page<Project> findByStatus(@Param("status") ProjectStatus status, Pageable pageable);
 
     // 뷰카운트 증가
     @Modifying
