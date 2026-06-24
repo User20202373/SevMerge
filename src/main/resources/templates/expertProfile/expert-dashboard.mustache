@@ -126,8 +126,8 @@
     .proj-mini-dday.urgent { color: #ef4444; }
 
     .grade-badge { display: inline-flex; align-items: center; padding: 0; border: none; background: transparent; }
-.grade-badge-img { width: 114px; height: 48px; object-fit: contain; flex-shrink: 0; margin-bottom:10px;}
-.grade-badge-wrap { display: flex; justify-content: center; margin: 0; }
+    .grade-badge-img { width: 114px; height: 48px; object-fit: contain; flex-shrink: 0; margin-bottom:10px;}
+    .grade-badge-wrap { display: flex; justify-content: center; margin: 0; }
 
     /* ── FOOTER (exmain 스타일) ── */
     :root {
@@ -482,21 +482,21 @@
         <div class="proj-mini-grid">
 
             {{#projects}}
-            <a href="/projects/{{id}}" class="proj-mini-card">
-                <span class="proj-mini-cat">{{categoryName}}</span>
-                <div class="proj-mini-title">{{title}}</div>
-                <div class="proj-mini-desc">{{description}}</div>
-                <div class="proj-mini-bottom">
-                    <span class="proj-mini-budget">{{budgetMin}}~{{budgetMax}}만원</span>
-                    <span class="proj-mini-dday {{#isUrgent}}urgent{{/isUrgent}}">D-{{dDay}}</span>
-                </div>
-            </a>
+                <a href="/projects/{{id}}" class="proj-mini-card">
+                    <span class="proj-mini-cat">{{categoryName}}</span>
+                    <div class="proj-mini-title">{{title}}</div>
+                    <div class="proj-mini-desc">{{description}}</div>
+                    <div class="proj-mini-bottom">
+                        <span class="proj-mini-budget">{{budgetMin}}~{{budgetMax}}만원</span>
+                        <span class="proj-mini-dday {{#isUrgent}}urgent{{/isUrgent}}">D-{{dDay}}</span>
+                    </div>
+                </a>
             {{/projects}}
 
             {{^projects}}
-            <div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#c4c9d9; font-size:14px;">
-                검색 결과가 없습니다.
-            </div>
+                <div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#c4c9d9; font-size:14px;">
+                    검색 결과가 없습니다.
+                </div>
             {{/projects}}
 
         </div>

@@ -114,6 +114,17 @@
         .nav-drawer-item:hover { background: #f8f9ff; color: var(--blue); border-color: var(--blue); }
         .nav-drawer-item.active { color: var(--blue); border-color: var(--blue); background: #eff6ff; }
 
+        /* 드로어 섹션 구분선 */
+        .nav-drawer-divider {
+            height: 1px; background: #f3f4f6;
+            margin: 6px 16px;
+        }
+        .nav-drawer-section-label {
+            display: block; padding: 10px 24px 4px;
+            font-size: 11px; font-weight: 700; color: #9ca3af;
+            letter-spacing: .05em; text-transform: uppercase;
+        }
+
         /* 비로그인/관리자 일반 링크 */
         .nav-links {
             display: flex; gap: 24px; align-items: center;
@@ -283,6 +294,7 @@
         @media (max-width: 960px) {
             .nav-links { display: none; }
             #hamburgerGuest { display: flex; }
+            #hamburgerAdmin { display: flex; } /* ← admin 햄버거 추가 */
         }
         @media (max-width: 480px) {
             .nav-inner { padding: 0 12px; }
@@ -312,7 +324,7 @@
                     <a href="/boards"               class="nav-tab">게시판</a>
                     <a href="/messages"             class="nav-tab">쪽지함</a>
                     <a href="/chat/room"            class="nav-tab">채팅방</a>
-                    <a href="/advertisements/my" class="nav-tab">광고 신청</a>
+                    <a href="/advertisements/my"    class="nav-tab">광고 신청</a>
                 </nav>
                 <div class="nav-drawer" id="drawerExpert">
                     <div class="nav-drawer-backdrop" onclick="closeDrawer('drawerExpert','hamburgerExpert')"></div>
@@ -325,7 +337,7 @@
                         <a href="/boards"               class="nav-drawer-item">게시판</a>
                         <a href="/messages"             class="nav-drawer-item">쪽지함</a>
                         <a href="/chat/room"            class="nav-drawer-item">채팅방</a>
-                        <a href="/advertisements/my" class="nav-drawer-item">광고 신청</a>
+                        <a href="/advertisements/my"    class="nav-drawer-item">광고 신청</a>
                     </div>
                 </div>
             {{/isDashboard}}
@@ -451,6 +463,29 @@
                         </div>
                     </div>
                 </nav>
+
+                {{! ── [FIX] admin 모바일 드로어 추가 ── }}
+                <div class="nav-drawer" id="drawerAdmin">
+                    <div class="nav-drawer-backdrop" onclick="closeDrawer('drawerAdmin','hamburgerAdmin')"></div>
+                    <div class="nav-drawer-panel">
+                        <a href="/admin/members"                  class="nav-drawer-item">회원 관리</a>
+                        <a href="/admin/projects"                 class="nav-drawer-item">프로젝트 관리</a>
+                        <div class="nav-drawer-divider"></div>
+                        <span class="nav-drawer-section-label">게시판 관리</span>
+                        <a href="/admin/boards"                   class="nav-drawer-item">자유게시판</a>
+                        <a href="/admin/notices"                  class="nav-drawer-item">공지사항</a>
+                        <a href="/admin/reports"                  class="nav-drawer-item">댓글신고관리</a>
+                        <a href="/admin/inquiry"                  class="nav-drawer-item">1:1문의관리</a>
+                        <div class="nav-drawer-divider"></div>
+                        <a href="/admin/blacklists"               class="nav-drawer-item">블랙리스트</a>
+                        <div class="nav-drawer-divider"></div>
+                        <span class="nav-drawer-section-label">전문가 승인</span>
+                        <a href="/admin/experts/withdraw"         class="nav-drawer-item">출금 요청 관리</a>
+                        <a href="/admin/experts?status=PENDING"   class="nav-drawer-item">전문가 승인 관리</a>
+                        <a href="/admin/experts/grade"            class="nav-drawer-item">등급별 전문가 관리</a>
+                        <a href="/admin/refund-applications"      class="nav-drawer-item">환불 요청 관리</a>
+                    </div>
+                </div>
             {{/isAdmin}}
 
             {{^isLoggedIn}}
@@ -478,6 +513,17 @@
             {{/isLoggedIn}}
 
             <div class="nav-actions">
+                {{! ── [FIX] admin 햄버거 버튼 추가 ── }}
+                {{#isAdmin}}
+                    <button class="nav-hamburger" id="hamburgerAdmin" aria-label="메뉴 열기">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                {{/isAdmin}}
+
                 {{#isLoggedIn}}{{^isAdmin}}
                     {{#isDashboard}}
                         <button class="nav-hamburger" id="hamburgerUser" aria-label="메뉴 열기">
@@ -497,6 +543,7 @@
                         </a>
                     {{/isDashboard}}
                 {{/isAdmin}}{{/isLoggedIn}}
+
                 {{#isLoggedIn}}
                     <a href="/notifications" class="nav-bell" aria-label="알림">
                         <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -590,8 +637,13 @@
             }
         });
 
-        /* 햄버거 버튼 클릭 */
-        [['hamburgerExpert','drawerExpert'],['hamburgerUser','drawerUser'],['hamburgerGuest','drawerGuest']].forEach(function(pair) {
+        /* 햄버거 버튼 클릭 — [FIX] admin 쌍 추가 */
+        [
+            ['hamburgerExpert', 'drawerExpert'],
+            ['hamburgerUser',   'drawerUser'],
+            ['hamburgerGuest',  'drawerGuest'],
+            ['hamburgerAdmin',  'drawerAdmin']
+        ].forEach(function(pair) {
             const btn = document.getElementById(pair[0]);
             if (!btn) return;
             btn.addEventListener('click', function() {
@@ -666,6 +718,21 @@
             document.querySelectorAll('.nav-links > .admin-main-item').forEach(function(link) {
                 if (link.getAttribute('href') === currentPath)
                     link.style.cssText = 'color:#2563eb!important;font-weight:bold!important;';
+            });
+
+            /* 드로어 아이템 active도 동일 로직으로 처리 */
+            document.querySelectorAll('#drawerAdmin .nav-drawer-item').forEach(function(link) {
+                const href = link.getAttribute('href');
+                if (!href) return;
+                const match =
+                    (href.includes('boards')              && currentPath.includes('board')) ||
+                    (href.includes('notices')             && currentPath.includes('notice')) ||
+                    (href.includes('withdraw')            && currentPath.includes('/admin/experts/withdraw')) ||
+                    (href.includes('status=PENDING')      && currentPath.includes('/admin/experts') && !currentPath.includes('withdraw') && !currentPath.includes('grade')) ||
+                    (href.includes('grade')               && currentPath.includes('/admin/experts/grade')) ||
+                    (href.includes('refund-applications') && currentPath.includes('/admin/refund-applications')) ||
+                    href === currentPath;
+                if (match) link.classList.add('active');
             });
 
             document.querySelectorAll('.nav-submenu .submenu-link').forEach(function(link) {
