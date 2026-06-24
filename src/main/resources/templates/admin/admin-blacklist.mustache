@@ -295,7 +295,9 @@
         background: #fee2e2;
     }
 
-    .paging {
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .unused_paging {
         display: flex;
         justify-content: center;
         gap: 6px;
@@ -453,6 +455,11 @@
                     현재 차단된 회원 내역이 없습니다.
                 </div>
             {{/blacklistLogs}}
+        </div>
+        <div class="pagination">
+            {{#prevPage}}<a href="/admin/blacklists?page={{prevPage}}&keyword={{keyword}}" class="page-btn">이전</a>{{/prevPage}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+            {{#nextPage}}<a href="/admin/blacklists?page={{nextPage}}&keyword={{keyword}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
     </main>
 </div>

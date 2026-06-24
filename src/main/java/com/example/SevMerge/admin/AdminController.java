@@ -152,15 +152,19 @@ public class AdminController {
     // 관리자 공지사항 관리
     @GetMapping("/admin/notices")
     public String adminNotices(@RequestParam(value = "keyword", required = false) String keyword,
+                               @RequestParam(defaultValue = "1") int page,
                                Model model, HttpSession session) {
         Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 
-        BoardType type = BoardType.NOTICE;
+        List<BoardResponse.ListDTO> all = boardService.getAdminBoardsByType(BoardType.NOTICE, keyword);
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("boards", s < total ? all.subList(s, e) : new ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
 
-        List<BoardResponse.ListDTO> adminNotices = boardService.getAdminBoardsByType(type, keyword);
-
-        model.addAttribute("boards", adminNotices);
         model.addAttribute("isFree", false);
         model.addAttribute("isNotice", true);
         model.addAttribute("isInquiry", false);
@@ -204,28 +208,31 @@ public class AdminController {
 
     // 전문가 승인 관리 페이지
     @GetMapping("/admin/experts")
-    public String adminExpertPage(@RequestParam(value = "status", required = false) String status, Model model) {
+    public String adminExpertPage(@RequestParam(value = "status", required = false) String status,
+                                  @RequestParam(defaultValue = "1") int page, Model model) {
 
-        List<ExpertProfileResponse> expertsList;
-
+        List<ExpertProfileResponse> all;
         if ("PENDING".equals(status)) {
-
-            expertsList = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.PENDING);
+            all = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.PENDING);
             model.addAttribute("isPending", true);
         } else if ("APPROVED".equals(status)) {
-            expertsList = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.ACTIVE);
+            all = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.ACTIVE);
             model.addAttribute("isApproved", true);
         } else if ("REJECTED".equals(status)) {
-
-            expertsList = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.REJECTED);
+            all = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.REJECTED);
             model.addAttribute("isRejected", true);
         } else {
-
-            expertsList = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.PENDING);
+            all = memberService.getExpertProfilesByStatus(com.example.SevMerge.member.Status.PENDING);
             model.addAttribute("isAll", true);
         }
 
-        model.addAttribute("experts", expertsList);
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("experts", s < total ? all.subList(s, e) : new ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
+        model.addAttribute("currentStatus", status != null ? status : "");
         return "admin/admin-expert";
     }
 
@@ -252,23 +259,25 @@ public class AdminController {
 
     // 블랙리스트 관리 페이지 조회
     @GetMapping("/admin/blacklists")
-    public String blacklistPage(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
-        List<BlackList> allblacklist = blacklistRepository.findAllWithMemberOrderByIdDesc();
-        List<BlackList> blackListLogs = new ArrayList<>();
-
+    public String blacklistPage(@RequestParam(value = "keyword", required = false) String keyword,
+                                @RequestParam(defaultValue = "1") int page, Model model) {
+        List<BlackList> all = blacklistRepository.findAllWithMemberOrderByIdDesc();
+        List<BlackList> filtered = new ArrayList<>();
         if (keyword != null && !keyword.trim().isEmpty()) {
-            for (BlackList blackList : allblacklist) {
-                if (blackList.getReason().contains(keyword) || blackList.getMember().getName().contains(keyword)) {
-                    blackListLogs.add(blackList);
-                }
+            for (BlackList bl : all) {
+                if (bl.getReason().contains(keyword) || bl.getMember().getName().contains(keyword)) filtered.add(bl);
             }
         } else {
-            blackListLogs = allblacklist;
+            filtered = all;
         }
 
-        model.addAttribute("blacklistLogs", blackListLogs);
+        int ps = 15, total = filtered.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("blacklistLogs", s < total ? filtered.subList(s, e) : new ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
         model.addAttribute("keyword", keyword != null ? keyword : "");
-
         return "admin/admin-blacklist";
     }
 
@@ -290,13 +299,19 @@ public class AdminController {
     // 출금요청 관리 페이지
     @GetMapping("/admin/experts/withdraw")
     public String adminExpertWithdraw(@RequestParam(value = "status", required = false) String status,
-                                      Model model) {
-        List<WithdrawalService.AdminWithdrawalDTO> withdrawals = withdrawalService.getAllForAdmin(status);
-        long pendingCount = withdrawals.stream().filter(WithdrawalService.AdminWithdrawalDTO::isPending).count();
+                                      @RequestParam(defaultValue = "1") int page, Model model) {
+        List<WithdrawalService.AdminWithdrawalDTO> all = withdrawalService.getAllForAdmin(status);
+        long pendingCount = all.stream().filter(WithdrawalService.AdminWithdrawalDTO::isPending).count();
 
-        model.addAttribute("withdrawals", withdrawals);
-        model.addAttribute("totalCount", withdrawals.size());
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("withdrawals", s < total ? all.subList(s, e) : new ArrayList<>());
+        model.addAttribute("totalCount", total);
         model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
+        model.addAttribute("currentStatus", status != null ? status : "");
         model.addAttribute("isWithdrawAll",       status == null);
         model.addAttribute("isWithdrawPending",   "PENDING".equals(status));
         model.addAttribute("isWithdrawCompleted", "COMPLETED".equals(status));

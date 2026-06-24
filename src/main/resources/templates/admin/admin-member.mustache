@@ -302,12 +302,8 @@
         background: #fee2e2;
     }
 
-    .paging {
-        display: flex;
-        justify-content: center;
-        gap: 6px;
-        margin-top: 24px;
-    }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
 
     .page-btn {
         padding: 9px 15px;
@@ -426,23 +422,10 @@
                 </div>
             {{/members}}
         </div>
-        <div class="paging"
-             style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 24px;">
-
-            <!-- 1. 이전 페이지 버튼 -->
-            {{#hasPrev}}
-                <a href="/admin/members?page={{prevPage}}&keyword={{keyword}}&sort={{sort}}" class="page-btn" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #4a5568;">이전</a>
-            {{/hasPrev}}
-
-            <!-- 2. 현재 페이지 표시 및 안내 -->
-            <span class="page-info" style="font-size: 14px; font-weight: 600; color: #2d3748; padding: 6px 12px;">
-                {{displayPage}} / {{totalPages}} 페이지
-            </span>
-
-            <!-- 3. 다음 페이지 버튼 -->
-            {{#hasNext}}
-                <a href="/admin/members?page={{nextPage}}&keyword={{keyword}}&sort={{sort}}" class="page-btn" style="padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #4a5568;">다음</a>
-            {{/hasNext}}
+        <div class="pagination">
+            {{#hasPrev}}<a href="/admin/members?page={{prevPage}}&keyword={{keyword}}&sort={{sort}}&roleFilter={{roleFilter}}" class="page-btn">이전</a>{{/hasPrev}}
+            <span class="page-info">{{displayPage}} / {{totalPages}}</span>
+            {{#hasNext}}<a href="/admin/members?page={{nextPage}}&keyword={{keyword}}&sort={{sort}}&roleFilter={{roleFilter}}" class="page-btn">다음</a>{{/hasNext}}
         </div>
     </main>
 </div>

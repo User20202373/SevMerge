@@ -17,6 +17,8 @@ public class BoardResponse {
         private Integer viewCount;
         private String content;
         private BoardInquiryScope inquiryScope;
+        private String attachmentUrl;
+        private String attachmentName;
 
         public ListDTO(Board board) {
             this.id = board.getId();
@@ -26,7 +28,8 @@ public class BoardResponse {
             this.viewCount = board.getViewCount();
             this.content = board.getContent();
             this.inquiryScope = board.getInquiryScope();
-
+            this.attachmentUrl = board.getAttachmentUrl();
+            this.attachmentName = board.getAttachmentName();
             if (board.getCreatedAt() != null) {
                 this.createdAt = MyDateUtil.timestampFormat(board.getCreatedAt());
             }
@@ -40,7 +43,6 @@ public class BoardResponse {
                 case SECURITY -> "계정";
             };
         }
-
     }
 
     @Data
@@ -53,6 +55,9 @@ public class BoardResponse {
         private Long memberId;
         private Timestamp createdAt;
         private Integer viewCount;
+        private String attachmentUrl;
+        private String attachmentName;
+        private boolean hasAttachment;
 
         public DetailDTO(Board board) {
             this.id = board.getId();
@@ -63,9 +68,9 @@ public class BoardResponse {
             this.memberId = board.getMember().getId();
             this.createdAt = board.getCreatedAt();
             this.viewCount = board.getViewCount();
+            this.attachmentUrl = board.getAttachmentUrl();
+            this.attachmentName = board.getAttachmentName();
+            this.hasAttachment = board.getAttachmentUrl() != null && !board.getAttachmentUrl().isEmpty();
         }
     }
-
-
-
 }

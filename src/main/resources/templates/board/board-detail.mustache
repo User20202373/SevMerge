@@ -1,351 +1,151 @@
 {{> layout/header}}
 
 <style>
-    body {
-        background: linear-gradient(135deg, #c8d8f0 0%, #dce8f8 40%, #b8cce8 100%);
-        background-attachment: fixed;
-    }
+    body { background: linear-gradient(135deg, #c8d8f0 0%, #dce8f8 40%, #b8cce8 100%); background-attachment: fixed; }
 
-    .detail-section {
-        padding: 40px 28px 80px;
-        position: relative;
-        z-index: 1;
-    }
+    .detail-section { padding: 40px 28px 80px; position: relative; z-index: 1; }
+    .detail-inner { max-width: 860px; margin: 0 auto; }
 
-    .detail-inner {
-        max-width: 860px;
-        margin: 0 auto;
-    }
-
-    .detail-nav {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: #4a6fa5;
-        margin-bottom: 28px;
-    }
-
-    .detail-nav a {
-        color: #4a6fa5;
-        text-decoration: none;
-    }
-
-    .detail-nav a:hover {
-        color: #2563eb;
-    }
-
-    .detail-nav span {
-        color: #93aecf;
-    }
+    /* 브레드크럼 */
+    .detail-nav { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4a6fa5; margin-bottom: 20px; }
+    .detail-nav a { color: #4a6fa5; text-decoration: none; transition: color .15s; }
+    .detail-nav a:hover { color: #2563eb; }
+    .detail-nav span { color: #93aecf; }
 
     /* 게시글 카드 */
     .detail-card {
-        backdrop-filter: blur(16px);
-        background: rgba(255, 255, 255, .58);
-        border: 1.5px solid rgba(255, 255, 255, .85);
-        border-radius: 24px;
-        padding: 36px 40px;
-        margin-bottom: 16px;
-        box-shadow: 0 8px 32px rgba(37, 99, 235, .08);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        background: rgba(255,255,255,.58); border: 1.5px solid rgba(255,255,255,.85);
+        border-radius: 24px; padding: 36px 40px; margin-bottom: 16px;
+        box-shadow: 0 8px 32px rgba(37,99,235,.08), inset 0 1px 0 rgba(255,255,255,.9);
     }
 
+    /* 게시글 헤더 */
     .detail-header {
-        padding-bottom: 20px;
-        border-bottom: 1px solid rgba(37, 99, 235, .08);
-        margin-bottom: 24px;
+        display: flex; justify-content: space-between; align-items: flex-start;
+        padding-bottom: 22px; border-bottom: 1px solid rgba(37,99,235,.08); margin-bottom: 26px;
     }
-
+    .detail-header-left { flex: 1; }
     .detail-category {
-        font-size: 11px;
-        font-weight: 700;
-        color: #2563eb;
-        background: rgba(37, 99, 235, .1);
-        border: 1px solid rgba(37, 99, 235, .15);
-        padding: 4px 10px;
-        border-radius: 6px;
-        display: inline-block;
-        margin-bottom: 12px;
+        font-size: 11px; font-weight: 700; color: #2563eb;
+        background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.15);
+        padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 12px;
     }
+    .detail-title { font-size: 24px; font-weight: 900; color: #1e3a6e; letter-spacing: -0.5px; line-height: 1.35; margin-bottom: 14px; }
+    .detail-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: #4a6fa5; font-weight: 500; }
+    .detail-meta .author { color: #1e3a6e; font-weight: 700; }
+    .detail-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: #93aecf; }
 
-    .detail-title {
-        font-size: 24px;
-        font-weight: 900;
-        color: #1e3a6e;
-        letter-spacing: -0.5px;
-        line-height: 1.35;
-        margin-bottom: 14px;
-    }
+    /* 수정/삭제 버튼 */
+    .detail-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; padding-top: 4px; }
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: all .15s; text-decoration: none; }
+    .btn-sm { padding: 7px 14px; font-size: 12px; }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,.25); }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-outline { backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); color: #2d4a7a; }
+    .btn-outline:hover { background: rgba(255,255,255,.9); border-color: rgba(37,99,235,.2); }
+    .btn-danger { background: rgba(255,243,243,.85); color: #ef4444; border: 1.5px solid #fecaca; }
+    .btn-danger:hover { background: #fff0f0; border-color: #ef4444; }
+    .btn-danger-solid { background: #ef4444; color: #fff; border: none; box-shadow: 0 4px 12px rgba(239,68,68,.25); }
+    .btn-danger-solid:hover { background: #dc2626; transform: translateY(-1px); }
 
-    .detail-meta {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        font-size: 13px;
-        color: #4a6fa5;
-        font-weight: 500;
-    }
+    /* 본문 */
+    .detail-content { font-size: 15px; color: #2d4a7a; line-height: 1.9; min-height: 160px; padding: 8px 0 24px; white-space: pre-wrap; }
 
-    .detail-meta .author {
-        color: #1e3a6e;
-        font-weight: 700;
+    /* 첨부파일 */
+    .attachment-box {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 16px; margin-top: 8px;
+        backdrop-filter: blur(8px); background: rgba(239,246,255,.7);
+        border: 1px solid rgba(37,99,235,.2); border-radius: 12px;
     }
+    .attachment-icon { color: #2563eb; flex-shrink: 0; }
+    .attachment-link { font-size: 13px; font-weight: 600; color: #2563eb; text-decoration: none; word-break: break-all; }
+    .attachment-link:hover { text-decoration: underline; }
+    .attachment-size { font-size: 11px; color: #93aecf; flex-shrink: 0; }
 
-    .detail-meta-dot {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: #93aecf;
-    }
-
-    .detail-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-bottom: 0;
-    }
-
-    .detail-content {
-        font-size: 15px;
-        color: #2d4a7a;
-        line-height: 1.9;
-        min-height: 160px;
-        padding: 8px 0;
-        white-space: pre-wrap;
-    }
-
-    .detail-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 20px;
-        border-top: 1px solid rgba(37, 99, 235, .08);
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 9px 18px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
-        border: none;
-        font-family: inherit;
-        transition: all .15s;
-        text-decoration: none;
-    }
-
-    .btn-sm {
-        padding: 7px 14px;
-        font-size: 12px;
-        border-radius: 20px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, .25);
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-1px);
-    }
-
-    .btn-outline {
-        backdrop-filter: blur(8px);
-        background: rgba(255, 255, 255, .6);
-        border: 1.5px solid rgba(255, 255, 255, .8);
-        color: #2d4a7a;
-    }
-
-    .btn-outline:hover {
-        background: rgba(255, 255, 255, .9);
-        border-color: rgba(37, 99, 235, .2);
-    }
+    /* 하단 */
+    .detail-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid rgba(37,99,235,.08); margin-top: 8px; }
 
     /* 댓글 섹션 */
     .comment-section {
-        backdrop-filter: blur(16px);
-        background: rgba(255, 255, 255, .55);
-        border: 1.5px solid rgba(255, 255, 255, .8);
-        border-radius: 24px;
-        padding: 32px 40px;
-        box-shadow: 0 4px 20px rgba(37, 99, 235, .07);
+        backdrop-filter: blur(16px); background: rgba(255,255,255,.55);
+        border: 1.5px solid rgba(255,255,255,.8); border-radius: 24px; padding: 32px 40px;
+        box-shadow: 0 4px 20px rgba(37,99,235,.07);
     }
+    .comment-title { font-size: 16px; font-weight: 900; color: #1e3a6e; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .comment-count { font-size: 13px; font-weight: 700; color: #2563eb; background: rgba(37,99,235,.1); padding: 2px 10px; border-radius: 20px; }
 
-    .comment-title {
-        font-size: 16px;
-        font-weight: 900;
-        color: #1e3a6e;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+    .comment-form { background: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.8); border-radius: 14px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .comment-textarea { width: 100%; padding: 12px 14px; background: rgba(255,255,255,.8); border: 1.5px solid rgba(37,99,235,.15); border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; resize: none; height: 90px; line-height: 1.7; transition: all .15s; box-sizing: border-box; }
+    .comment-textarea::placeholder { color: #93aecf; }
+    .comment-textarea:focus { border-color: #2563eb; background: rgba(255,255,255,.95); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+    .comment-form-footer { display: flex; justify-content: flex-end; }
 
-    .comment-count {
-        font-size: 14px;
-        font-weight: 700;
-        color: #2563eb;
-        background: rgba(37, 99, 235, .1);
-        padding: 2px 10px;
-        border-radius: 20px;
-    }
+    .comment-list { display: flex; flex-direction: column; }
+    .comment-item { padding: 18px 0; border-bottom: 1px solid rgba(37,99,235,.06); }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .comment-author-wrap { display: flex; align-items: center; gap: 10px; }
+    .comment-avatar { width: 34px; height: 34px; border-radius: 10px; background: rgba(37,99,235,.1); border: 1px solid rgba(37,99,235,.15); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #2563eb; flex-shrink: 0; }
+    .comment-author { font-size: 13px; font-weight: 700; color: #1e3a6e; }
+    .comment-date { font-size: 11px; color: #93aecf; margin-top: 2px; }
+    .comment-actions { display: flex; gap: 6px; align-items: center; }
+    .comment-btn { font-size: 12px; color: #4a6fa5; font-weight: 600; background: none; border: none; cursor: pointer; font-family: inherit; padding: 4px 8px; border-radius: 8px; transition: all .15s; }
+    .comment-btn:hover { background: rgba(37,99,235,.08); color: #2563eb; }
+    .comment-btn.delete:hover { background: rgba(239,68,68,.08); color: #ef4444; }
+    .comment-content { font-size: 14px; color: #2d4a7a; line-height: 1.75; padding-left: 44px; }
 
-    .comment-form {
-        background: rgba(255, 255, 255, .5);
-        border: 1px solid rgba(255, 255, 255, .8);
-        border-radius: 14px;
-        padding: 16px;
-        margin-bottom: 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    /* 댓글 수정 인풋 */
+    .comment-edit-input {
+        flex: 1; padding: 8px 12px; border: 1.5px solid rgba(37,99,235,.3);
+        border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e3a6e;
+        background: rgba(255,255,255,.9); outline: none;
     }
+    .comment-edit-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+    .btn-success { background: #10b981; color: #fff; border: none; padding: 7px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .btn-success:hover { background: #059669; }
+    .btn-gray { background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); color: #4a6fa5; padding: 7px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .btn-gray:hover { background: rgba(255,255,255,.9); }
 
-    .comment-textarea {
-        width: 100%;
-        padding: 12px 14px;
-        background: rgba(255, 255, 255, .8);
-        border: 1.5px solid rgba(37, 99, 235, .15);
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: inherit;
-        color: #1e3a6e;
-        outline: none;
-        resize: none;
-        height: 90px;
-        line-height: 1.7;
-        transition: all .15s;
-    }
+    .comment-empty { text-align: center; padding: 32px 0; font-size: 14px; color: #93aecf; }
 
-    .comment-textarea::placeholder {
-        color: #93aecf;
-    }
+    /* 신고 모달 */
+    .modal-bg { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(13,27,46,.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
+    .modal-bg.open { display: flex; }
+    .modal-card { backdrop-filter: blur(20px); background: rgba(255,255,255,.92); border: 1.5px solid rgba(255,255,255,.9); border-radius: 20px; padding: 32px; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(37,99,235,.15); }
+    .modal-title { font-size: 18px; font-weight: 900; color: #1e3a6e; margin-bottom: 6px; }
+    .modal-desc { font-size: 13px; color: #4a6fa5; margin-bottom: 20px; }
+    .modal-label { font-size: 13px; font-weight: 700; color: #2d4a7a; margin-bottom: 6px; display: block; }
+    .modal-select, .modal-textarea { width: 100%; box-sizing: border-box; padding: 12px 14px; background: rgba(255,255,255,.8); border: 1.5px solid rgba(37,99,235,.15); border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; margin-bottom: 16px; }
+    .modal-select:focus, .modal-textarea:focus { border-color: #2563eb; background: rgba(255,255,255,.95); }
+    .modal-textarea { height: 110px; resize: none; }
+    .modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-cancel { padding: 10px 20px; background: rgba(243,244,248,.8); color: #4a6fa5; border: none; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .modal-cancel:hover { background: rgba(243,244,248,1); }
+    .modal-submit { padding: 10px 20px; background: #ef4444; color: #fff; border: none; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(239,68,68,.25); }
+    .modal-submit:hover { background: #dc2626; }
 
-    .comment-textarea:focus {
-        border-color: #2563eb;
-        background: rgba(255, 255, 255, .95);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
-    }
-
-    .comment-form-footer {
-        display: flex;
-        justify-content: flex-end;
-    }
-
-    .comment-list {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .comment-item {
-        padding: 18px 0;
-        border-bottom: 1px solid rgba(37, 99, 235, .06);
-    }
-
-    .comment-item:last-child {
-        border-bottom: none;
-    }
-
-    .comment-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
-
-    .comment-author-wrap {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .comment-avatar {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: rgba(37, 99, 235, .1);
-        border: 1px solid rgba(37, 99, 235, .15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: 900;
-        color: #2563eb;
-        flex-shrink: 0;
-    }
-
-    .comment-author {
-        font-size: 13px;
-        font-weight: 700;
-        color: #1e3a6e;
-    }
-
-    .comment-date {
-        font-size: 11px;
-        color: #93aecf;
-        margin-top: 2px;
-    }
-
-    .comment-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .comment-btn {
-        font-size: 12px;
-        color: #4a6fa5;
-        font-weight: 600;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        padding: 0;
-        transition: color .15s;
-    }
-
-    .comment-btn:hover {
-        color: #2563eb;
-    }
-
-    .comment-btn.delete:hover {
-        color: #ef4444;
-    }
-
-    .comment-content {
-        font-size: 14px;
-        color: #2d4a7a;
-        line-height: 1.75;
-        padding-left: 44px;
-    }
-
-    .comment-empty {
-        text-align: center;
-        padding: 32px 0;
-        font-size: 14px;
-        color: #93aecf;
-    }
+    @media (max-width: 640px) { .detail-card, .comment-section { padding: 24px 20px; } .detail-header { flex-direction: column; gap: 14px; } .detail-title { font-size: 20px; } }
 </style>
 
 <section class="detail-section">
     <div class="detail-inner">
+
+        <!-- 브레드크럼 -->
+        <div class="detail-nav">
+            <a href="/boards?boardType={{board.boardType}}">게시판</a>
+            <span>›</span>
+            <span>{{board.title}}</span>
+        </div>
+
         <div class="detail-card">
 
-            <!-- 브레드크럼 -->
-            <div class="detail-nav">
-                <a href="/boards?boardType={{board.boardType}}">게시판</a>
-                <span>›</span>
-                <span>{{board.title}}</span>
-            </div>
-
-            <!-- 게시글 헤더 -->
-            <div class="detail-header"
-                 style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 24px; border-bottom: 1.5px solid #eaecf4; margin-bottom: 28px;">
-
-                <div style="text-align: left;">
+            <!-- 헤더 -->
+            <div class="detail-header">
+                <div class="detail-header-left">
                     <span class="detail-category">{{board.boardType}}</span>
-                    <h1 class="detail-title" style="margin-bottom: 16px;">{{board.title}}</h1>
+                    <h1 class="detail-title">{{board.title}}</h1>
                     <div class="detail-meta">
                         <span class="author">{{board.memberName}}</span>
                         <div class="detail-meta-dot"></div>
@@ -355,9 +155,7 @@
                     </div>
                 </div>
 
-                <div class="detail-actions"
-                     style="margin-bottom: 0; padding-bottom: 2px; flex-shrink: 0; display: flex; gap: 8px; align-items: center;">
-                    <!-- 작성자 본인일 때만 뜨는 수정/삭제 -->
+                <div class="detail-actions">
                     {{^isNotice}}
                         {{#isOwner}}
                             <a href="/boards/{{board.id}}/edit" class="btn btn-outline btn-sm">수정</a>
@@ -368,37 +166,22 @@
                             <a href="/admin/notices/{{board.id}}/update" class="btn btn-primary btn-sm">수정</a>
                         {{/isAdmin}}
                     {{/isNotice}}
-                    <!-- 관리자가 아닐 때만 일반 회원용 삭제 버튼 노출 -->
+
                     {{#isOwner}}
                         {{^isAdmin}}
-                            <button type="button" onclick="deleteBoard({{board.id}})" class="btn btn-sm"
-                                    style="background:#fff3f3; color:#ef4444; border:1.5px solid #fecaca;">삭제
-                            </button>
+                            <button type="button" onclick="deleteBoard({{board.id}})" class="btn btn-sm btn-danger">삭제</button>
                         {{/isAdmin}}
                     {{/isOwner}}
 
                     {{#isAdmin}}
-                        <!-- 공지사항 상세글일 때 처리하는 삭제 폼 -->
                         {{#isNotice}}
-                            <form action="/admin/notices/{{board.id}}/delete" method="POST"
-                                  onsubmit="return confirm('관리자 권한으로 이 공지사항을 강제 삭제하시겠습니까?');"
-                                  style="display:inline; margin: 0;">
-                                <button type="submit" class="btn btn-sm"
-                                        style="background:#fff3f3; color:#ef4444; border:1.5px solid #fecaca; font-weight: 700;">
-                                    삭제
-                                </button>
+                            <form action="/admin/notices/{{board.id}}/delete" method="POST" onsubmit="return confirm('이 공지사항을 삭제하시겠습니까?');" style="margin:0;">
+                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                             </form>
                         {{/isNotice}}
-
-                        <!-- 일반 자유게시판 상세글일 때 처리하는 삭제 폼 -->
                         {{^isNotice}}
-                            <form action="/admin/boards/{{board.id}}/delete" method="POST"
-                                  onsubmit="return confirm('관리자 권한으로 이 게시글을 강제 삭제하시겠습니까?');"
-                                  style="display:inline; margin: 0;">
-                                <button type="submit" class="btn btn-sm"
-                                        style="background:#fff3f3; color:#ef4444; border:1.5px solid #fecaca; font-weight: 700;">
-                                    삭제
-                                </button>
+                            <form action="/admin/boards/{{board.id}}/delete" method="POST" onsubmit="return confirm('관리자 권한으로 삭제하시겠습니까?');" style="margin:0;">
+                                <button type="submit" class="btn btn-sm btn-danger">관리자 삭제</button>
                             </form>
                         {{/isNotice}}
                     {{/isAdmin}}
@@ -408,30 +191,36 @@
             <!-- 본문 -->
             <div class="detail-content">{{board.content}}</div>
 
+            <!-- 첨부파일 -->
+            {{#board.hasAttachment}}
+                <div class="attachment-box">
+                <span class="attachment-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+                </span>
+                    <a href="{{board.attachmentUrl}}" target="_blank" class="attachment-link">{{board.attachmentName}}</a>
+                    <span class="attachment-size">첨부파일 다운로드</span>
+                </div>
+            {{/board.hasAttachment}}
+
             <!-- 하단 -->
             <div class="detail-footer">
-                <a href="/boards?boardType={{board.boardType}}" class="btn btn-outline">← 목록으로</a>
+                <a href="/boards?boardType={{board.boardType}}" class="btn btn-outline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                목록으로
+                </a>
             </div>
 
-            <!-- =====================================================
-                 댓글 섹션
-                 - comments : 댓글 리스트
-                 - comment.id / memberName / content / createdAt
-                 - isCommentOwner : 댓글 작성자 본인 여부
-            ====================================================== -->
-            <div class="comment-section">
-
+            <!-- 댓글 섹션 -->
+            <div class="comment-section" style="margin-top: 24px;">
                 <div class="comment-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18h2v2H4v2H2V4h2v14Zm16 0H6v-2h14v2Zm2-2h-2V4h2v12Zm-12-2H6v-2h4v2Zm4-4H6V8h8v2Zm6-6H4V2h16v2Z"/></svg>
                     댓글
+                    <span class="comment-count">{{comments.size}}</span>
                 </div>
 
                 <!-- 댓글 작성 폼 -->
                 <form class="comment-form" action="/boards/{{board.id}}/comments/save" method="POST">
-                <textarea
-                        class="comment-textarea"
-                        name="content"
-                        placeholder="댓글을 입력하세요..."
-                ></textarea>
+                    <textarea class="comment-textarea" name="content" placeholder="댓글을 입력하세요..."></textarea>
                     <div class="comment-form-footer">
                         <button type="submit" class="btn btn-primary btn-sm">등록</button>
                     </div>
@@ -449,211 +238,128 @@
                                         <div class="comment-date">{{createdAt}}</div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="comment-actions-container">
-                                {{#isAdmin}}
-                                    <!-- 지가 작성한 댓글 수정/삭제 노출 -->
-                                    {{#isOwner}}
-                                        <div class="comment-actions" id="comment-actions-{{id}}"
-                                             style="display:inline-block;">
+                                <div class="comment-actions">
+                                    {{#isAdmin}}
+                                        {{#isOwner}}
                                             <button class="comment-btn" onclick="toggleEdit('{{id}}')">수정</button>
-                                            <form action="/comments/{{id}}/delete" method="POST"
-                                                  style="display:inline;">
+                                            <form action="/comments/{{id}}/delete" method="POST" style="display:inline; margin:0;">
                                                 <input type="hidden" name="boardId" value="{{boardId}}">
                                                 <button type="submit" class="comment-btn delete">삭제</button>
                                             </form>
-                                        </div>
-                                    {{/isOwner}}
-
-                                    <!-- 다른 사람이 작성한 댓글 -->
-                                    {{^isOwner}}
-                                        <div class="comment-actions" style="display:inline-block;">
-                                            <form action="/comments/{{id}}/delete" method="POST" style="display:inline;">
+                                        {{/isOwner}}
+                                        {{^isOwner}}
+                                            <form action="/comments/{{id}}/delete" method="POST" style="display:inline; margin:0;">
                                                 <input type="hidden" name="boardId" value="{{boardId}}">
-                                                <button type="submit" class="comment-btn delete"
-                                                        style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
-                                                    관리자 삭제
-                                                </button>
+                                                <button type="submit" class="comment-btn delete">관리자 삭제</button>
                                             </form>
-                                        </div>
-                                    {{/isOwner}}
-                                {{/isAdmin}}
+                                        {{/isOwner}}
+                                    {{/isAdmin}}
 
-                                <!-- 일반인 경우 -->
-                                {{^isAdmin}}
-                                    {{#isOwner}}
-                                        <div class="comment-actions" id="comment-actions-{{id}}"
-                                             style="display:inline-block;">
+                                    {{^isAdmin}}
+                                        {{#isOwner}}
                                             <button class="comment-btn" onclick="toggleEdit('{{id}}')">수정</button>
-                                            <form action="/comments/{{id}}/delete" method="POST"
-                                                  style="display:inline;">
+                                            <form action="/comments/{{id}}/delete" method="POST" style="display:inline; margin:0;">
                                                 <input type="hidden" name="boardId" value="{{boardId}}">
                                                 <button type="submit" class="comment-btn delete">삭제</button>
                                             </form>
-                                        </div>
-                                    {{/isOwner}}
-                                    {{^isOwner}}
-                                        {{^isCommentAdmin}}
-                                            <div class="comment-actions" style="display:inline-block;">
-                                                <button type="button" class="comment-btn report"
-                                                        onclick="openReportModal({{id}}, {{boardId}})"
-                                                        style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer;">
-                                                    신고
-                                                </button>
-                                            </div>
-                                        {{/isCommentAdmin}}
-                                    {{/isOwner}}
-                                {{/isAdmin}}
-                            </div>
-                            <div class="comment-content">
-                                <div id="comment-text-{{id}}" style="display: block;">
-                                    {{comment}}
+                                        {{/isOwner}}
+                                        {{^isOwner}}
+                                            {{^isCommentAdmin}}
+                                                <button type="button" class="comment-btn" onclick="openReportModal({{id}}, {{boardId}})" style="color:#ef4444;">신고</button>
+                                            {{/isCommentAdmin}}
+                                        {{/isOwner}}
+                                    {{/isAdmin}}
                                 </div>
+                            </div>
 
-                                <div id="comment-edit-form-{{id}}"
-                                     style="display: none; width: 100%; margin-top: 10px;">
-                                    <form action="/comments/{{id}}/update" method="POST"
-                                          style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                            <div class="comment-content">
+                                <div id="comment-text-{{id}}">{{comment}}</div>
+                                <div id="comment-edit-form-{{id}}" style="display:none; margin-top:10px;">
+                                    <form action="/comments/{{id}}/update" method="POST" style="display:flex; gap:8px; align-items:center; width:100%;">
                                         <input type="hidden" name="boardId" value="{{boardId}}">
-
-                                        <input type="text" name="comment" value="{{comment}}" required
-                                               style="flex: 1; padding: 6px 10px; border: 1px solid #007bff; border-radius: 4px; font-size: 14px;">
-
-                                        <button type="submit" class="comment-btn"
-                                                style="background-color: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px;">
-                                            수정완료
-                                        </button>
-                                        <button type="button" class="comment-btn" onclick="toggleEdit('{{id}}')"
-                                                style="background-color: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px;">
-                                            취소
-                                        </button>
+                                        <input type="text" name="comment" value="{{comment}}" required class="comment-edit-input"/>
+                                        <button type="submit" class="btn-success">수정완료</button>
+                                        <button type="button" onclick="toggleEdit('{{id}}')" class="btn-gray">취소</button>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     {{/comments}}
+
+                    {{^comments}}
+                        <div class="comment-empty">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>
+                    {{/comments}}
                 </div>
-
-                <script>
-                    function toggleEdit(commentId) {
-                        const textView = document.getElementById('comment-text-' + commentId);
-                        const editForm = document.getElementById('comment-edit-form-' + commentId);
-                        const actions = document.getElementById('comment-actions-' + commentId);
-
-                        if (editForm.style.display === 'none') {
-                            editForm.style.display = 'block';
-                            textView.style.display = 'none';
-                            if (actions) actions.style.display = 'none';
-                        } else {
-                            editForm.style.display = 'none';
-                            textView.style.display = 'block';
-                            if (actions) actions.style.display = 'block';
-                        }
-                    }
-
-                    async function deleteBoard(boardId) {
-                        try {
-                            if (!confirm("정말 삭제하시겠습니까?")) {
-                                return;
-                            }
-                            const res = await fetch("/boards/" + boardId, {
-                                method: "DELETE",
-                            });
-
-                            if (res.ok) {
-                                location.href = "/boards";
-                            }
-                        } catch (e) {
-                            alert(e.message);
-                        }
-                    }
-                </script>
-                {{^comments}}
-                    <div class="comment-empty">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>
-                {{/comments}}
-
             </div>
-        </div>
 
+        </div>
     </div>
 </section>
 
-<div id="reportModal"
-     style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
-    <div style="background-color: #fff; padding: 28px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: 0 4px 24px rgba(0,0,0,0.15); box-sizing: border-box;">
-
-        <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 20px; font-weight: 700; color: #1c1e26;">댓글 신고하기</h3>
-        <p style="font-size: 13px; color: #9ca3af; margin-bottom: 20px;">해당 댓글을 신고하는 사유와 상세 내용을 작성해 주세요.</p>
-
+<!-- 신고 모달 -->
+<div id="reportModal" class="modal-bg">
+    <div class="modal-card">
+        <h3 class="modal-title">댓글 신고하기</h3>
+        <p class="modal-desc">신고 사유와 상세 내용을 작성해 주세요.</p>
         <form id="reportForm" action="" method="POST">
             <input type="hidden" id="modalBoardId" name="boardId" value="">
-
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 13px; font-weight: 700; color: #4b5563; margin-bottom: 6px;">신고
-                    분류</label>
-                <select name="reason" required
-                        style="width: 100%; padding: 12px; border: 1.5px solid #e2e5ef; border-radius: 9px; font-size: 14px; outline: none; background: #fff; box-sizing: border-box;">
-                    <option value="" disabled selected>신고 사유를 선택하세요</option>
-                    <option value="스팸 광고 / 홍보성 도배">스팸 광고 / 홍보성 도배</option>
-                    <option value="욕설 / 비속어 및 혐오 표현">욕설 / 비속어 및 혐오 표현</option>
-                    <option value="타인 비방 및 명예훼손">타인 비방 및 명예훼손</option>
-                    <option value="음란성 혹은 부적절한 내용">음란성 혹은 부적절한 내용</option>
-                    <option value="기타 사유">기타 사유</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <label style="display: block; font-size: 13px; font-weight: 700; color: #4b5563; margin-bottom: 6px;">상세
-                    내용 입력</label>
-                <textarea name="contentDetail" placeholder="신고 사유에 대한 구체적인 내용을 입력해 주세요. (최대 300자)" maxlength="300"
-                          required
-                          style="width: 100%; height: 120px; padding: 12px; border: 1.5px solid #e2e5ef; border-radius: 9px; font-size: 14px; font-family: inherit; resize: none; outline: none; box-sizing: border-box; color: #1c1e26;"></textarea>
-            </div>
-
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" onclick="closeReportModal()"
-                        style="padding: 11px 20px; background: #f3f4f6; color: #4b5563; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;">
-                    취소
-                </button>
-                <button type="submit"
-                        style="padding: 11px 20px; background: #dc3545; color: #fff; border: none; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
-                    신고보내기
-                </button>
+            <label class="modal-label">신고 분류</label>
+            <select name="reason" required class="modal-select">
+                <option value="" disabled selected>신고 사유를 선택하세요</option>
+                <option value="스팸 광고 / 홍보성 도배">스팸 광고 / 홍보성 도배</option>
+                <option value="욕설 / 비속어 및 혐오 표현">욕설 / 비속어 및 혐오 표현</option>
+                <option value="타인 비방 및 명예훼손">타인 비방 및 명예훼손</option>
+                <option value="음란성 혹은 부적절한 내용">음란성 혹은 부적절한 내용</option>
+                <option value="기타 사유">기타 사유</option>
+            </select>
+            <label class="modal-label">상세 내용</label>
+            <textarea name="contentDetail" placeholder="신고 사유에 대한 구체적인 내용을 입력해 주세요. (최대 300자)" maxlength="300" required class="modal-textarea"></textarea>
+            <div class="modal-btns">
+                <button type="button" onclick="closeReportModal()" class="modal-cancel">취소</button>
+                <button type="submit" class="modal-submit">신고 보내기</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+    function toggleEdit(commentId) {
+        const text = document.getElementById('comment-text-' + commentId);
+        const form = document.getElementById('comment-edit-form-' + commentId);
+        const isHidden = form.style.display === 'none';
+        form.style.display = isHidden ? 'block' : 'none';
+        text.style.display = isHidden ? 'none' : 'block';
+    }
+
+    async function deleteBoard(boardId) {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        try {
+            const res = await fetch('/boards/' + boardId, { method: 'DELETE' });
+            if (res.ok) location.href = '/boards';
+        } catch(e) { alert(e.message); }
+    }
+
     function openReportModal(commentId, boardId) {
-        const modal = document.getElementById('reportModal');
-        const form = document.getElementById('reportForm');
-        const hiddenBoardInput = document.getElementById('modalBoardId');
-
-        form.action = "/comments/" + commentId + "/report";
-        hiddenBoardInput.value = boardId;
-
-        modal.style.display = "flex";
+        document.getElementById('reportForm').action = '/comments/' + commentId + '/report';
+        document.getElementById('modalBoardId').value = boardId;
+        document.getElementById('reportModal').classList.add('open');
     }
 
     function closeReportModal() {
-        const modal = document.getElementById('reportModal');
-        modal.style.display = "none";
+        document.getElementById('reportModal').classList.remove('open');
         document.getElementById('reportForm').reset();
     }
 
-    window.onclick = function (event) {
-        const modal = document.getElementById('reportModal');
-        if (event.target == modal) {
-            closeReportModal();
-        }
-    }
-</script>
-<script>
+    window.addEventListener('click', e => {
+        if (e.target === document.getElementById('reportModal')) closeReportModal();
+    });
+
+    // 아바타 첫 글자
     document.querySelectorAll('.comment-avatar').forEach(el => {
         const t = el.textContent.trim();
         el.textContent = t ? t.charAt(0) : '?';
     });
 </script>
+
 {{> layout/footer}}

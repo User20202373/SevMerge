@@ -1,6 +1,5 @@
 package com.example.SevMerge.board;
 
-
 import com.example.SevMerge.member.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -20,30 +19,44 @@ public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
+
     @Column(nullable = false, length = 200)
     private String title;
+
     @Column(nullable = false)
     private String content;
+
     @ColumnDefault("0")
     private Integer viewCount = 0;
+
     @CreationTimestamp
     private Timestamp createdAt;
 
     @ColumnDefault("true")
     private Boolean isActive;
 
-    // todo - 추후 Member Class추가
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private BoardInquiryScope inquiryScope; // 1:1 문의 게시판 종류
+    private BoardInquiryScope inquiryScope;
+
+    // 첨부파일 경로 (단일 파일)
+    @Column(length = 500)
+    private String attachmentUrl;
+
+    // 첨부파일 원본명
+    @Column(length = 200)
+    private String attachmentName;
 
     @Builder
-    public Board(BoardInquiryScope inquiryScope, BoardType boardType, String title, String content, Integer viewCount, Timestamp createdAt, Member member,Boolean isActive) {
+    public Board(BoardInquiryScope inquiryScope, BoardType boardType, String title, String content,
+                 Integer viewCount, Timestamp createdAt, Member member, Boolean isActive,
+                 String attachmentUrl, String attachmentName) {
         this.boardType = boardType;
         this.title = title;
         this.content = content;
@@ -52,13 +65,18 @@ public class Board {
         this.member = member;
         this.isActive = isActive;
         this.inquiryScope = inquiryScope;
+        this.attachmentUrl = attachmentUrl;
+        this.attachmentName = attachmentName;
     }
 
-    // 편의 메서드
-    public void update(BoardRequest.UpdateBoardDTO updateBoardDTO) {
-        this.title = updateBoardDTO.getTitle();
-        this.content = updateBoardDTO.getContent();
-        this.inquiryScope = updateBoardDTO.getInquiryScope();
+    public void update(BoardRequest.UpdateBoardDTO dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.inquiryScope = dto.getInquiryScope();
+        if (dto.getAttachmentUrl() != null) {
+            this.attachmentUrl = dto.getAttachmentUrl();
+            this.attachmentName = dto.getAttachmentName();
+        }
     }
 
     public void softDelete() {

@@ -44,20 +44,25 @@ public class RefundApplicationController {
     // 관리자 전체/대기 목록
     @GetMapping("/admin/refund-applications")
     public String adminRefundList(@RequestParam(required = false) String status,
+                                  @RequestParam(defaultValue = "1") int page,
                                   HttpSession session, Model model) {
         Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
-        if (loginMember == null || !loginMember.isAdmin()) {
-            return "redirect:/login";
-        }
+        if (loginMember == null || !loginMember.isAdmin()) return "redirect:/login";
 
-        List<RefundApplicationResponse> applications;
+        List<RefundApplicationResponse> all;
         if ("pending".equalsIgnoreCase(status)) {
-            applications = refundApplicationService.getPendingApplications();
+            all = refundApplicationService.getPendingApplications();
         } else {
-            applications = refundApplicationService.getAllApplications();
+            all = refundApplicationService.getAllApplications();
         }
 
-        model.addAttribute("applications", applications);
+        int ps = 15, total = all.size(), tp = Math.max(1, (int) Math.ceil((double) total / ps));
+        int s = (page - 1) * ps, e = Math.min(s + ps, total);
+        model.addAttribute("applications", s < total ? all.subList(s, e) : new java.util.ArrayList<>());
+        model.addAttribute("currentPage", page); model.addAttribute("totalPages", tp);
+        model.addAttribute("prevPage", page > 1 ? page - 1 : null);
+        model.addAttribute("nextPage", page < tp ? page + 1 : null);
+        model.addAttribute("currentStatus", status != null ? status : "");
         model.addAttribute("isAdmin", true);
         return "admin/refund-list";
     }

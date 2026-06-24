@@ -347,7 +347,9 @@
         background: #fee2e2;
     }
 
-    .paging {
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 24px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .unused_paging {
         display: flex;
         justify-content: center;
         gap: 6px;
@@ -533,6 +535,11 @@
                     </span>
                 </div>
             {{/reports}}
+        </div>
+        <div class="pagination">
+            {{#prevPage}}<a href="/admin/reports?page={{prevPage}}&keyword={{keyword}}" class="page-btn">이전</a>{{/prevPage}}
+            <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+            {{#nextPage}}<a href="/admin/reports?page={{nextPage}}&keyword={{keyword}}" class="page-btn">다음</a>{{/nextPage}}
         </div>
     </main>
 </div>

@@ -84,10 +84,10 @@
     .cm-soon-desc { font-size: 14px; color: #4a6fa5; }
 
     /* 페이지네이션 */
-    .cm-paging { display: flex; justify-content: center; gap: 6px; margin-top: 22px; }
-    .cm-page { padding: 9px 14px; border-radius: 8px; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #4a6fa5; cursor: pointer; text-decoration: none; transition: all .15s; }
-    .cm-page:hover { border-color: rgba(37,99,235,.3); color: #2563eb; }
-    .cm-page.active { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 22px; }
+    .pagination .page-info { font-size: 13px; color: #6b7280; font-weight: 600; }
+    .page-btn { padding: 9px 15px; border-radius: 8px; backdrop-filter: blur(8px); background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); font-size: 13px; font-weight: 600; color: #6b7280; text-decoration: none; transition: all .15s; }
+    .page-btn:hover { border-color: #93c5fd; color: #2563eb; background: rgba(255,255,255,.9); }
 
     /* 모달 */
     .ar-modal-bg { display: none; position: fixed; inset: 0; background: rgba(13,27,46,.5); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
@@ -229,6 +229,11 @@
                     {{^clientBids}}
                         <div class="cm-empty">아직 들어온 제안서가 없습니다.</div>
                     {{/clientBids}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=bids&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=bids&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isBids}}
 
                 {{! ===== 내 프로젝트 ===== }}
@@ -280,6 +285,11 @@
                         </div>
                     {{/projects}}
                     {{^projects}}<div class="cm-empty">등록한 프로젝트가 없습니다.</div>{{/projects}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=projects&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=projects&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isProjects}}
 
                 {{! ===== 내 게시글 ===== }}
@@ -298,6 +308,11 @@
                         </a>
                     {{/boards}}
                     {{^boards}}<div class="cm-empty">작성한 게시글이 없습니다.</div>{{/boards}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=boards&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=boards&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isBoards}}
 
                 {{! ===== 리뷰 ===== }}
@@ -320,6 +335,11 @@
                         </a>
                     {{/reviews}}
                     {{^reviews}}<div class="cm-empty">작성한 리뷰가 없습니다.</div>{{/reviews}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=reviews&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=reviews&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isReviews}}
 
                 {{! ===== 북마크 ===== }}
@@ -350,6 +370,11 @@
                         </div>
                     {{/bookMarks}}
                     {{^bookMarks}}<div class="cm-empty">북마크한 전문가가 없습니다.</div>{{/bookMarks}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=bookmarks&page={{prevPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=bookmarks&page={{nextPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isBookmarks}}
 
                 {{! ===== 찜한 전문가 ===== }}
@@ -390,17 +415,10 @@
                         <div class="cm-empty">찜한 전문가가 없습니다.</div>
                     {{/wishes}}
 
-                    <!-- 페이지네이션 -->
-                    <div class="cm-paging" style="margin-top:20px;">
-                        {{#wishHasPrev}}
-                            <a href="/my-pages?tab=wishlist&wishPage={{wishPrevPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}"
-                            class="cm-page">‹ 이전</a>
-                        {{/wishHasPrev}}
-                        <span class="cm-page active">{{wishCurrentPage}}</span>
-                        {{#wishHasNext}}
-                            <a href="/my-pages?tab=wishlist&wishPage={{wishNextPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}"
-                            class="cm-page">다음 ›</a>
-                        {{/wishHasNext}}
+                    <div class="pagination">
+                        {{#wishHasPrev}}<a href="/my-pages?tab=wishlist&wishPage={{wishPrevPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}" class="page-btn">이전</a>{{/wishHasPrev}}
+                        <span class="page-info">{{wishCurrentPage}} / {{wishTotalPages}}</span>
+                        {{#wishHasNext}}<a href="/my-pages?tab=wishlist&wishPage={{wishNextPage}}{{#keyword}}&keyword={{keyword}}{{/keyword}}" class="page-btn">다음</a>{{/wishHasNext}}
                     </div>
                 {{/isWishlist}}
 
@@ -427,6 +445,11 @@
                         </a>
                     {{/messages}}
                     {{^messages}}<div class="cm-empty">받은 쪽지가 없습니다.</div>{{/messages}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=messages&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=messages&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                     <div style="text-align:right; margin-top:12px;">
                         <a href="/messages" class="cm-btn cm-btn-primary">쪽지함 전체보기</a>
                     </div>
@@ -472,6 +495,11 @@
                         </div>
                     {{/payments}}
                     {{^payments}}<div class="cm-empty">결제 내역이 없습니다.</div>{{/payments}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=payments&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=payments&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isPayments}}
 
                 {{! ===== 충전 내역 ===== }}
@@ -498,6 +526,11 @@
                     {{/chargeHistories}}
                     <div style="text-align:right; margin-top:12px;">
                         <a href="/charge/form" class="cm-btn cm-btn-primary">포인트 충전하기</a>
+                    </div>
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=chargeHistory&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=chargeHistory&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
                     </div>
                 {{/isChargeHistory}}
 
@@ -526,6 +559,11 @@
                         </div>
                     {{/refunds}}
                     {{^refunds}}<div class="cm-empty">환불 신청 내역이 없습니다.</div>{{/refunds}}
+                    <div class="pagination">
+                        {{#prevPage}}<a href="/my-pages?tab=refundHistory&page={{prevPage}}" class="page-btn">이전</a>{{/prevPage}}
+                        <span class="page-info">{{currentPage}} / {{totalPages}}</span>
+                        {{#nextPage}}<a href="/my-pages?tab=refundHistory&page={{nextPage}}" class="page-btn">다음</a>{{/nextPage}}
+                    </div>
                 {{/isRefundHistory}}
 
                 {{!  정보 수정  }}
