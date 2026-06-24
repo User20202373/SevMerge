@@ -298,9 +298,23 @@
         this.value=v.length<4?v:v.length<8?v.slice(0,3)+'-'+v.slice(3):v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7);
     });
 
-    sendCodeBtn.addEventListener('click',async function(){
+       sendCodeBtn.addEventListener('click',async function(){
         const email=emailInput.value.trim(); if(!email){alert('이메일을 입력해주세요.');return;}
-        sendCodeBtn.disabled=true; showSendingToast('이메일 발송중입니다');
+        sendCodeBtn.disabled=true;
+
+        // 1. 중복 이메일 먼저 체크
+        try{
+            const dupRes=await fetch('/api/member/check-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+            const dupData=await dupRes.json();
+            if(!dupData.available){
+                alert(dupData.message);
+                sendCodeBtn.disabled=false;
+                return;
+            }
+        }catch(e){alert('이메일 확인 중 오류가 발생했습니다.');sendCodeBtn.disabled=false;return;}
+
+        // 2. 중복 아니면 인증 코드 발송
+        showSendingToast('이메일 발송중입니다');
         try{
             const res=await fetch('/api/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
             if(res.ok){alert('인증 코드가 발송되었습니다.');codeGroup.style.display='flex';codeGroup.style.flexDirection='column';}

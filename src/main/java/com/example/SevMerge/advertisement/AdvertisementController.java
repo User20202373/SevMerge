@@ -68,7 +68,7 @@ public class AdvertisementController {
 
             advertisementService.purchase(loginMember.getId(), placement, customMessage, savedImage);
             redirectAttrs.addFlashAttribute("successMsg", "광고가 등록되었습니다.");
-            return "redirect:/advertisements/my";
+            return "redirect:/advertisements/my#history";
         } catch (BadRequestException e) {
             redirectAttrs.addFlashAttribute("errorMsg", e.getMessage());
             return "redirect:/advertisements/form";

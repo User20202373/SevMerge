@@ -1,0 +1,141 @@
+{{> layout/header}}
+
+<style>
+    .admin-wrap { display: flex; min-height: calc(100vh - 64px); }
+    .admin-content { flex: 1; padding: 36px 36px 80px; background: #f5f6fa; }
+    .admin-title { font-size: 22px; font-weight: 900; color: #1c1e26; margin-bottom: 4px; }
+    .admin-desc { font-size: 14px; color: #9ca3af; margin-bottom: 28px; }
+
+    .section-title { font-size: 17px; font-weight: 800; color: #1c1e26; margin: 32px 0 16px; padding-bottom: 10px; border-bottom: 1px solid #eaecf4; }
+
+    .ad-list { display: flex; flex-direction: column; gap: 16px; }
+    .ad-card { background: #fff; border: 1.5px solid #eaecf4; border-radius: 14px; padding: 22px 24px; display: flex; gap: 20px; align-items: flex-start; }
+    .ad-thumb { width: 120px; height: 80px; border-radius: 8px; background: #f0f4fa; flex-shrink: 0; overflow: hidden; border: 1px solid #eaecf4; cursor: pointer; transition: opacity .15s; }
+    .ad-thumb:hover { opacity: .85; }
+    .ad-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ad-body { flex: 1; }
+    .ad-expert-name { font-size: 16px; font-weight: 800; color: #1c1e26; margin-bottom: 4px; }
+    .ad-placement { display: inline-block; font-size: 11px; font-weight: 700; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 2px 10px; border-radius: 20px; margin-bottom: 8px; }
+    .ad-msg { font-size: 13px; color: #6b7280; margin-bottom: 8px; line-height: 1.5; }
+    .ad-meta { font-size: 12px; color: #9ca3af; }
+    .ad-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+    .approve-btn { padding: 9px 18px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .approve-btn:hover { background: #1d4ed8; }
+    .reject-btn { padding: 9px 18px; background: #fff; color: #ef4444; border: 1.5px solid #fecaca; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .reject-btn:hover { background: #fff3f3; }
+    .empty-state { text-align: center; padding: 40px 0; font-size: 15px; color: #c4c9d9; }
+
+    .status-pending  { font-size: 11px; background: #fef3c7; color: #b45309; border: 1px solid #fde68a; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+    .status-active   { font-size: 11px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+    .status-rejected { font-size: 11px; background: #fff3f3; color: #ef4444; border: 1px solid #fecaca; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+    .status-expired  { font-size: 11px; background: #f3f4f8; color: #9ca3af; padding: 3px 10px; border-radius: 20px; font-weight: 700; display: inline-block; }
+
+    /* 이미지 모달 */
+    .img-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 9999; align-items: center; justify-content: center; cursor: pointer; }
+    .img-modal-bg.open { display: flex; }
+    .img-modal-bg img { max-width: 90vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+</style>
+
+<div class="admin-wrap">
+    <main class="admin-content">
+        <h1 class="admin-title">광고 승인 관리</h1>
+        <p class="admin-desc">전문가가 신청한 광고를 검토하고 승인 또는 거절합니다.</p>
+
+        <!-- 승인 대기 -->
+        <div class="section-title">⏳ 승인 대기 ({{pendingCount}}건)</div>
+        <div class="ad-list">
+            {{#pendingAds}}
+                <div class="ad-card" id="ad-card-{{id}}">
+                    <div class="ad-thumb" onclick="openImg('{{displayImageUrl}}')">
+                        {{#bannerImage}}
+                            <img src="{{displayImageUrl}}" alt="배너"/>
+                        {{/bannerImage}}
+                        {{^bannerImage}}
+                            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;">이미지 없음</div>
+                        {{/bannerImage}}
+                    </div>
+                    <div class="ad-body">
+                        <div class="ad-expert-name">{{expertName}}</div>
+                        <span class="ad-placement">{{placement}}</span>
+                        <span class="status-pending">승인 대기</span>
+                        <div class="ad-msg">"{{customMessage}}"</div>
+                        <div class="ad-meta">신청 기간: {{startDate}} ~ {{endDate}} | 결제 금액: {{price}}P</div>
+                    </div>
+                    <div class="ad-actions">
+                        <button class="approve-btn" onclick="processAd({{id}}, 'approve')">승인</button>
+                        <button class="reject-btn" onclick="processAd({{id}}, 'reject')">거절</button>
+                    </div>
+                </div>
+            {{/pendingAds}}
+            {{^pendingAds}}
+                <div class="empty-state">승인 대기 중인 광고가 없습니다.</div>
+            {{/pendingAds}}
+        </div>
+
+        <!-- 처리 완료 이력 -->
+        <div class="section-title">📋 처리 완료 이력</div>
+        <div class="ad-list">
+            {{#processedAds}}
+                <div class="ad-card">
+                    <div class="ad-thumb" onclick="openImg('{{displayImageUrl}}')">
+                        {{#bannerImage}}
+                            <img src="{{displayImageUrl}}" alt="배너"/>
+                        {{/bannerImage}}
+                        {{^bannerImage}}
+                            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;">이미지 없음</div>
+                        {{/bannerImage}}
+                    </div>
+                    <div class="ad-body">
+                        <div class="ad-expert-name">{{expertName}}</div>
+                        <span class="ad-placement">{{placement}}</span>
+                        {{#isActive}}<span class="status-active">노출중</span>{{/isActive}}
+                        {{#isRejected}}<span class="status-rejected">거절됨</span>{{/isRejected}}
+                        {{#isExpired}}<span class="status-expired">종료</span>{{/isExpired}}
+                        <div class="ad-msg">"{{customMessage}}"</div>
+                        <div class="ad-meta">기간: {{startDate}} ~ {{endDate}} | {{price}}P</div>
+                    </div>
+                </div>
+            {{/processedAds}}
+            {{^processedAds}}
+                <div class="empty-state">처리된 광고 이력이 없습니다.</div>
+            {{/processedAds}}
+        </div>
+    </main>
+</div>
+
+<!-- 이미지 모달 -->
+<div class="img-modal-bg" id="imgModal" onclick="closeImg()">
+    <img id="imgModalSrc" src="" alt="배너 이미지"/>
+</div>
+
+<script>
+    function openImg(url) {
+        if (!url || url === '/images/default.png') return;
+        document.getElementById('imgModalSrc').src = url;
+        document.getElementById('imgModal').classList.add('open');
+    }
+    function closeImg() {
+        document.getElementById('imgModal').classList.remove('open');
+    }
+
+    function processAd(adId, action) {
+        const label = action === 'approve' ? '승인' : '거절';
+        if (!confirm(`해당 광고를 ${label}하시겠습니까?`)) return;
+
+        fetch(`/api/admin/advertisements/${adId}/${action}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => {
+            if (res.ok) {
+                alert(`광고가 ${label}되었습니다.`);
+                location.reload();
+            } else {
+                alert('처리 중 오류가 발생했습니다.');
+            }
+        })
+        .catch(() => alert('통신 오류가 발생했습니다.'));
+    }
+</script>
+
+{{> layout/footer}}

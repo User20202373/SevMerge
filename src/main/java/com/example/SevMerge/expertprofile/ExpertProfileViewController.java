@@ -96,9 +96,9 @@ public class ExpertProfileViewController {
 
         // 탭 활성화
         model.addAttribute("isAll", career == null && keyword == null);
-        model.addAttribute("isFullstack", "fullstack".equalsIgnoreCase(career));
-        model.addAttribute("isBackend", "backend".equalsIgnoreCase(career));
-        model.addAttribute("isFrontend", "frontend".equalsIgnoreCase(career));
+        model.addAttribute("isFullstack", "java".equalsIgnoreCase(career));
+        model.addAttribute("isBackend", "spring".equalsIgnoreCase(career));
+        model.addAttribute("isFrontend", "react".equalsIgnoreCase(career));
         model.addAttribute("isApp", "flutter".equalsIgnoreCase(career));
         model.addAttribute("isUiux", "figma".equalsIgnoreCase(career));
         model.addAttribute("keyword", keyword != null ? keyword : "");
