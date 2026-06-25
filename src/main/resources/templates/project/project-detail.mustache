@@ -265,10 +265,18 @@
                         <span class="info-label">인증 전문가</span>
                         <span class="info-value">{{#project.isCertifiedOnly}}필수 요구{{/project.isCertifiedOnly}}{{^project.isCertifiedOnly}}제한 없음{{/project.isCertifiedOnly}}</span>
                     </div>
-                    {{^isOwner}}
-                    <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
-                    <a href="/chat/start/project/{{project.id}}?withMemberId={{project.memberId}}" class="bid-btn" style="background:rgba(255,255,255,.6);color:#2563eb;border:1.5px solid rgba(37,99,235,.3);box-shadow:none;margin-top:10px;">💬 의뢰인에게 문의</a>
-                    {{/isOwner}}
+                  {{^isOwner}}
+                      {{#project.isOpen}}
+                      <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
+                      {{/project.isOpen}}
+                      {{^project.isOpen}}
+                      <button class="bid-btn" disabled
+                              style="background:#e5e7eb; color:#9ca3af; cursor:not-allowed; border:none;">
+                          🔒 모집 마감된 프로젝트입니다
+                      </button>
+                      {{/project.isOpen}}
+                      <a href="/chat/start/project/{{project.id}}?withMemberId={{project.memberId}}" class="bid-btn" style="background:rgba(255,255,255,.6);color:#2563eb;border:1.5px solid rgba(37,99,235,.3);box-shadow:none;margin-top:10px;">💬 의뢰인에게 문의</a>
+                  {{/isOwner}}
                 </div>
 
                 {{#expertCard}}
