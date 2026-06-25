@@ -587,7 +587,7 @@
 
         document.getElementById("sendBtn").addEventListener("click", send);
         input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") send();
+            if (e.key === "Enter" && !e.isComposing) send();
         });
     })();
 </script>
