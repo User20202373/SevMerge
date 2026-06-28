@@ -110,7 +110,7 @@ public class MemberController {
     // 로그인/ 로그아웃
     @GetMapping("/login")
     public String loginForm(HttpSession session ,Model model) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember != null) {
             return "redirect:/main";
         }
@@ -243,7 +243,7 @@ public class MemberController {
                          @RequestParam(defaultValue = "1") int page,
                          HttpSession session, Model model,
                          HttpServletRequest request) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         // 세션 유저 방어(로그아웃 상태 시 로그인창으로)
         if (loginMember == null) {
             return "redirect:/login";
@@ -445,7 +445,7 @@ public class MemberController {
     @DeleteMapping("/my-pages/withdraw")
     @ResponseBody
     public ResponseEntity<?> withdrawMyAccount(HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) return ResponseEntity.status(401).body("세션 만료");
         try {
             memberService.withdrawMember(loginMember.getId());
@@ -459,7 +459,7 @@ public class MemberController {
     // 회원 정보 수정 페이지 이동 (GET)
     @GetMapping("/mypage/update") //
     public String updateMemberPage(HttpSession session, Model model) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) {
             return "redirect:/login";
         }
@@ -475,12 +475,12 @@ public class MemberController {
             @RequestPart("data") MemberRequest.Update request,
             @RequestPart(value = "profileImageFile", required = false) MultipartFile profileImageFile,
             HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) return ResponseEntity.status(401).body("세션 만료");
 
         try {
             memberService.updateMyInfo(loginMember.getId(), request, profileImageFile);
-            session.setAttribute(Define.SESSION_USER, memberService.findMemberById(loginMember.getId()));
+            session.setAttribute(Define.SESSION_USER, new SessionUser(memberService.findMemberById(loginMember.getId())));
             return ResponseEntity.ok().body("정보 변경 완료");
         } catch (BadRequestException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -490,10 +490,10 @@ public class MemberController {
     @DeleteMapping("/my-pages/profile-image")
     @ResponseBody
     public ResponseEntity<?> deleteProfileImage(HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) return ResponseEntity.status(401).body("세션 만료");
         memberService.deleteProfileImage(loginMember.getId());
-        session.setAttribute(Define.SESSION_USER, memberService.findMemberById(loginMember.getId()));
+        session.setAttribute(Define.SESSION_USER, new SessionUser(memberService.findMemberById(loginMember.getId())));
         return ResponseEntity.ok().body("삭제 완료");
     }
 
@@ -501,7 +501,7 @@ public class MemberController {
     @PostMapping("/api/member/verify-password")
     @ResponseBody
     public ResponseEntity<?> verifyCurrentPassword(@RequestBody Map<String, String> body, HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
 
         String currentPassword = body.get("currentPassword");
@@ -582,7 +582,7 @@ public class MemberController {
     public String deleteMemberByAdmin(@PathVariable(name = "id") Long id,
                                       HttpSession session,
                                       Model model) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser.isAdmin());
         memberService.withdrawMember(id);
         return "redirect:/admin/members";
@@ -627,7 +627,7 @@ public class MemberController {
                 return "redirect:/expert-rejected";
             }
 
-            session.setAttribute(Define.SESSION_USER, existing);
+            session.setAttribute(Define.SESSION_USER, new SessionUser(existing));
             log.info("구글 기존 회원 로그인 - memberId={}", existing.getId());
             return "redirect:/";
         }
@@ -669,7 +669,7 @@ public class MemberController {
                 return "redirect:/expert-rejected";
             }
 
-            session.setAttribute(Define.SESSION_USER, existing);
+            session.setAttribute(Define.SESSION_USER, new SessionUser(existing));
             log.info("카카오 기존 회원 로그인 - memberId={}", existing.getId());
             return "redirect:/";
         }
@@ -730,7 +730,7 @@ public class MemberController {
         }
         if (member != null) {
             Member freshMember = memberService.findMemberById(member.getId());
-            session.setAttribute(Define.SESSION_USER, freshMember);
+            session.setAttribute(Define.SESSION_USER, new SessionUser(freshMember));
             log.info("소셜 회원가입 최종 완료 -> 온전한 세션 주입 완료 - memberId={}", freshMember.getId());
         }
 

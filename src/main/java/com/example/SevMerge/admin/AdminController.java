@@ -8,10 +8,7 @@ import com.example.SevMerge.advertisement.AdvertisementService;
 import com.example.SevMerge.board.*;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.expertprofile.ExpertProfileResponse;
-import com.example.SevMerge.member.Member;
-import com.example.SevMerge.member.MemberResponse;
-import com.example.SevMerge.member.MemberService;
-import com.example.SevMerge.member.Role;
+import com.example.SevMerge.member.*;
 import com.example.SevMerge.partnership.PartnerShipService;
 import com.example.SevMerge.project.ProjectResponseDTO;
 import com.example.SevMerge.project.ProjectService;
@@ -24,7 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.SevMerge.member.SessionUser;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -60,7 +57,7 @@ public class AdminController {
 
         long newMemberCount = memberService.getNewMemberCountThisMonth();
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        SessionUser sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser);
 
         model.addAttribute("stats", memberService.getAllMembers());
@@ -175,7 +172,7 @@ public class AdminController {
     public String adminNotices(@RequestParam(value = "keyword", required = false) String keyword,
                                @RequestParam(defaultValue = "1") int page,
                                Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        SessionUser sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
 
         List<BoardResponse.ListDTO> all = boardService.getAdminBoardsByType(BoardType.NOTICE, keyword);
@@ -199,7 +196,7 @@ public class AdminController {
     // 관리자 공지사항 수정화면 띄우기
     @GetMapping("/admin/notices/{id}/update")
     public String updateNoticeForm(@PathVariable("id") Long id, Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        SessionUser sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         boolean isAdmin = sessionUser != null && sessionUser.getRole() == Role.ADMIN;
 
         Board board = boardRepository.findById(id)
@@ -309,7 +306,7 @@ public class AdminController {
     @PostMapping("/admin/blacklist/release/{memberId}")
     public String releaseBlacklistMember(@PathVariable(name = "memberId") Long memberId,
                                          HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        SessionUser sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) {
             return "redirect:/login";
         }

@@ -26,7 +26,7 @@ public class BidInterceptor implements HandlerInterceptor {
                 return false;
             }
 
-            Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+            Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
             // 2. 전문가(Expert)가 아니면 (예: 의뢰인이 제안서 작성 주소로 강제 진입했을 때)
             if (!sessionUser.isExpert()) {

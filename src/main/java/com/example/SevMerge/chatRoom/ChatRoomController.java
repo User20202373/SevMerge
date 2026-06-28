@@ -20,7 +20,7 @@ public class ChatRoomController {
 
     @GetMapping("/chat/room")
     public String showChatRoom(HttpSession session, Model model) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("rooms", chatRoomService.findMyRooms(sessionMember));
         return "chatRoom/chatRoom-list";
     }
@@ -33,7 +33,7 @@ public class ChatRoomController {
     @GetMapping("/chat/room/{roomId}")
     public String chatRoomPage(@PathVariable Long roomId, HttpSession session, Model model) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionMember == null) {
             return "redirect:/login";
         }
@@ -74,7 +74,7 @@ public class ChatRoomController {
             @RequestBody ChatRoomRequest request,
             HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionMember == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
@@ -87,7 +87,7 @@ public class ChatRoomController {
     // 전문가 프로필에서 : 의뢰인이 문의
     @GetMapping("/chat/start/expert/{expertId}")
     public String startProfileChat(@PathVariable Long expertId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         return "redirect:/chat/room/" + chatRoomService.getOrCreateProfileRoom(sessionMember, expertId);
     }
 
@@ -95,14 +95,14 @@ public class ChatRoomController {
     @GetMapping("/chat/start/project/{projectId}")
     public String startProjectChat(@PathVariable Long projectId,
                                    @RequestParam Long withMemberId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         return "redirect:/chat/room/" + chatRoomService.getOrCreateProjectRoom(projectId, sessionMember, withMemberId);
     }
 
     // 채팅방 삭제 (나에게서, 양쪽 다 삭제 시 하드딜리트)
     @PostMapping("/chat/room/{roomId}/delete")
     public String deleteRoom(@PathVariable Long roomId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         chatRoomService.deleteRoom(roomId, sessionMember);
         return "redirect:/chat/room";
     }
@@ -113,7 +113,7 @@ public class ChatRoomController {
     public ResponseEntity<Void> deleteMessage(@PathVariable Long messageId,
                                               @RequestParam(defaultValue = "false") boolean forAll,
                                               HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         chatMessageService.deleteMessage(messageId, sessionMember, forAll);
         return ResponseEntity.ok().build();
     }

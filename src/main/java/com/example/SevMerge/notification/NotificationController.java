@@ -29,7 +29,7 @@ public class NotificationController {
 
     @GetMapping("/notifications")
     public String notificationPage(Model model, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("notifications", notificationService.findAllNotifications(sessionMember));
 
         return "notification/notification-list";
@@ -38,7 +38,7 @@ public class NotificationController {
     @PostMapping("/notifications/{id}/read")
     @ResponseBody
     public ApiResponse<?> readNotification(@PathVariable("id") Long notificationId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         notificationService.markAsRead(notificationId, sessionMember);
 
         return ApiResponse.ok("알림을 읽음 처리 했습니다.");
@@ -46,7 +46,7 @@ public class NotificationController {
 
     @PostMapping("/notifications/read-all")
     public String readAll(HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         notificationService.changeAllRead(sessionMember);
         return "redirect:/notifications";
     }
@@ -54,21 +54,21 @@ public class NotificationController {
     @PostMapping("/notifications/{id}/delete")
     @ResponseBody
     public ApiResponse<?> deleteNotification(@PathVariable("id") Long notificationId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         notificationService.deleteNotification(notificationId, sessionMember);
         return ApiResponse.ok("알림을 삭제했습니다.");
     }
 
     @PostMapping("/notifications/delete-all")
     public String deleteAll(HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         notificationService.deleteAllNotifications(sessionMember);
         return "redirect:/notifications";
     }
 
     @GetMapping(value = "/notifications/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter createEmitter(HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionMember == null) {
             SseEmitter emitter = new SseEmitter(0L);
             emitter.complete();

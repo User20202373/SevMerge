@@ -38,7 +38,7 @@ public class ChatMessageController {
     @PostMapping("/chat/upload")
     @ResponseBody
     public ResponseEntity<?> uploadImage(@RequestParam MultipartFile file, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionMember == null) return ResponseEntity.status(401).build();
         if (!FileUtil.isImageFile(file)) return ResponseEntity.badRequest().body(Map.of("message", "이미지 파일만 업로드 가능합니다"));
         try {

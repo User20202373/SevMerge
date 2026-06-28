@@ -31,7 +31,7 @@ public class WithdrawalController {
     /** 출금 신청 폼 */
     @GetMapping("/form")
     public String withdrawalForm(HttpSession session, Model model) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -42,7 +42,7 @@ public class WithdrawalController {
     /** 출금내역 */
     @GetMapping("/history")
     public String withdrawalHistory(HttpSession session, Model model) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -65,7 +65,7 @@ public class WithdrawalController {
                                     HttpSession             session,
                                     RedirectAttributes      redirectAttrs) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 

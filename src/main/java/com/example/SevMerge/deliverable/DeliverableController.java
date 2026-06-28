@@ -24,7 +24,7 @@ public class DeliverableController {
                          @RequestParam(value = "note", required = false) String note,
                          @RequestParam(value = "isFinal", defaultValue = "false") boolean isFinal,
                          HttpSession session) throws IOException {
-        Member user = (Member) session.getAttribute(Define.SESSION_USER);
+        Member user = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (user == null) return "redirect:/login";
         deliverableService.submit(projectId, file, note, isFinal, user);
         return "redirect:/bids/my-orders";
@@ -35,7 +35,7 @@ public class DeliverableController {
                            @RequestParam("reason") String reason,
                            @RequestParam("projectId") Long projectId,
                            HttpSession session) {
-        Member user = (Member) session.getAttribute(Define.SESSION_USER);
+        Member user = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (user == null) return "redirect:/login";
         deliverableService.requestRevision(deliverableId, reason, user);
         return "redirect:/projects/" + projectId;
@@ -45,7 +45,7 @@ public class DeliverableController {
     public String approve(@PathVariable("id") Long deliverableId,
                           @RequestParam("projectId") Long projectId,
                           HttpSession session) {
-        Member user = (Member) session.getAttribute(Define.SESSION_USER);
+        Member user = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (user == null) return "redirect:/login";
         deliverableService.approve(deliverableId, user);
         return "redirect:/projects/" + projectId;

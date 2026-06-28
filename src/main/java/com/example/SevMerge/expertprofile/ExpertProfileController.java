@@ -25,7 +25,7 @@ public class ExpertProfileController {
           @RequestBody @Valid ExpertProfileRequest.SaveRequest req,
           HttpSession session) {
 
-    Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+    Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
     ExpertProfileResponse response = expertProfileService.save(sessionUser, req);
     return ResponseEntity.ok(ApiResponse.ok(response));
   }
@@ -52,7 +52,7 @@ public class ExpertProfileController {
       @RequestBody @Valid ExpertProfileRequest.SaveRequest req,
       HttpSession session) {
 
-    Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+    Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
     ExpertProfileResponse response = expertProfileService.update(sessionUser.getId(), req);
     return ResponseEntity.ok(ApiResponse.ok(response));
   }

@@ -5,6 +5,7 @@ import com.example.SevMerge.comment.CommentService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.Role;
+import com.example.SevMerge.member.SessionUser;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
@@ -31,7 +32,7 @@ public class BoardController {
                             @RequestParam(defaultValue = "1") int page,
                             Model model, HttpSession session) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isFree",    boardType.equalsIgnoreCase("FREE"));
         model.addAttribute("isNotice",  boardType.equalsIgnoreCase("NOTICE"));
         model.addAttribute("isInquiry", boardType.equalsIgnoreCase("INQUIRY"));
@@ -65,7 +66,7 @@ public class BoardController {
     // ── 상세 ────────────────────────────────────────────────────────
     @GetMapping("/boards/{boardId}")
     public String showBoardDetail(@PathVariable Long boardId, Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         boardService.increaseViewCount(boardId);
 
         String sessionUserRole = (sessionUser != null && sessionUser.getRole() != null)
@@ -86,7 +87,7 @@ public class BoardController {
     @GetMapping("/boards/save")
     public String saveBoardPage(@RequestParam(defaultValue = "FREE") String boardType,
                                 Model model, HttpSession session) throws BadRequestException {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         if (boardType.equalsIgnoreCase("NOTICE")) {
             if (sessionUser == null || sessionUser.getRole() != Role.ADMIN)
@@ -109,7 +110,7 @@ public class BoardController {
     public String saveBoard(@ModelAttribute BoardRequest.SaveBoardDTO saveBoardDTO,
                             @RequestParam(value = "attachmentFile", required = false) MultipartFile attachmentFile,
                             HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         saveBoardDTO.setAttachmentFile(attachmentFile);
         saveBoardDTO.validate();
         boardService.saveBoard(sessionUser, saveBoardDTO);
@@ -124,7 +125,7 @@ public class BoardController {
     // ── 수정 페이지 ─────────────────────────────────────────────────
     @GetMapping("/boards/{boardId}/edit")
     public String updateBoardPage(@PathVariable Long boardId, Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         BoardResponse.DetailDTO board = boardService.detailBoard(boardId);
 
         model.addAttribute("board",     board);
@@ -141,7 +142,7 @@ public class BoardController {
                               @ModelAttribute BoardRequest.UpdateBoardDTO dto,
                               @RequestParam(value = "attachmentFile", required = false) MultipartFile attachmentFile,
                               HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         boardService.updateBoard(boardId, dto, sessionUser.getId(), attachmentFile);
         return "redirect:/boards/" + boardId;
     }
@@ -150,7 +151,7 @@ public class BoardController {
     @DeleteMapping("/boards/{boardId}")
     @ResponseBody
     public ResponseEntity<?> deleteBoard(@PathVariable Long boardId, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         boardService.deleteBoard(boardId, sessionUser.getId());
         return ResponseEntity.ok().build();
     }
@@ -161,7 +162,7 @@ public class BoardController {
                               @RequestParam(required = false) String keyword,
                               @RequestParam(defaultValue = "1") int page,
                               Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         model.addAttribute("isAdmin", sessionUser != null && sessionUser.getRole() == Role.ADMIN);
         List<BoardResponse.ListDTO> all =
                 boardService.getAdminBoardsByType(BoardType.valueOf(boardType.toUpperCase()), keyword);
@@ -181,7 +182,7 @@ public class BoardController {
 
     @PostMapping("/admin/boards/{boardId}/delete")
     public String deleteBoardByAdmin(@PathVariable Long boardId, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) return "redirect:/admin/boards";
         boardService.deleteBoardByAdmin(boardId);
         return "redirect:/admin/boards";
@@ -189,7 +190,7 @@ public class BoardController {
 
     @GetMapping("/admin/notices/write")
     public String noticeWriteForm(Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) return "redirect:/login";
         model.addAttribute("isAdmin", true);
         model.addAttribute("isNotice", true);
@@ -200,7 +201,7 @@ public class BoardController {
 
     @PostMapping("/admin/notices/write")
     public String noticeWrite(@RequestParam String title, @RequestParam String content, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) return "redirect:/login";
         boardService.createNotice(title, content, sessionUser.getId());
         return "redirect:/admin/notices";
@@ -208,7 +209,7 @@ public class BoardController {
 
     @PostMapping("/admin/notices/{boardId}/delete")
     public String deleteNoticeByAdmin(@PathVariable Long boardId, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) return "redirect:/login";
         boardService.deleteNotice(boardId);
         return "redirect:/admin/notices";
@@ -218,7 +219,7 @@ public class BoardController {
     public String adminInquiryList(@RequestParam(defaultValue = "1") int page,
                                    @RequestParam(value = "keyword", required = false) String keyword,
                                    Model model, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null || sessionUser.getRole() != Role.ADMIN) return "redirect:/login";
         List<BoardResponse.ListDTO> all = boardService.findAllInquiry(BoardType.INQUIRY, sessionUser);
         if (keyword != null && !keyword.isEmpty()) {

@@ -23,7 +23,7 @@ public class BookMarkController {
     @PostMapping("/bookmarks/toggle/{expertId}")
     public Map<String, Boolean> toggleBookmark(@PathVariable(name = "expertId") Long expertId, HttpSession session){
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if(sessionMember == null){
             throw new BadRequestException("로그인 먼저 해주세요");
         }
@@ -39,7 +39,7 @@ public class BookMarkController {
                                  HttpSession session
                                  ) {
 
-        Member member = (Member) session.getAttribute(Define.SESSION_USER);
+        Member member = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if(member == null) {
             throw new BadRequestException("로그인 먼저 해주세요");
         }

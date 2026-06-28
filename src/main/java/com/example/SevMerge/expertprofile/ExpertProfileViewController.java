@@ -62,7 +62,7 @@ public class ExpertProfileViewController {
                        @RequestParam(defaultValue = "1") int page,
                        HttpSession session, Model model) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         List<ExpertProfileResponse> profiles = expertProfileService.getAll();
 
         // career(기술 키워드) 필터링
@@ -134,7 +134,7 @@ public class ExpertProfileViewController {
         ExpertProfileResponse profile = expertProfileService.getByMemberId(memberId);
         model.addAttribute("expertProfile", profile);
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         // 추가된 찜여부 확인
         boolean isWished = false;
@@ -168,7 +168,7 @@ public class ExpertProfileViewController {
             @RequestParam(required = false) String category,
             HttpSession session, Model model) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -227,7 +227,7 @@ public class ExpertProfileViewController {
     // ──────────────────────────────────────────────────
     @GetMapping("/my/form")
     public String form(HttpSession session, Model model) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -248,7 +248,7 @@ public class ExpertProfileViewController {
     @PostMapping("/my/form")
     public String submitForm(@ModelAttribute ExpertProfileRequest.SaveRequest req,
                              HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -266,7 +266,7 @@ public class ExpertProfileViewController {
     // ──────────────────────────────────────────────────
     @GetMapping("/my/info-edit")
     public String infoEditForm(HttpSession session, Model model) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -282,7 +282,7 @@ public class ExpertProfileViewController {
     public String infoEditSubmit(@ModelAttribute MemberRequest.Update req,
                                  HttpSession session,
                                  org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login";
         if (!sessionUser.isExpert()) return "redirect:/";
 
@@ -306,7 +306,7 @@ public class ExpertProfileViewController {
     @ResponseBody
     public ResponseEntity<?> toggleWish(@PathVariable Long expertId, HttpSession session) {
         // 1. 세션에서 로그인한 유저 확인
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         // 2. 로그인되지 않았다면 401 Unauthorized 응답 반환
         if (sessionUser == null) {

@@ -36,14 +36,14 @@ public class main {
 
     @GetMapping("/")
     public String introPage(HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember != null) return "redirect:/main";
         return "intro";
     }
 
     @GetMapping("/main")
     public String exmainPage(HttpSession session, Model model) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         model.addAttribute("isMainPage", true);
 

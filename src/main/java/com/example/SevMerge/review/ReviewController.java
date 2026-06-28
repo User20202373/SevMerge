@@ -35,7 +35,7 @@ public class ReviewController {
     public String myReviews(HttpSession session, Model model,
                             @RequestParam(defaultValue = "1") int page) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "login-form";
 
         PageRequest pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "id"));
@@ -61,7 +61,7 @@ public class ReviewController {
                                  @RequestParam(required = false) Long targetId,
                                  @RequestParam(required = false) Long projectId) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "login-form";
 
         Member targeter = memberService.findMemberById(targetId);
@@ -80,7 +80,7 @@ public class ReviewController {
                              @RequestParam(required = false) Long targetId,
                              @RequestParam(required = false) Long projectId) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "login-form";
 
         reviewDTO.setProjectId(projectId);  // DTO에 projectId 세팅
@@ -98,7 +98,7 @@ public class ReviewController {
     @GetMapping("/reviews/{reviewId}")
     public String reviewDetail(@PathVariable(name = "reviewId") Long reviewId, Model model, HttpSession session) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) {
             return "login-form";
         }
@@ -113,7 +113,7 @@ public class ReviewController {
     @GetMapping("/reviews/{reviewId}/edit")
     public String editReviewForm(@PathVariable(name = "reviewId") Long reviewId, Model model, HttpSession session) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) {
             return "login-form";
         }
@@ -129,7 +129,7 @@ public class ReviewController {
                                           @RequestBody ReviewRequest.UpdateRequestDTO updateRequestDTO,
                                           HttpSession session) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) {
             return ResponseEntity.status(401).build();
         }
@@ -143,7 +143,7 @@ public class ReviewController {
     @PostMapping("/reviews/{reviewId}/delete")
     public String deleteReview(@PathVariable(name = "reviewId") Long reviewId, HttpSession session) {
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) {
             return "login-form";
         }

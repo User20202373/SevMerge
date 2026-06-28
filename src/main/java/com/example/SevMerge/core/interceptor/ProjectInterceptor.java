@@ -27,7 +27,7 @@ public class ProjectInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         // 2. 의뢰인(Client)이 아니면 (예: 전문가가 프로젝트 등록/수정 주소로 강제 진입 시)
         if (!sessionUser.isClient()) {

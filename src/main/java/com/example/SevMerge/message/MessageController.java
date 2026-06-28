@@ -30,7 +30,7 @@ public class MessageController {
                               @RequestParam(required = false) String keyword,
                               Model model, HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         Page<MessageResponse.ListDTO> messagePage = messageService.findMessages(sessionMember, box, page, sort, keyword);
 
@@ -52,7 +52,7 @@ public class MessageController {
 
     @GetMapping("/messages/{id}")
     public String messageDetail(@PathVariable Long id, Model model, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         MessageResponse.DetailDTO message = messageService.findMessageByIdWithDetails(id, sessionMember);
         model.addAttribute("message", message);
         return "message/message-detail";
@@ -63,7 +63,7 @@ public class MessageController {
                                   @RequestParam(required = false) Long projectId,
                                   Model model, HttpSession session) {
 
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         List<MessageResponse.ContactDTO> contacts = messageService.findContacts(sessionMember);
 
         model.addAttribute("contacts", contacts);
@@ -73,21 +73,21 @@ public class MessageController {
     }
     @PostMapping("/messages/send")
     public String sendMessage(MessageRequest.SendDTO reqDTO, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         messageService.sendMessage(sessionMember, reqDTO);
         return "redirect:/messages?box=sent";
     }
 
     @PostMapping("/messages/{id}/delete")
     public String deleteMessage(@PathVariable Long id, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         boolean isSenderDelete = messageService.deleteMessage(id, sessionMember);
         return isSenderDelete ? "redirect:/messages?box=sent" : "redirect:/messages?box=received";
     }
 
     @GetMapping("/messages/files/{messageFilesId}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long messageFilesId, HttpSession session) {
-        Member sessionMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         return messageService.downloadFile(messageFilesId, sessionMember);
 
     }

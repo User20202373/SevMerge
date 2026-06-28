@@ -6,6 +6,7 @@ import com.example.SevMerge.bid.BidService;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.member.Member;
 import com.example.SevMerge.member.Role;
+import com.example.SevMerge.member.SessionUser;
 import com.example.SevMerge.payment.PaymentResponse;
 import com.example.SevMerge.payment.PaymentService;
 import com.example.SevMerge.review.ReviewService;
@@ -45,7 +46,7 @@ public class ProjectController {
     // 프로젝트 등록
     @PostMapping("/projects/save")
     public String save(ProjectRequestDTO.SaveDTO req, HttpSession session) {
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser == null) return "redirect:/login-form";
         req.validate();
         projectService.saveProject(req, sessionUser);
@@ -99,7 +100,7 @@ public class ProjectController {
         model.addAttribute("isEtc", "ETC".equals(category));
         model.addAttribute("isCertifiedOnly", "CERTIFIED_ONLY".equals(bidFilter));
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (sessionUser != null) {
             model.addAttribute("sessionUser", sessionUser);
         }
@@ -112,7 +113,7 @@ public class ProjectController {
     public String detail(@PathVariable("id") Long id, Model model, HttpSession session) {
         log.info("프로젝트 상세조회 요청 - projectId: {}", id);
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         ProjectResponseDTO.DetailDTO project = projectService.findProjectById(id);
         model.addAttribute("project", project);
 
@@ -178,7 +179,7 @@ public class ProjectController {
     ) {
         log.info("project 수정 요청");
 
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
 
         req.validate();
         // 세션유저 검증이 필요없음으로 null
@@ -192,7 +193,7 @@ public class ProjectController {
     public ResponseEntity<?> delete(@PathVariable Long id,
                                     HttpSession session) {
         log.info("project 삭제 요청");
-        Member sessionUser = (Member) session.getAttribute(Define.SESSION_USER);
+        Member sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
         projectService.deleteProject(id, sessionUser);
         return ResponseEntity.ok().build();
     }
@@ -299,7 +300,7 @@ public class ProjectController {
 
     @PostMapping("/projects/{id}/skip-review")
     public String skipReview(@PathVariable Long id, HttpSession session) {
-        Member loginMember = (Member) session.getAttribute(Define.SESSION_USER);
+        Member loginMember = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (loginMember == null) return "redirect:/login";
         projectService.skipReview(id, loginMember);
         return "redirect:/my-pages?tab=projects";

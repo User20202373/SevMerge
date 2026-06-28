@@ -20,7 +20,7 @@ public class CancelRequestController {
     public String request(@PathVariable("id") Long projectId,
                           @RequestParam("reason") String reason,
                           HttpSession session) {
-        Member user = (Member) session.getAttribute(Define.SESSION_USER);
+        Member user = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (user == null) return "redirect:/login";
         try {
             cancelRequestService.requestCancel(projectId, user, reason);
@@ -32,7 +32,7 @@ public class CancelRequestController {
     @PostMapping("/cancel-requests/{id}/approve")
     public String approve(@PathVariable("id") Long requestId,
                           HttpSession session) {
-        Member user = (Member) session.getAttribute(Define.SESSION_USER);
+        Member user = (SessionUser) session.getAttribute(Define.SESSION_USER);
         if (user == null) return "redirect:/login";
         cancelRequestService.approveCancel(requestId, user);
         return "redirect:/bids/my-orders";
