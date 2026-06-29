@@ -1,48 +1,151 @@
 {{> layout/header}}
 <style>
     body { background: linear-gradient(135deg, #c8d8f0 0%, #dce8f8 40%, #b8cce8 100%); background-attachment: fixed; }
-    .page-wrap { min-height: calc(100vh - 64px); display: flex; align-items: stretch; justify-content: center; padding: 20px 28px 28px; position: relative; z-index: 1; }
-    .edit-card { width: 100%; backdrop-filter: blur(30px); background: rgba(255,255,255,.52); border: 1.5px solid rgba(255,255,255,.82); border-radius: 28px; box-shadow: 0 20px 60px rgba(37,99,235,.1); display: flex; flex-direction: column; overflow: hidden; }
+
+    .page-wrap {
+        min-height: calc(100vh - 64px);
+        display: flex; align-items: stretch; justify-content: center;
+        padding: 20px 28px 28px; position: relative; z-index: 1;
+    }
+    .edit-card {
+        width: 100%;
+        backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+        background: rgba(255,255,255,.52); border: 1.5px solid rgba(255,255,255,.82);
+        border-radius: 28px;
+        box-shadow: 0 20px 60px rgba(37,99,235,.1), inset 0 1px 0 rgba(255,255,255,.9);
+        display: flex; flex-direction: column; overflow: hidden;
+    }
     .edit-card form { flex: 1; display: flex; flex-direction: column; }
-    .edit-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 36px 0; border-bottom: 1px solid rgba(37,99,235,.08); flex-shrink: 0; }
+
+    /* 헤더 + 탭 */
+    .edit-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 22px 36px 0; border-bottom: 1px solid rgba(37,99,235,.08); flex-shrink: 0;
+    }
     .edit-header-left { display: flex; align-items: center; gap: 14px; }
-    .btn-back { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8); display: flex; align-items: center; justify-content: center; color: #4a6fa5; text-decoration: none; transition: all .15s; }
-    .btn-back:hover { background: rgba(255,255,255,.9); color: #2563eb; }
-    .edit-title { font-size: 20px; font-weight: 900; color: #1e3a6e; }
+    .btn-back {
+        width: 36px; height: 36px; border-radius: 50%;
+        backdrop-filter: blur(8px); background: rgba(255,255,255,.6);
+        border: 1.5px solid rgba(255,255,255,.8);
+        display: flex; align-items: center; justify-content: center;
+        color: #4a6fa5; text-decoration: none; transition: all .15s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.9); border-color: rgba(37,99,235,.3); color: #2563eb; }
+    .edit-title { font-size: 20px; font-weight: 900; color: #1e3a6e; letter-spacing: -.5px; }
     .edit-tabs { display: flex; }
-    .edit-tab { padding: 16px 22px; font-size: 14px; font-weight: 700; color: #4a6fa5; border-bottom: 2.5px solid transparent; text-decoration: none; transition: all .15s; }
+    .edit-tab {
+        padding: 16px 22px; font-size: 14px; font-weight: 700; color: #4a6fa5;
+        border-bottom: 2.5px solid transparent; text-decoration: none; transition: all .15s; white-space: nowrap;
+    }
+    .edit-tab:hover { color: #1e3a6e; }
     .edit-tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+
+    /* 폼 바디 */
     .edit-body { flex: 1; }
-    .section-divider { padding: 18px 36px 0; font-size: 11px; font-weight: 700; color: #2563eb; letter-spacing: .8px; text-transform: uppercase; }
-    .form-row { display: grid; grid-template-columns: 180px 1fr; align-items: flex-start; padding: 18px 36px; border-bottom: 1px solid rgba(37,99,235,.06); }
-    .form-row-label { display: flex; align-items: center; gap: 8px; padding-top: 13px; }
+    .section-divider {
+        padding: 18px 36px 0; font-size: 11px; font-weight: 700; color: #2563eb;
+        letter-spacing: .8px; text-transform: uppercase;
+        border-top: 1px solid rgba(37,99,235,.06);
+    }
+    .section-divider:first-child { border-top: none; }
+
+    .form-row {
+        display: grid; grid-template-columns: 180px 1fr;
+        align-items: flex-start; padding: 18px 36px;
+        border-bottom: 1px solid rgba(37,99,235,.06); transition: background .15s;
+    }
+    .form-row:focus-within { background: rgba(37,99,235,.02); }
+    .form-row-label { display: flex; align-items: center; gap: 8px; padding-top: 13px; flex-shrink: 0; }
     .form-label-text { font-size: 14px; font-weight: 700; color: #1e3a6e; }
     .form-required { color: #ef4444; font-size: 13px; }
     .form-optional { font-size: 11px; font-weight: 600; color: #93aecf; background: rgba(37,99,235,.06); border-radius: 5px; padding: 2px 7px; }
-    .form-select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,.6); border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px; font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; box-sizing: border-box; }
-    .form-select:focus { border-color: #2563eb; background: rgba(255,255,255,.9); }
-    .form-input { width: 100%; padding: 12px 16px 12px 40px; background: rgba(255,255,255,.6); border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px; font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; box-sizing: border-box; }
-    .form-input:focus { border-color: #2563eb; background: rgba(255,255,255,.9); }
+
+    /* 입력 요소 */
+    .form-select {
+        width: 100%; padding: 12px 16px; background: rgba(255,255,255,.6);
+        border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px;
+        font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none;
+        cursor: pointer; appearance: none; transition: all .18s; box-sizing: border-box;
+    }
+    .form-select:focus { border-color: #2563eb; background: rgba(255,255,255,.9); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+
+    .form-input {
+        width: 100%; padding: 12px 16px 12px 40px; background: rgba(255,255,255,.6);
+        border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px;
+        font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; transition: all .18s; box-sizing: border-box;
+    }
+    .form-input::placeholder { color: #93aecf; }
+    .form-input:focus { border-color: #2563eb; background: rgba(255,255,255,.9); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+
     .form-input-wrap { position: relative; }
     .form-input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #93aecf; width: 16px; height: 16px; pointer-events: none; }
-    .form-textarea { width: 100%; padding: 12px 16px; background: rgba(255,255,255,.6); border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px; font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none; resize: vertical; min-height: 160px; line-height: 1.75; box-sizing: border-box; }
-    .form-textarea:focus { border-color: #2563eb; background: rgba(255,255,255,.9); }
-    .form-hint { font-size: 12px; color: #4a6fa5; margin-top: 5px; }
-    .stack-box { background: rgba(255,255,255,.5); border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px; padding: 16px; }
+
+    .form-textarea {
+        width: 100%; padding: 12px 16px; background: rgba(255,255,255,.6);
+        border: 1.5px solid rgba(37,99,235,.1); border-radius: 12px;
+        font-size: 14px; font-family: inherit; color: #1e3a6e; outline: none;
+        resize: vertical; min-height: 160px; line-height: 1.75; transition: all .18s; box-sizing: border-box;
+    }
+    .form-textarea::placeholder { color: #93aecf; }
+    .form-textarea:focus { border-color: #2563eb; background: rgba(255,255,255,.9); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+
+    .form-hint { font-size: 12px; color: #4a6fa5; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+
+    /* 기술 스택 */
+    .stack-box {
+        background: rgba(255,255,255,.5); border: 1.5px solid rgba(37,99,235,.1);
+        border-radius: 12px; padding: 16px;
+    }
     .stack-box-label { font-size: 11px; font-weight: 700; color: #4a6fa5; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
     .stack-grid { display: flex; flex-wrap: wrap; gap: 7px; }
     .stack-chip { display: flex; align-items: center; cursor: pointer; }
     .stack-chip input[type="checkbox"] { display: none; }
-    .stack-chip-label { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid rgba(37,99,235,.12); background: rgba(255,255,255,.7); color: #2d4a7a; cursor: pointer; transition: all .15s; user-select: none; }
-    .stack-chip input:checked + .stack-chip-label { background: #2563eb; color: #fff; border-color: #2563eb; }
-    .stack-preview { display: flex; align-items: center; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(37,99,235,.08); font-size: 12px; color: #4a6fa5; min-height: 22px; flex-wrap: wrap; }
+    .stack-chip-label {
+        padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        border: 1.5px solid rgba(37,99,235,.12); background: rgba(255,255,255,.7);
+        color: #2d4a7a; cursor: pointer; transition: all .15s; user-select: none;
+    }
+    .stack-chip input:checked + .stack-chip-label { background: #2563eb; color: #fff; border-color: #2563eb; box-shadow: 0 2px 8px rgba(37,99,235,.25); }
+    .stack-chip-label:hover { border-color: #2563eb; color: #2563eb; background: rgba(255,255,255,.95); }
+    .stack-chip input:checked + .stack-chip-label:hover { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+    .stack-preview {
+        display: flex; align-items: center; gap: 6px;
+        margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(37,99,235,.08);
+        font-size: 12px; color: #4a6fa5; min-height: 22px; flex-wrap: wrap;
+    }
+    .stack-preview-label { font-weight: 700; color: #2563eb; flex-shrink: 0; }
     .stack-empty-hint { font-size: 12px; color: #93aecf; }
-    .edit-footer { display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 18px 36px 24px; border-top: 1px solid rgba(37,99,235,.08); flex-shrink: 0; }
-    .btn-cancel { padding: 11px 24px; border-radius: 20px; font-size: 14px; font-weight: 700; background: rgba(255,255,255,.65); border: 1.5px solid rgba(255,255,255,.85); color: #2d4a7a; text-decoration: none; cursor: pointer; font-family: inherit; }
-    .btn-submit { padding: 11px 28px; border-radius: 20px; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; cursor: pointer; font-family: inherit; box-shadow: 0 4px 14px rgba(37,99,235,.3); display: inline-flex; align-items: center; gap: 6px; }
-    .btn-submit:hover { transform: translateY(-1px); }
+
+    /* 푸터 */
+    .edit-footer {
+        display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+        padding: 18px 36px 24px; border-top: 1px solid rgba(37,99,235,.08); flex-shrink: 0;
+    }
+    .btn-cancel {
+        padding: 11px 24px; border-radius: 20px; font-size: 14px; font-weight: 700;
+        backdrop-filter: blur(8px); background: rgba(255,255,255,.65);
+        border: 1.5px solid rgba(255,255,255,.85); color: #2d4a7a;
+        text-decoration: none; cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,.9); border-color: rgba(37,99,235,.2); }
+    .btn-submit {
+        padding: 11px 28px; border-radius: 20px; font-size: 14px; font-weight: 800;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff;
+        border: none; cursor: pointer; font-family: inherit;
+        box-shadow: 0 4px 14px rgba(37,99,235,.3); transition: all .15s;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(37,99,235,.4); }
+
+    @media (max-width: 760px) {
+        .page-wrap { padding: 12px 12px 16px; }
+        .edit-header, .form-row, .section-divider, .edit-footer { padding-left: 18px; padding-right: 18px; }
+        .form-row { grid-template-columns: 1fr; gap: 8px; }
+        .form-row-label { padding-top: 0; }
+    }
 </style>
 
+<!-- 서버 데이터 전달용 -->
 <div id="profileData"
      data-career="{{expertProfile.career}}"
      data-speciality="{{expertProfile.speciality}}"
@@ -51,6 +154,8 @@
 
 <section class="page-wrap">
     <div class="edit-card">
+
+        <!-- 헤더 + 탭 -->
         <div class="edit-header">
             <div class="edit-header-left">
                 <a href="/experts/dashboard" class="btn-back">
@@ -64,9 +169,12 @@
             </div>
         </div>
 
+        <!-- 폼 -->
         <form id="profileForm" action="/experts/my/form" method="POST">
             <div class="edit-body">
-                <div class="section-divider" style="padding-top:18px;">프로필 정보</div>
+
+                <!-- 직종 -->
+                <div class="section-divider" style="padding-top:18px; border-top:none;">프로필 정보</div>
 
                 <div class="form-row">
                     <div class="form-row-label">
@@ -86,6 +194,7 @@
                     </select>
                 </div>
 
+                <!-- 기술 스택 -->
                 <div class="form-row">
                     <div class="form-row-label" style="padding-top:13px;">
                         <span class="form-label-text">기술 스택</span>
@@ -104,17 +213,19 @@
                     </div>
                 </div>
 
+                <!-- 자기소개 -->
                 <div class="form-row">
                     <div class="form-row-label" style="padding-top:13px;">
                         <span class="form-label-text">자기소개</span>
                         <span class="form-required">*</span>
                     </div>
                     <div>
-                        <textarea name="intro" class="form-textarea" placeholder="본인의 경력, 강점, 대표 프로젝트 경험 등을 자유롭게 소개해주세요.">{{expertProfile.intro}}</textarea>
-                        <p class="form-hint">클라이언트가 가장 먼저 읽는 항목입니다.</p>
+                        <textarea name="intro" class="form-textarea" placeholder="본인의 경력, 강점, 대표 프로젝트 경험 등을 자유롭게 소개해주세요. (예: 5년차 백엔드 개발자로 ...)">{{expertProfile.intro}}</textarea>
+                        <p class="form-hint">클라이언트가 가장 먼저 읽는 항목입니다. 구체적으로 작성할수록 수주 확률이 높아집니다.</p>
                     </div>
                 </div>
 
+                <!-- GitHub -->
                 <div class="form-row">
                     <div class="form-row-label">
                         <span class="form-label-text">GitHub / 포트폴리오</span>
@@ -122,12 +233,13 @@
                     </div>
                     <div>
                         <div class="form-input-wrap">
-                            <svg class="form-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            <svg class="form-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                             <input id="githubInput" type="url" name="githubUrl" class="form-input" placeholder="https://github.com/your-handle"/>
                         </div>
-                        <p class="form-hint">GitHub, Notion, 개인 블로그 등 어떤 URL이든 입력 가능합니다.</p>
+                        <p class="form-hint">GitHub, Notion 포트폴리오, 개인 블로그 등 어떤 URL이든 입력 가능합니다.</p>
                     </div>
                 </div>
+
             </div>
 
             <div class="edit-footer">
@@ -138,6 +250,7 @@
                 </button>
             </div>
         </form>
+
     </div>
 </section>
 
@@ -153,42 +266,56 @@
             'Premiere Pro','After Effects','DaVinci Resolve','Final Cut Pro','CapCut','Blender',
             'Git','Linux','WordPress','Shopify','Nginx','Jenkins','Kubernetes'
         ];
-        var stackGrid = document.getElementById('stackGrid');
-        var stackPreview = document.getElementById('stackPreview');
+
+        var stackGrid       = document.getElementById('stackGrid');
+        var stackPreview    = document.getElementById('stackPreview');
         var specialityInput = document.getElementById('specialityInput');
-        var profileData = document.getElementById('profileData');
-        var savedCareer = profileData ? profileData.getAttribute('data-career') || '' : '';
+        var profileData     = document.getElementById('profileData');
+        var githubInput     = document.getElementById('githubInput');
+        var careerSelect    = document.getElementById('careerSelect');
+
+        var savedCareer     = profileData ? profileData.getAttribute('data-career')     || '' : '';
         var savedSpeciality = profileData ? profileData.getAttribute('data-speciality') || '' : '';
-        var savedGithub = profileData ? profileData.getAttribute('data-github') || '' : '';
-        var githubInput = document.getElementById('githubInput');
-        var careerSelect = document.getElementById('careerSelect');
+        var savedGithub     = profileData ? profileData.getAttribute('data-github')     || '' : '';
+
         if (githubInput && savedGithub) githubInput.value = savedGithub;
         if (careerSelect && savedCareer) careerSelect.value = savedCareer;
-        var preChecked = savedSpeciality ? savedSpeciality.split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+
+        var preChecked = savedSpeciality
+            ? savedSpeciality.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+            : [];
+
         function getChecked() {
-            return Array.from(stackGrid.querySelectorAll('input[type="checkbox"]:checked')).map(function(cb){ return cb.value; });
+            return Array.from(stackGrid.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(function (cb) { return cb.value; });
         }
+
         function syncHidden() {
             var checked = getChecked();
             specialityInput.value = checked.join(', ');
-            stackPreview.innerHTML = checked.length
-                ? '<span style="font-weight:700;color:#2563eb;">선택됨 ' + checked.length + '개</span> ' + checked.join(', ')
-                : '<span class="stack-empty-hint">선택된 기술이 없습니다.</span>';
+            if (checked.length) {
+                stackPreview.innerHTML = '<span class="stack-preview-label">선택됨 ' + checked.length + '개</span> ' + checked.join(', ');
+            } else {
+                stackPreview.innerHTML = '<span class="stack-empty-hint">선택된 기술이 없습니다.</span>';
+            }
         }
-        ALL_STACKS.forEach(function(tech) {
-            var label = document.createElement('label');
-            label.className = 'stack-chip';
+
+        ALL_STACKS.forEach(function (tech) {
+            var labelEl = document.createElement('label');
+            labelEl.className = 'stack-chip';
             var cb = document.createElement('input');
             cb.type = 'checkbox'; cb.value = tech;
             cb.checked = preChecked.indexOf(tech) !== -1;
             cb.addEventListener('change', syncHidden);
             var span = document.createElement('span');
             span.className = 'stack-chip-label'; span.textContent = tech;
-            label.appendChild(cb); label.appendChild(span);
-            stackGrid.appendChild(label);
+            labelEl.appendChild(cb); labelEl.appendChild(span);
+            stackGrid.appendChild(labelEl);
         });
+
         syncHidden();
-        document.getElementById('profileForm').addEventListener('submit', function() {
+
+        document.getElementById('profileForm').addEventListener('submit', function () {
             specialityInput.value = getChecked().join(', ');
         });
     }());
