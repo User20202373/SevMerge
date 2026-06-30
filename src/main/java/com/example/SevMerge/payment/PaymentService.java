@@ -5,6 +5,7 @@ import com.example.SevMerge.core.exception.ForbiddenException;
 import com.example.SevMerge.core.exception.NotFoundException;
 import com.example.SevMerge.member.MemberRepository;
 import com.example.SevMerge.member.Role;
+import com.example.SevMerge.revenue.PlatformRevenueService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,8 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final EscrowSettlementRequestRepository escrowRequestRepository;
     private final MemberRepository memberRepository;
+
+    private final PlatformRevenueService platformRevenueService;
 
     @PersistenceContext
     private EntityManager em;
@@ -157,6 +160,13 @@ public class PaymentService {
             log.warn("[Escrow] 관리자 계정 없음 — 수수료 {}원 미지급 (paymentId={})",
                     payment.getPlatformFee(), paymentId);
         }
+        platformRevenueService.record(
+                com.example.SevMerge.revenue.PlatformRevenueType.COMMISSION,
+                payment.getPlatformFee(),
+                payment.getId(),
+                payment.getExpertId(),
+                "프로젝트 중개 수수료 - projectId=" + payment.getProjectId()
+        );
 
         // 프로젝트 상태 → DONE
         em.createNativeQuery(
@@ -312,6 +322,13 @@ public class PaymentService {
         if (adminUpdated == 0) {
             log.warn("[Escrow] 관리자 계정 없음 — 수수료 {}원 미지급", payment.getPlatformFee());
         }
+        platformRevenueService.record(
+                com.example.SevMerge.revenue.PlatformRevenueType.COMMISSION,
+                payment.getPlatformFee(),
+                payment.getId(),
+                payment.getExpertId(),
+                "프로젝트 중개 수수료 - projectId=" + payment.getProjectId()
+        );
 
         // 프로젝트 → DONE
         em.createNativeQuery("UPDATE project_tb SET project_status = 'DONE' WHERE id = :pid")

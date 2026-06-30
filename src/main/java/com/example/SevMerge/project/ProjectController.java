@@ -131,6 +131,12 @@ public class ProjectController {
 
         model.addAttribute("deliverables", deliverableService.getByProject(id));
 
+        boolean hasAlreadyBid = false;
+        if (member != null && member.isExpert()) {
+            hasAlreadyBid = bidRepository.findByProjectIdAndExpertId(id, member.getId()).isPresent();
+        }
+        model.addAttribute("hasAlreadyBid", hasAlreadyBid);
+
         int bidCount = (bids != null) ? bids.size() : 0;
         model.addAttribute("bidCount", bidCount);
 

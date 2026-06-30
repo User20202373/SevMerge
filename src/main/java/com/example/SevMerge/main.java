@@ -6,6 +6,7 @@ import com.example.SevMerge.adbid.AdSlot;
 import com.example.SevMerge.advertisement.AdvertisementPlacement;
 import com.example.SevMerge.advertisement.AdvertisementResponse;
 import com.example.SevMerge.advertisement.AdvertisementService;
+import com.example.SevMerge.bid.BidRepository;
 import com.example.SevMerge.core.util.Define;
 import com.example.SevMerge.expertprofile.ExpertProfileResponse;
 import com.example.SevMerge.expertprofile.ExpertProfileService;
@@ -34,6 +35,7 @@ public class main {
     private final ReviewService reviewService;
     private final AdBidService adBidService;
     private final MemberRepository memberRepository;
+    private final BidRepository bidRepository;
 
     @GetMapping("/")
     public String introPage(HttpSession session) {
@@ -85,6 +87,13 @@ public class main {
         List<ProjectResponseDTO.ListDTO> projects =
                 projectService.findAllProjectsList().stream()
                         .filter(p -> "OPEN".equals(p.getProjectStatus()))
+                        .filter(p -> {
+                            // ↓ 추가: 전문가면 이미 제안한 프로젝트 제외
+                            if (loginMember != null && loginMember.isExpert()) {
+                                return !bidRepository.findByProjectIdAndExpertId(p.getId(), loginMember.getId()).isPresent();
+                            }
+                            return true;
+                        })
                         .sorted(Comparator.comparing(
                                 ProjectResponseDTO.ListDTO::getCreatedAt).reversed())
                         .limit(9)

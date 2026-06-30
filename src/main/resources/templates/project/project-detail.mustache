@@ -450,7 +450,14 @@
                             </span>
                         </div>
                         {{^isOwner}}
-                            <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
+                            {{^hasAlreadyBid}}
+                                <a href="/bids/save-form?projectId={{project.id}}" class="bid-btn">제안서 보내기</a>
+                            {{/hasAlreadyBid}}
+                            {{#hasAlreadyBid}}
+                                <div class="bid-btn" style="background:#e5e7eb;color:#9ca3af;cursor:not-allowed;text-align:center;">
+                                    이미 제안서를 제출했습니다
+                                </div>
+                            {{/hasAlreadyBid}}
                             <a href="/chat/start/project/{{project.id}}?withMemberId={{project.memberId}}" class="bid-btn-outline">💬 의뢰인에게 문의</a>
                         {{/isOwner}}
                     </div>
