@@ -42,7 +42,7 @@ public class BoardController {
         model.addAttribute("boardType", boardType);
 
         if (boardType.equalsIgnoreCase("INQUIRY")) {
-            if (sessionUser == null) return "login-form";
+            if (sessionUser == null) return "redirect:/login";
             Member member = memberRepository.findById(sessionUser.getId()).orElseThrow();
             List<BoardResponse.ListDTO> list = boardService.findAllInquiry(BoardType.INQUIRY, member, null);
             model.addAttribute("boards", list);
