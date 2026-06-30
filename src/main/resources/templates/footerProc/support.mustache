@@ -99,7 +99,10 @@
         backdrop-filter: blur(16px);
         background: rgba(255,255,255,.6); border: 1.5px solid rgba(255,255,255,.8);
         border-radius:12px; padding:18px 20px;
+        cursor: pointer; transition: all .15s;
     }
+    .type-card:hover { border-color: rgba(191,219,254,.9); box-shadow:0 4px 14px rgba(37,99,235,.08); background: rgba(255,255,255,.8); }
+    .type-card.active { border-color: #2563eb; background: rgba(239,246,255,.8); }
     .type-card-title { font-size:13px; font-weight:700; color:#1c1e26; margin-bottom:4px; }
     .type-card-desc { font-size:12px; color:#9ca3af; line-height:1.6; }
 
@@ -119,6 +122,8 @@
     }
     .form-input:focus, .form-textarea:focus { border-color:#2563eb; background: rgba(255,255,255,.9); }
     .form-textarea { resize:vertical; min-height:100px; }
+
+    /* 전문가 등록 */
     .expert-steps { display:flex; flex-direction:column; gap:16px; margin-bottom:40px; }
     .expert-step {
         display:flex; gap:20px; align-items:flex-start;
@@ -297,22 +302,25 @@
             <p style="font-size:13px; color:#6b7280; margin-top:8px; margin-bottom:8px;">SevMerge와 함께 성장할 파트너를 찾고 있습니다. 아래 양식을 통해 제휴를 제안해 주세요.</p>
 
             <div class="partnership-grid">
+                <!-- 왼쪽: type-card 클릭으로 타입 선택 -->
                 <div class="partnership-type">
-                    <div class="type-card">
+                    <div class="type-card active" onclick="selectType('COMPANY', this)">
                         <div class="type-card-title">🏢 기업 제휴</div>
                         <div class="type-card-desc">기업 전용 외주 매칭, 단체 계약 등 B2B 협업을 제안해 주세요.</div>
                     </div>
-                    <div class="type-card">
+                    <div class="type-card" onclick="selectType('EDUCATION', this)">
                         <div class="type-card-title">🎓 교육기관 제휴</div>
                         <div class="type-card-desc">부트캠프, 교육기관과의 전문가 양성 및 매칭 협력을 환영합니다.</div>
                     </div>
-                    <div class="type-card">
+                    <div class="type-card" onclick="selectType('MARKET', this)">
                         <div class="type-card-title">📣 마케팅 제휴</div>
                         <div class="type-card-desc">공동 프로모션, 콘텐츠 협업 등 다양한 마케팅 제휴를 제안해 주세요.</div>
                     </div>
                 </div>
 
+                <!-- 오른쪽: 폼 -->
                 <form class="partnership-form" action="/partnership/inquiry" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="partnerShipType" id="partnerShipType" value="COMPANY">
                     <div class="form-group">
                         <label class="form-label">회사명 / 단체명</label>
                         <input type="text" name="companyName" class="form-input" placeholder="예: (주)세브머지" required>
@@ -323,12 +331,12 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">이메일</label>
-                        <input type="email" name="email" class="form-input" placeholder="답변해드릴 당담자 이메일을 입력해 주세요" required>
+                        <input type="email" name="email" class="form-input" placeholder="답변해드릴 담당자 이메일을 입력해 주세요" required>
                     </div>
-                        <div class="form-group">
-                            <label class="form-label">파일첨부</label>
-                            <input type="file" name="partnerFile" class="form-input" placeholder="파일을 올려주세요" required>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">파일첨부</label>
+                        <input type="file" name="partnerFile" class="form-input" required>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">제휴 내용</label>
                         <textarea name="content" class="form-textarea" placeholder="제안하고 싶은 제휴 내용을 작성해 주세요." required></textarea>
@@ -357,7 +365,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="expert-step">
                     <div class="step-num" style="background:#f59e0b;">2</div>
                     <div>
@@ -368,7 +375,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="expert-step">
                     <div class="step-num" style="background:#059669;">3</div>
                     <div>
@@ -406,11 +412,16 @@
         </div>
     {{/tabExpert}}
 
-
 </section>
 
 <script>
-
+    function selectType(type, el) {
+        document.getElementById('partnerShipType').value = type;
+        document.querySelectorAll('.type-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        el.classList.add('active');
+    }
 
     function partner(event) {
         event.preventDefault();
@@ -433,7 +444,6 @@
         alert("제휴문의를 메일로 보냈습니다.");
         event.target.closest('form').submit();
     }
-
 </script>
 
 {{> layout/footer}}

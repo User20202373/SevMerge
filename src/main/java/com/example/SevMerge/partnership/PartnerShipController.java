@@ -29,6 +29,8 @@ public class PartnerShipController {
 
 @PostMapping("/partnership/inquiry")
     public String request(PartnerShipRequest request){
+
+    System.out.println("타입확인: "+request.getPartnerShipType());
     partnerShipService.save(request);
     return "redirect:/supports";
 
