@@ -56,6 +56,10 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.4.5-6DB33F?style=flat-square&logo=springboot&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat-square&logo=spring&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL_8.0-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
+![Spring AI](https://img.shields.io/badge/Spring_AI_1.1.1-6DB33F?style=flat-square&logo=spring&logoColor=white)
+![WebSocket](https://img.shields.io/badge/WebSocket_(STOMP)-010101?style=flat-square&logo=socket.io&logoColor=white)
+![SSE](https://img.shields.io/badge/SSE-FF6C37?style=flat-square&logo=html5&logoColor=white)
 
 **Frontend**
 
@@ -209,8 +213,8 @@ SMS·이메일·SSE 알림 등 외부 연동을 트랜잭션 커밋 이후에 �
 ---
 
 ## 📑 ERD
+<img width="1275" height="876" alt="ERD" src="https://github.com/user-attachments/assets/184e5114-7fe8-43e7-82a8-12cd08987f77" />
 
-*(ERD 이미지 추가 예정)*
 
 ---
 
@@ -244,7 +248,7 @@ TOSS_SECRET_KEY=
 MAIL_USERNAME=
 MAIL_PASSWORD=
 
-# SolAPI (SMS)
+# SolAPI (SMS
 SOLAPI_KEY=
 SOLAPI_SECRET_KEY=
 SOLAPI_SENDER_NUMBER=
