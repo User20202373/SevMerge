@@ -159,6 +159,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <img src="docs/ERD_img/Erd_img.png" width="800">
 
+
 | 엔티티 | 테이블명 | 설명 | 핵심 상태/필드 |
 |---|---|---|---|
 | Member | member_tb | 회원 | role(CLIENT/EXPERT/ADMIN)<br>status(ACTIVE/PENDING/REJECTED/SUSPENDED/BLACKLISTED/COMMUNITY_RESTRICTED)<br>balance |
@@ -185,41 +186,41 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 ## 기능 시연
 
-## 프로젝트
+## 9. 기능 — 프로젝트
 
 <table>
 <tr>
   <td align="center"><b>검색 다중 필터</b></td>
-  <td align="center"><b>작성 (비공개 옵션)</b></td>
+  <td align="center"><b>작성</b></td>
   <td align="center"><b>수정·삭제</b></td>
 </tr>
 <tr>
   <td><img src="docs/demo/project/project-search-filter.gif" width="270"></td>
-  <td><img src="docs/demo/project/project-write-private.gif" width="270"></td>
+  <td><img src="docs/demo/project/project-write.gif" width="270"></td>
   <td><img src="docs/demo/project/project-edit-delete.gif" width="270"></td>
 </tr>
 </table>
 
 <br/>
 
-## 제안서
+## 10. 기능 — 제안서
 
 <table>
 <tr>
-  <td align="center"><b>작성 ~ 낙찰</b></td>
+  <td align="center"><b>작성</b></td>
   <td align="center"><b>목록·수정·삭제</b></td>
-  <td align="center"><b>보류</b></td>
+  <td align="center"><b>보류 및 낙찰</b></td>
 </tr>
 <tr>
-  <td><img src="docs/demo/bid/bid-write-to-win.gif" width="270"></td>
+  <td><img src="docs/demo/bid/bid-write.gif" width="270"></td>
   <td><img src="docs/demo/bid/bid-list-edit-delete.gif" width="270"></td>
-  <td><img src="docs/demo/bid/bid-hold.gif" width="270"></td>
+  <td><img src="docs/demo/bid/bid-hold-and-win.gif" width="270"></td>
 </tr>
 </table>
 
 <br/>
 
-## 포트폴리오
+## 11. 기능 — 포트폴리오
 
 <table>
 <tr>
@@ -234,7 +235,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 게시글
+## 12. 기능 — 게시글
 
 <table>
 <tr>
@@ -251,7 +252,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 리뷰
+## 13. 기능 — 리뷰
 
 <table>
 <tr>
@@ -266,13 +267,12 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 채팅 · 쪽지 · 알림
-
+## 14. 기능 — 채팅 · 쪽지 · 알림
 <table>
 <tr>
-  <td align="center"><b>소켓 채팅</b></td>
+  <td align="center"><b>채팅</b></td>
   <td align="center"><b>채팅 삭제</b></td>
-  <td align="center"><b>쪽지 보내기</b></td>
+  <td align="center"><b>쪽지 작성</b></td>
 </tr>
 <tr>
   <td><img src="docs/demo/chat/chat-socket.gif" width="270"></td>
@@ -280,16 +280,18 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
   <td><img src="docs/demo/message/message-send.gif" width="270"></td>
 </tr>
 <tr>
-  <td align="center" colspan="3"><b>실시간 알림</b></td>
+  <td align="center"><b>쪽지 받음</b></td>
+  <td align="center" colspan="2"><b>실시간 알림</b></td>
 </tr>
 <tr>
-  <td align="center" colspan="3"><img src="docs/demo/notification/notification.gif" width="500"></td>
+  <td><img src="docs/demo/message/message-receive.gif" width="270"></td>
+  <td align="center" colspan="2"><img src="docs/demo/notification/notification.gif" width="400"></td>
 </tr>
 </table>
 
 <br/>
 
-## 광고
+## 15. 기능 — 광고
 
 <table>
 <tr>
@@ -306,29 +308,29 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 어드민
+## 16. 기능 — 어드민 
 
 <table>
 <tr>
   <td align="center"><b>관리자 차트</b></td>
   <td align="center"><b>전문가 승인·거절</b></td>
-  <td align="center"><b>환불 처리</b></td>
+  <td align="center"><b>환불 승인·거절</b></td>
 </tr>
 <tr>
   <td><img src="docs/demo/admin/admin-chart.gif" width="270"></td>
   <td><img src="docs/demo/admin/admin-expert-approve.gif" width="270"></td>
-  <td><img src="docs/demo/admin/admin-refund.gif" width="270"></td>
+  <td><img src="docs/demo/admin/admin-refund-approve.gif" width="270"></td>
 </tr>
 </table>
 
 <br/>
 
-## 회원 · 검색 · 기타
+## 17. 기능 — 회원 · 검색 · 기타
 
 <table>
 <tr>
   <td align="center"><b>회원가입</b></td>
-  <td align="center"><b>비밀번호 변경</b></td>
+  <td align="center"><b>비밀번호 수정</b></td>
   <td align="center"><b>북마크</b></td>
 </tr>
 <tr>
