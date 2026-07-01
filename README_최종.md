@@ -186,7 +186,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 ## 기능 시연
 
-## 9. 기능 — 프로젝트
+## 프로젝트
 
 <table>
 <tr>
@@ -195,7 +195,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
   <td align="center"><b>수정·삭제</b></td>
 </tr>
 <tr>
-  <td><img src="docs/demo/project/project-search-filter.gif" width="270"></td>
+  <td><img src="docs/demo/project/project-search-filter.gif" width="270" alt="이미지"></td>
   <td><img src="docs/demo/project/project-write.gif" width="270"></td>
   <td><img src="docs/demo/project/project-edit-delete.gif" width="270"></td>
 </tr>
@@ -203,7 +203,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 10. 기능 — 제안서
+## 제안서
 
 <table>
 <tr>
@@ -220,7 +220,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 11. 기능 — 포트폴리오
+## 포트폴리오
 
 <table>
 <tr>
@@ -235,7 +235,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 12. 기능 — 게시글
+## 게시글
 
 <table>
 <tr>
@@ -252,7 +252,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 13. 기능 — 리뷰
+## 리뷰
 
 <table>
 <tr>
@@ -267,7 +267,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 14. 기능 — 채팅 · 쪽지 · 알림
+## 채팅 · 쪽지 · 알림
 <table>
 <tr>
   <td align="center"><b>채팅</b></td>
@@ -285,13 +285,13 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 </tr>
 <tr>
   <td><img src="docs/demo/message/message-receive.gif" width="270"></td>
-  <td align="center" colspan="2"><img src="docs/demo/notification/notification.gif" width="400"></td>
+  <td align="center" colspan="2"><img src="docs/demo/notification/notification.gif" width="270"></td>
 </tr>
 </table>
 
 <br/>
 
-## 15. 기능 — 광고
+## 광고
 
 <table>
 <tr>
@@ -308,7 +308,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 16. 기능 — 어드민 
+## 관리자
 
 <table>
 <tr>
@@ -325,7 +325,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 <br/>
 
-## 17. 기능 — 회원 · 검색 · 기타
+## 회원
 
 <table>
 <tr>
@@ -340,13 +340,24 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 </tr>
 <tr>
   <td align="center"><b>전문가 검색</b></td>
-  <td align="center"><b>제휴 문의</b></td>
   <td align="center"><b>환불 신청</b></td>
 </tr>
 <tr>
   <td><img src="docs/demo/expert-search/expert-search.gif" width="270"></td>
-  <td><img src="docs/demo/partnership/partnership.gif" width="270"></td>
   <td><img src="docs/demo/refund-request/refund-request.gif" width="270"></td>
+</tr>
+</table>
+
+<br/>
+
+## 제휴 문의
+
+<table>
+<tr>
+  <td align="center"><b>제휴 문의</b></td>
+</tr>
+<tr>
+  <td><img src="docs/demo/partnership/partnership.gif" width="270"></td>
 </tr>
 </table>
 
