@@ -131,6 +131,12 @@ public class ProjectController {
 
         model.addAttribute("deliverables", deliverableService.getByProject(id));
 
+        boolean hasAlreadyBid = false;
+        if (member != null && member.isExpert()) {
+            hasAlreadyBid = bidRepository.findByProjectIdAndExpertId(id, member.getId()).isPresent();
+        }
+        model.addAttribute("hasAlreadyBid", hasAlreadyBid);
+
         int bidCount = (bids != null) ? bids.size() : 0;
         model.addAttribute("bidCount", bidCount);
 
@@ -222,7 +228,7 @@ public class ProjectController {
         } catch (Exception e) {
             log.warn("결제 승인 처리 중 - {}", e.getMessage());
         }
-        return "redirect:/my-pages?tab=projects";
+        return "redirect:/my-pages?tab=projects&filter=done";
     }
 
 

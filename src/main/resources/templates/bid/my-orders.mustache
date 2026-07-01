@@ -32,6 +32,32 @@
     /* ── 본문 ── */
     .list-content { flex: 1; padding: 24px 32px 32px; display: flex; flex-direction: column; }
 
+    /* ── 취소 요청 알림 카드 ── */
+    .cancel-alert {
+        background: linear-gradient(135deg, #fff7ed, #ffedd5);
+        border: 1.5px solid #fed7aa;
+        border-radius: 16px; padding: 18px 22px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(234,88,12,.08);
+    }
+    .cancel-alert-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
+    .cancel-alert-title { font-weight: 800; color: #ea580c; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+    .cancel-alert-meta { font-size: 12px; color: #c2410c; }
+    .cancel-alert-reason {
+        font-size: 13px; color: #9a3412; line-height: 1.6;
+        background: rgba(255,255,255,.6); border-radius: 10px;
+        padding: 10px 14px; margin-bottom: 12px;
+    }
+    .cancel-alert-actions { display: flex; justify-content: flex-end; }
+    .btn-cancel-approve {
+        padding: 8px 18px;
+        background: linear-gradient(135deg, #ea580c, #c2410c); color: #fff;
+        border: none; border-radius: 20px;
+        font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+        box-shadow: 0 4px 10px rgba(234,88,12,.25); transition: all .15s;
+    }
+    .btn-cancel-approve:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(234,88,12,.35); }
+
     /* ── 테이블 ── */
     .order-table {
         backdrop-filter: blur(16px); background: rgba(255,255,255,.55);
@@ -122,6 +148,23 @@
         <!-- 본문 -->
         <div class="list-content">
 
+            <!-- ── 취소 요청 알림 ── -->
+            {{#cancelRequests}}
+                <div class="cancel-alert">
+                    <div class="cancel-alert-top">
+                        <span class="cancel-alert-title">⚠️ 취소 요청 — {{project.title}}</span>
+                        <span class="cancel-alert-meta">의뢰인: {{requester.name}}</span>
+                    </div>
+                    <div class="cancel-alert-reason">사유: {{reason}}</div>
+                    <div class="cancel-alert-actions">
+                        <form action="/cancel-requests/{{id}}/approve" method="POST"
+                              onsubmit="return confirm('취소를 승인하시겠습니까?\n에스크로 금액이 의뢰인에게 환불되고 프로젝트가 취소됩니다.');">
+                            <button type="submit" class="btn-cancel-approve">취소 승인</button>
+                        </form>
+                    </div>
+                </div>
+            {{/cancelRequests}}
+
             <div class="order-table">
                 <div class="order-table-head">
                     <span>프로젝트</span>
@@ -133,32 +176,32 @@
                 </div>
 
                 {{#orders}}
-                <div class="order-row">
-                    <span class="cell cell-title">{{projectTitle}}</span>
-                    <span class="cell cell-price">{{proposedPrice}}원</span>
-                    <span class="cell cell-settle">{{payment.netAmount}}원</span>
-                    <span class="cell">{{estimatedDays}}일</span>
-                    <span class="cell">
+                    <div class="order-row">
+                        <span class="cell cell-title">{{projectTitle}}</span>
+                        <span class="cell cell-price">{{proposedPrice}}원</span>
+                        <span class="cell cell-settle">{{payment.netAmount}}원</span>
+                        <span class="cell">{{estimatedDays}}일</span>
+                        <span class="cell">
                         {{#isInProgress}}<span class="badge badge-progress">진행중</span>{{/isInProgress}}
-                        {{#isDone}}
-                            {{^payment.isSettled}}<span class="badge badge-waiting">승인 대기</span>{{/payment.isSettled}}
-                            {{#payment.isSettled}}<span class="badge badge-settled">정산완료</span>{{/payment.isSettled}}
-                        {{/isDone}}
+                            {{#isDone}}
+                                {{^payment.isSettled}}<span class="badge badge-waiting">승인 대기</span>{{/payment.isSettled}}
+                                {{#payment.isSettled}}<span class="badge badge-settled">정산완료</span>{{/payment.isSettled}}
+                            {{/isDone}}
                     </span>
-                    <span class="cell cell-actions">
+                        <span class="cell cell-actions">
                         <a href="/projects/{{projectId}}" class="btn-view">보기</a>
-                        {{#isInProgress}}
-                        <button class="btn-done" data-bid-id="{{id}}">✓ 완료</button>
-                        {{/isInProgress}}
+                            {{#isInProgress}}
+                                <button class="btn-done" data-bid-id="{{id}}">✓ 완료</button>
+                            {{/isInProgress}}
                     </span>
-                </div>
+                    </div>
                 {{/orders}}
 
                 {{^orders}}
-                <div class="empty-state">
-                    <div class="empty-icon">📦</div>
-                    <p class="empty-msg">아직 진행중인 주문이 없습니다.</p>
-                </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📦</div>
+                        <p class="empty-msg">아직 진행중인 주문이 없습니다.</p>
+                    </div>
                 {{/orders}}
             </div>
 
@@ -173,18 +216,18 @@
 </section>
 
 <script>
-document.querySelectorAll('.btn-done').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const bidId = this.dataset.bidId;
-        if (!confirm('작업 완료 처리하시겠습니까?\n의뢰인에게 승인 요청이 전송됩니다.')) return;
-        fetch(`/bids/${bidId}/complete`, { method: 'POST' })
-            .then(res => {
-                if (res.ok) { alert('작업 완료 신고가 전송되었습니다. 의뢰인의 승인을 기다려주세요.'); location.reload(); }
-                else res.json().then(d => alert(d.message || '처리 중 오류가 발생했습니다.'));
-            })
-            .catch(() => alert('서버와 통신 중 오류가 발생했습니다.'));
+    document.querySelectorAll('.btn-done').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const bidId = this.dataset.bidId;
+            if (!confirm('작업 완료 처리하시겠습니까?\n의뢰인에게 승인 요청이 전송됩니다.')) return;
+            fetch(`/bids/${bidId}/complete`, { method: 'POST' })
+                .then(res => {
+                    if (res.ok) { alert('작업 완료 신고가 전송되었습니다. 의뢰인의 승인을 기다려주세요.'); location.reload(); }
+                    else res.json().then(d => alert(d.message || '처리 중 오류가 발생했습니다.'));
+                })
+                .catch(() => alert('서버와 통신 중 오류가 발생했습니다.'));
+        });
     });
-});
 </script>
 
 {{> layout/footer}}

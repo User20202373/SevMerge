@@ -248,6 +248,7 @@ public class ProjectService {
         List<Project> projectList = projectRepository.findAdminProjectsByKeyword(keyword);
 
         return projectList.stream()
+
                 .map(ProjectResponseDTO.ListDTO::new)
                 .collect(Collectors.toList());
     }
