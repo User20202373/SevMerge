@@ -157,7 +157,7 @@ SevMerge는 프로젝트 등록, 제안서 비교, 계약, 결제, 작업 진행
 
 ## ERD 및 도메인 모델
 
-<img src="docs/ERD_img/Erd_img.png" width="800">
+<img src="docs/ERD/ERD.img.png" width="800">
 
 
 | 엔티티 | 테이블명 | 설명 | 핵심 상태/필드 |
