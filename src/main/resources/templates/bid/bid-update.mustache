@@ -123,12 +123,12 @@
 
                 <div class="form-group">
                     <label class="form-label">예상 작업 기간 (일)</label>
-                    <input type="number" id="estimatedDays" class="form-input" value="{{bid.estimatedDays}}" min="1" />
+                    <input type="number" id="estimatedDays" class="form-input" value="{{bid.estimatedDays}}" min="1" max="3650" />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">희망 금액 (원)</label>
-                    <input type="number" id="proposedPrice" class="form-input" value="{{bid.proposedPrice}}" min="0" />
+                    <input type="number" id="proposedPrice" class="form-input" value="{{bid.proposedPrice}}" min="0" max="999999999" />
                 </div>
 
                 <div class="form-btns">
@@ -142,24 +142,37 @@
 </section>
 
 <script>
-function updateBid() {
-    const id   = document.querySelector('#bidId').value;
-    const data = {
-        coverLetter:   document.querySelector('#coverLetter').value,
-        approach:      document.querySelector('#approach').value,
-        estimatedDays: document.querySelector('#estimatedDays').value,
-        proposedPrice: document.querySelector('#proposedPrice').value
-    };
-    if (!data.coverLetter.trim() || !data.approach.trim() || !data.estimatedDays || !data.proposedPrice) {
-        alert('⚠️ 모든 입력 항목을 올바르게 입력해 주세요.'); return;
+    function updateBid() {
+        const id   = document.querySelector('#bidId').value;
+        const data = {
+            coverLetter:   document.querySelector('#coverLetter').value,
+            approach:      document.querySelector('#approach').value,
+            estimatedDays: document.querySelector('#estimatedDays').value,
+            proposedPrice: document.querySelector('#proposedPrice').value
+        };
+        if (!data.coverLetter.trim() || !data.approach.trim() || !data.estimatedDays || !data.proposedPrice) {
+            alert('⚠️ 모든 입력 항목을 올바르게 입력해 주세요.'); return;
+        }
+
+        const MAX_PRICE = 999999999; // 약 10억원 상한선 (필요에 맞게 조정)
+        const MAX_DAYS = 3650; // 약 10년 상한선
+
+        if (Number(data.proposedPrice) > MAX_PRICE || Number(data.proposedPrice) < 0) {
+            alert('⚠️ 희망 금액이 올바르지 않습니다. (최대 ' + MAX_PRICE.toLocaleString() + '원)');
+            return;
+        }
+        if (Number(data.estimatedDays) > MAX_DAYS || Number(data.estimatedDays) < 1) {
+            alert('⚠️ 예상 작업 기간이 올바르지 않습니다.');
+            return;
+        }
+
+        fetch(`/bids/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json; charset=utf-8' }, body: JSON.stringify(data) })
+                .then(res => {
+                    if (res.ok) { alert('✏️ 제안서 수정이 완료되었습니다!'); location.href = '/my-pages?tab=bids'; }
+                    else alert('제안서 수정에 실패했습니다. 권한이 없거나 대기 중(PENDING) 상태가 아닐 수 있습니다.');
+                })
+                .catch(err => { console.error('Error:', err); alert('서버 통신 중 오류가 발생했습니다.'); });
     }
-    fetch(`/bids/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json; charset=utf-8' }, body: JSON.stringify(data) })
-        .then(res => {
-            if (res.ok) { alert('✏️ 제안서 수정이 완료되었습니다!'); location.href = '/my-pages?tab=bids'; }
-            else alert('제안서 수정에 실패했습니다. 권한이 없거나 대기 중(PENDING) 상태가 아닐 수 있습니다.');
-        })
-        .catch(err => { console.error('Error:', err); alert('서버 통신 중 오류가 발생했습니다.'); });
-}
 </script>
 
 {{> layout/footer}}

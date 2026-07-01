@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  * - 타 도메인 Entity가 수정되어도 이 파일에는 영향이 없습니다.
  */
 @Entity
-@Table(name = "payment")
+@Table(name = "payment_tb")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

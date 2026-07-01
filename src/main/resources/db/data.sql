@@ -214,17 +214,17 @@ VALUES (3, 'https://sevmerge.com/storage/profiles/expert_02.png',
 
 -- Payment 샘플데이터
 -- 1번 샘플: 웹 구축 계약 완료 및 신용카드 결제 (총 5,000,000원 / 수수료 500,000원 / 전문가 4,500,000원)
-INSERT INTO payment (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
+INSERT INTO payment_tb (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
                      paid_at)
 VALUES (1, 1, 2, 5000000, 500000, 4500000, 'imp_482019482103', 'card', 'PAID', NOW());
 
 -- 2번 샘플: AI 모델 개발 계약 완료 및 카카오페이 결제 (총 12,000,000원 / 수수료 1,200,000원 / 전문가 10,800,000원)
-INSERT INTO payment (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
+INSERT INTO payment_tb (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
                      paid_at)
 VALUES (2, 4, 2, 12000000, 1200000, 10800000, 'imp_910482019482', 'kakaopay', 'PAID', NOW());
 
 -- 3번 샘플: 가상계좌 무통장 입금 대기 중인 상태 연출 (READY 상태)
-INSERT INTO payment (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
+INSERT INTO payment_tb (project_id, client_id, expert_id, amount, platform_fee, net_amount, payment_key, method, status,
                      paid_at)
 VALUES (3, 1, 3, 1500000, 150000, 1350000, 'imp_vbank_009182', 'vbank', 'PAID', NOW());
 

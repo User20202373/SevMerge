@@ -152,7 +152,6 @@ public class BidController {
                                     HttpSession session) {
         log.info("제안서 수정 요청 - bidId: {}", id);
         SessionUser sessionUser = (SessionUser) session.getAttribute(Define.SESSION_USER);
-
         req.validate();
         Member member = memberRepository.findById(sessionUser.getId()).orElseThrow();
         bidService.updateBid(id, req, member);
