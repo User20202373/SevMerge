@@ -1,5 +1,6 @@
     package com.example.SevMerge.bid;
 
+    import com.example.SevMerge.core.exception.BadRequestException;
     import com.example.SevMerge.member.Member;
     import com.example.SevMerge.project.Project;
     import jakarta.persistence.*;

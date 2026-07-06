@@ -50,6 +50,14 @@
     .form-select  { appearance: none; cursor: pointer; }
     .form-textarea { resize: vertical; min-height: 240px; line-height: 1.7; }
 
+    .form-checkbox-wrap {
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 16px;
+        backdrop-filter: blur(8px); background: rgba(255,255,255,.45);
+        border-radius: 10px; border: 1.5px solid rgba(255,255,255,.8);
+        cursor: pointer; color: #2d4a7a; font-size: 14px;
+    }
+
     /* ── 버튼 ── */
     .form-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
     .btn {
@@ -120,12 +128,12 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">최소 예산 (만원)</label>
+                        <label class="form-label">최소 예산 (원)</label>
                         <input type="number" name="budgetMin" id="budgetMin" class="form-input"
                                value="{{project.budgetMin}}" min="0" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">최대 예산 (만원)</label>
+                        <label class="form-label">최대 예산 (원)</label>
                         <input type="number" name="budgetMax" id="budgetMax" class="form-input"
                                value="{{project.budgetMax}}" min="0" />
                     </div>
@@ -138,12 +146,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">인증 전문가 설정</label>
-                    <select name="bidFilter" id="bidFilter" class="form-select">
-                        <option value="ALL"            {{^project.isCertifiedOnly}}selected{{/project.isCertifiedOnly}}>전체 수신</option>
-                        <option value="CERTIFIED_ONLY" {{#project.isCertifiedOnly}}selected{{/project.isCertifiedOnly}}>인증 전문가만</option>
-                        <option value="GENERAL_ONLY">일반 전문가만</option>
-                    </select>
+                    <label class="form-label">보안 설정</label>
+                    <label class="form-checkbox-wrap">
+                        <input type="checkbox" name="isPrivate" id="isPrivate" value="true" {{#project.isPrivate}}checked{{/project.isPrivate}} />
+                        <span>🔒 비공개 입찰(블라인드) 적용하기</span>
+                    </label>
                 </div>
 
                 <div class="form-btns">
@@ -167,7 +174,7 @@
             budgetMin:   document.getElementById('budgetMin').value,
             budgetMax:   document.getElementById('budgetMax').value,
             deadline:    document.getElementById('deadline').value,
-            bidFilter:   document.getElementById('bidFilter').value
+            isPrivate:   document.getElementById('isPrivate').checked
         };
         if (!data.title.trim() || !data.category || !data.description.trim()) {
             alert('필수 항목을 입력해주세요.'); return;
